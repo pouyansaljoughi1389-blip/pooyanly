@@ -1,10 +1,13 @@
-name: Build Flutter APK
+name: Build POUYANLY Android APK
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -27,14 +30,29 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Verify Flutter project
+        working-directory: "pouyanly 2"
+        run: |
+          flutter --version
+          test -f pubspec.yaml
+          test -d android
+
       - name: Install dependencies
+        working-directory: "pouyanly 2"
         run: flutter pub get
 
-      - name: Build APK
+      - name: Check Flutter code
+        working-directory: "pouyanly 2"
+        run: flutter analyze
+
+      - name: Build Release APK
+        working-directory: "pouyanly 2"
         run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: POUYANLY-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: "pouyanly 2/build/app/outputs/flutter-apk/app-release.apk"
+          if-no-files-found: error
+          retention-days: 14
