@@ -517,11 +517,12 @@ class CourseData {
     return getAllUnits().where((unit) => unit.cefrLevel == level).toList();
   }
 
-  static List<Unit> getAllUnits() => [
-    ...a1Units,
-    ...a2Units,
-    ...ExpandedCourseData.units,
-  ];
+  static List<Unit> getAllUnits() {
+    final units = <Unit>[...a1Units, ...a2Units, ...ExpandedCourseData.units];
+    const order = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
+    units.sort((a, b) => (order[a.cefrLevel] ?? 99).compareTo(order[b.cefrLevel] ?? 99));
+    return units;
+  }
 
   static Lesson? getLessonById(String id) {
     for (final unit in getAllUnits()) {
