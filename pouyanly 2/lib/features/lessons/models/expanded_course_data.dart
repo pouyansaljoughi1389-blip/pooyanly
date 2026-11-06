@@ -85,10 +85,9 @@ class _Topic {
   final String id, level, title, titleFa, emoji;
   final List<String> lessonTitles, lessonTitlesFa, lessonEmojis, objectives;
   final List<_Word> words;
-  final int lessonCount;
   const _Topic(this.id, this.level, this.title, this.titleFa, this.emoji,
       this.lessonTitles, this.lessonTitlesFa, this.lessonEmojis, this.objectives, this.words,
-      {this.lessonCount = 6});
+      );
 }
 
 class _Word {
