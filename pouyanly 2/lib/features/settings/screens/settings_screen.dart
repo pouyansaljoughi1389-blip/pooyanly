@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../../core/services/learning_reminder_service.dart';
+import '../../../core/widgets/liquid_glass.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -565,12 +566,9 @@ class _SettingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.dividerLight),
-      ),
+    return LiquidGlass(
+      padding: EdgeInsets.zero,
+      borderRadius: BorderRadius.circular(18),
       child: Column(children: children),
     );
   }
