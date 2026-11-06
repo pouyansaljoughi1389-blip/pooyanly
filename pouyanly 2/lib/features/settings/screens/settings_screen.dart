@@ -138,7 +138,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           children: List.generate(7, (i) {
                             final active = _activeDays.contains(i);
                             return GestureDetector(
-                              onTap: () {
+                              onTap: () async {
                                 setState(() {
                                   if (active) {
                                     if (_activeDays.length > 1) _activeDays.remove(i);
