@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
+import '../../../core/services/learning_reminder_service.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -44,6 +45,7 @@ class _AccountScreenState extends State<AccountScreen> {
       contact: contact,
       contactType: isEmail ? 'email' : 'phone',
     );
+    await LearningReminderService.restore();
     if (!mounted) return;
     context.go('/onboarding');
   }
