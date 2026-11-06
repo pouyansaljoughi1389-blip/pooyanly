@@ -165,7 +165,7 @@ class WelcomeScreen extends StatelessWidget {
               PButton(
                 label: 'قبلاً ثبت‌نام کرده‌ام',
                 outlined: true,
-                onPressed: () => context.go('/home'),
+                onPressed: () => context.go('/account'),
               ),
               const SizedBox(height: 16),
               Text(
