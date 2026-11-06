@@ -120,6 +120,54 @@ class PlacementResultScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                 ],
 
+                // ── Personal focus ──
+                if (user.skillScores.isNotEmpty) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.dividerLight),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'اولویت پیشنهادی برای شما',
+                          style: TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _getSkillRecommendation(user.skillScores),
+                          style: const TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 12,
+                            height: 1.8,
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                        if (user.dailyStudyTime != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            'برنامهٔ پیشنهادی: روزانه ${user.dailyStudyTime!.minutes} دقیقه تمرین',
+                            style: const TextStyle(
+                              fontFamily: 'Vazirmatn',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
                 // ── Recommended Path ──
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -164,6 +212,22 @@ class PlacementResultScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getSkillRecommendation(Map<String, int> scores) {
+    const labels = {
+      'vocabulary': 'واژگان',
+      'grammar': 'گرامر',
+      'reading': 'درک مطلب',
+    };
+    final weakest = scores.entries.reduce(
+      (a, b) => a.value <= b.value ? a : b,
+    );
+    final label = labels[weakest.key] ?? weakest.key;
+    if (weakest.value >= 85) {
+      return 'عملکرد مهارت‌های سنجیده‌شده متعادل است. برای تشخیص دقیق‌تر، تمرین شنیداری و مکالمه هم لازم است.';
+    }
+    return 'فعلاً بهتر است روی $label تمرکز کنی. تمرین‌های کوتاه و مرور منظم این مهارت را تقویت می‌کند.';
   }
 
   String _getRecommendation(CefrLevel level) {

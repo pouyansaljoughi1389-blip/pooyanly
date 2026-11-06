@@ -191,54 +191,73 @@ class PlacementTestData {
     ),
   ];
 
-  // ── Calculate CEFR result from answers ───────────────────────────
+  // ── Calculate a conservative, skill-aware placement result ─────────
+  // Unanswered questions are excluded rather than counted as incorrect.
+  // A learner must demonstrate the prerequisite level before a higher
+  // level can be recommended.
   static Map<String, dynamic> calculateResult(Map<String, String> answers) {
-    final Map<String, List<bool>> skillResults = {
+    final skillResults = <String, List<bool>>{
       'vocabulary': [],
       'grammar': [],
       'reading': [],
     };
-
-    final Map<String, List<bool>> levelResults = {
+    final levelResults = <String, List<bool>>{
       'A1': [], 'A2': [], 'B1': [], 'B2': [],
     };
 
     for (final q in questions) {
       final answer = answers[q.id];
+      if (answer == null) continue;
       final correct = answer == q.correctAnswer;
       skillResults[q.skill]?.add(correct);
       levelResults[q.cefrLevel]?.add(correct);
     }
 
-    // Skill percentages
     final skillScores = <String, int>{};
     for (final entry in skillResults.entries) {
       if (entry.value.isEmpty) continue;
-      final correct = entry.value.where((b) => b).length;
-      skillScores[entry.key] = ((correct / entry.value.length) * 100).round();
+      final correct = entry.value.where((value) => value).length;
+      skillScores[entry.key] = (correct * 100 / entry.value.length).round();
     }
 
-    // Level accuracy
-    double a1Score = _levelScore(levelResults['A1']!);
-    double a2Score = _levelScore(levelResults['A2']!);
-    double b1Score = _levelScore(levelResults['B1']!);
-    double b2Score = _levelScore(levelResults['B2']!);
+    final levelScores = <String, double>{
+      for (final entry in levelResults.entries)
+        entry.key: _levelScore(entry.value),
+    };
 
-    // Determine CEFR level
-    CefrLevel cefrLevel;
-    if (b2Score >= 0.7) {
-      cefrLevel = CefrLevel.b2;
-    } else if (b1Score >= 0.6) {
-      cefrLevel = CefrLevel.b1;
-    } else if (a2Score >= 0.6) {
-      cefrLevel = CefrLevel.a2;
-    } else {
-      cefrLevel = CefrLevel.a1;
+    // No submitted answers means no defensible level estimate.
+    if (answers.isEmpty) {
+      return {
+        'cefrLevel': CefrLevel.unknown,
+        'skillScores': skillScores,
+        'levelScores': levelScores,
+        'answeredCount': 0,
+        'totalCount': questions.length,
+      };
+    }
+
+    // The current question bank is a short screening tool, not a certified
+    // CEFR exam. Use conservative progression and never skip prerequisites.
+    var estimatedLevel = CefrLevel.a1;
+    if (levelScores['A1']! >= 0.67) {
+      estimatedLevel = CefrLevel.a1;
+      if (levelScores['A2']! >= 0.60) {
+        estimatedLevel = CefrLevel.a2;
+        if (levelScores['B1']! >= 0.60) {
+          estimatedLevel = CefrLevel.b1;
+          if (levelScores['B2']! >= 0.60) {
+            estimatedLevel = CefrLevel.b2;
+          }
+        }
+      }
     }
 
     return {
-      'cefrLevel': cefrLevel,
+      'cefrLevel': estimatedLevel,
       'skillScores': skillScores,
+      'levelScores': levelScores,
+      'answeredCount': answers.length,
+      'totalCount': questions.length,
     };
   }
 
