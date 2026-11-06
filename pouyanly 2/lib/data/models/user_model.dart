@@ -127,6 +127,7 @@ class UserModel {
   final Map<String, int> vocabularyReviewRepetitions;
   final Map<String, int> vocabularyReviewMistakes;
   final String avatarEmoji;
+  final List<String> unlockedAvatarEmojis;
   final bool notificationsEnabled;
   final bool isDarkMode;
   final DateTime createdAt;
@@ -153,6 +154,7 @@ class UserModel {
     this.vocabularyReviewRepetitions = const {},
     this.vocabularyReviewMistakes = const {},
     this.avatarEmoji = '🦊',
+    this.unlockedAvatarEmojis = const ['🦊'],
     this.notificationsEnabled = true,
     this.isDarkMode = false,
     required this.createdAt,
@@ -186,6 +188,7 @@ class UserModel {
     Map<String, int>? vocabularyReviewRepetitions,
     Map<String, int>? vocabularyReviewMistakes,
     String? avatarEmoji,
+    List<String>? unlockedAvatarEmojis,
     bool? notificationsEnabled,
     bool? isDarkMode,
     DateTime? createdAt,
@@ -212,6 +215,7 @@ class UserModel {
       vocabularyReviewRepetitions: vocabularyReviewRepetitions ?? this.vocabularyReviewRepetitions,
       vocabularyReviewMistakes: vocabularyReviewMistakes ?? this.vocabularyReviewMistakes,
       avatarEmoji: avatarEmoji ?? this.avatarEmoji,
+      unlockedAvatarEmojis: unlockedAvatarEmojis ?? this.unlockedAvatarEmojis,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       isDarkMode: isDarkMode ?? this.isDarkMode,
       createdAt: createdAt ?? this.createdAt,
@@ -241,6 +245,7 @@ class UserModel {
     'vocabularyReviewRepetitions': vocabularyReviewRepetitions,
     'vocabularyReviewMistakes': vocabularyReviewMistakes,
     'avatarEmoji': avatarEmoji,
+    'unlockedAvatarEmojis': unlockedAvatarEmojis,
     'notificationsEnabled': notificationsEnabled,
     'isDarkMode': isDarkMode,
     'createdAt': createdAt.toIso8601String(),
@@ -282,6 +287,7 @@ class UserModel {
     vocabularyReviewRepetitions: Map<String, int>.from(j['vocabularyReviewRepetitions'] ?? {}),
     vocabularyReviewMistakes: Map<String, int>.from(j['vocabularyReviewMistakes'] ?? {}),
     avatarEmoji: j['avatarEmoji'] ?? '🦊',
+    unlockedAvatarEmojis: List<String>.from(j['unlockedAvatarEmojis'] ?? ['🦊']),
     notificationsEnabled: j['notificationsEnabled'] ?? true,
     isDarkMode: j['isDarkMode'] ?? false,
     createdAt: DateTime.tryParse(j['createdAt'] ?? '') ?? DateTime.now(),
