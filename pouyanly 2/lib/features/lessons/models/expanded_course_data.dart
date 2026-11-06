@@ -10,7 +10,7 @@ class ExpandedCourseData {
   static Unit _buildUnit(_Topic topic) {
     final lessons = <Lesson>[];
     for (var i = 0; i < 3; i++) {
-      final words = topic.words.skip(i * 3).take(3).toList();
+      final words = List.generate(6, (index) => topic.words[(i * 2 + index) % topic.words.length]);
       final vocabulary = words.map((word) => VocabularyItem(
         english: word.en,
         pronunciation: word.ipa,
@@ -49,7 +49,7 @@ class ExpandedCourseData {
         emoji: topic.lessonEmojis[i],
         objectivesFarsi: [topic.objectives[i]],
         skillFocus: const ['vocabulary', 'reading', 'sentence building'],
-        estimatedMinutes: topic.level == 'A1' || topic.level == 'A2' ? 7 : 10,
+        estimatedMinutes: topic.level == 'A1' || topic.level == 'A2' ? 8 : 12,
       ));
     }
     return Unit(
