@@ -16,6 +16,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pageCtrl = PageController();
   int _page = 0;
+  final _nameController = TextEditingController();
 
   LearningGoal? _goal;
   EngLevel? _level;
@@ -25,6 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void dispose() {
     _pageCtrl.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
@@ -39,19 +41,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _submit() async {
-    if (_goal == null || _level == null || _time == null || _period == null) return;
+    if (_goal == null || _level == null || _time == null || _period == null || _nameController.text.trim().isEmpty) return;
     await context.read<UserProvider>().setOnboardingData(
           goal: _goal!,
           level: _level!,
           time: _time!,
           period: _period!,
+          name: _nameController.text.trim(),
         );
     if (mounted) context.go('/placement-test');
   }
 
   bool get _canNext {
     switch (_page) {
-      case 0: return _goal != null;
+      case 0: return _goal != null && _nameController.text.trim().isNotEmpty;
       case 1: return _level != null;
       case 2: return _time != null;
       case 3: return _period != null;
@@ -100,7 +103,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 controller: _pageCtrl,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _GoalPage(selected: _goal, onSelect: (g) => setState(() => _goal = g)),
+                  _GoalPage(selected: _goal, onSelect: (g) => setState(() => _goal = g), nameController: _nameController),
                   _LevelPage(selected: _level, onSelect: (l) => setState(() => _level = l)),
                   _TimePage(selected: _time, onSelect: (t) => setState(() => _time = t)),
                   _PeriodPage(selected: _period, onSelect: (p) => setState(() => _period = p)),
@@ -129,7 +132,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class _GoalPage extends StatelessWidget {
   final LearningGoal? selected;
   final ValueChanged<LearningGoal> onSelect;
-  const _GoalPage({required this.selected, required this.onSelect});
+  final TextEditingController nameController;
+  const _GoalPage({required this.selected, required this.onSelect, required this.nameController});
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +147,18 @@ class _GoalPage extends StatelessWidget {
           const SizedBox(height: 6),
           const Text('بهترین مسیر یادگیری را برای شما تنظیم می‌کنیم',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
+          TextField(
+            controller: nameController,
+            textCapitalization: TextCapitalization.words,
+            decoration: const InputDecoration(
+              labelText: 'اسم دلخواه شما (اجباری)',
+              hintText: 'مثلاً Pouyan یا هر نامی که دوست داری',
+              prefixIcon: Icon(Icons.badge_outlined),
+            ),
+            onChanged: (_) {},
+          ),
+          const SizedBox(height: 14),
           Expanded(
             child: ListView(
               children: LearningGoal.values.map((g) => _ChoiceCard(
