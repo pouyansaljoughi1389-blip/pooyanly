@@ -55,7 +55,8 @@ class _HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<UserProvider>().user;
+    final userProvider = context.watch<UserProvider>();
+    final user = userProvider.user;
     if (user == null) return const SizedBox.shrink();
 
     final nextLesson = _getNextLesson(user);
@@ -122,7 +123,7 @@ class _HomePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        user.dailyStudyTime?.farsiLabel ?? '۱۰ دقیقه در روز',
+                        '${user.dailyStudyTime?.farsiLabel ?? '۱۰ دقیقه در روز'} • ${userProvider.todayXp}/۵۰ XP',
                         style: const TextStyle(
                           fontFamily: 'Vazirmatn',
                           fontSize: 18,
@@ -134,7 +135,7 @@ class _HomePage extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(100),
                         child: LinearProgressIndicator(
-                          value: user.completedLessonIds.isEmpty ? 0.0 : 0.3,
+                          value: userProvider.dailyXpProgress,
                           minHeight: 8,
                           backgroundColor: Colors.white24,
                           valueColor: const AlwaysStoppedAnimation(Colors.white),
