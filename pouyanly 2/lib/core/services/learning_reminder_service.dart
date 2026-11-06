@@ -20,7 +20,7 @@ class LearningReminderService {
     const settings = InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
     );
-    await _plugin.initialize(settings);
+    await _plugin.initialize(settings: settings);
     _initialized = true;
   }
 
@@ -50,7 +50,7 @@ class LearningReminderService {
   static Future<void> cancelAll() async {
     await initialize();
     for (var id = 8100; id < 8107; id++) {
-      await _plugin.cancel(id);
+      await _plugin.cancel(id: id);
     }
   }
 
@@ -104,11 +104,11 @@ class LearningReminderService {
         );
       }
       await _plugin.zonedSchedule(
-        8100 + index,
-        'وقت تمرین انگلیسیه! 📚',
-        'چند دقیقه تمرین امروز، تو را به هدفت نزدیک‌تر می‌کند.',
-        scheduled,
-        details,
+        id: 8100 + index,
+        title: 'وقت تمرین انگلیسیه! 📚',
+        body: 'چند دقیقه تمرین امروز، تو را به هدفت نزدیک‌تر می‌کند.',
+        scheduledDate: scheduled,
+        notificationDetails: details,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
       );
