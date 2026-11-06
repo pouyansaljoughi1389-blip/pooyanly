@@ -1,3 +1,5 @@
+import 'expanded_course_data.dart';
+
 // ─── Enums ─────────────────────────────────────────────────────────────────
 
 enum ExerciseType {
@@ -511,14 +513,15 @@ class CourseData {
   // ── Helpers ──────────────────────────────────────────────────────
 
   static List<Unit> getUnitsForLevel(String cefrLevel) {
-    switch (cefrLevel.toUpperCase()) {
-      case 'A1': return a1Units;
-      case 'A2': return a2Units;
-      default:   return a1Units;
-    }
+    final level = cefrLevel.toUpperCase();
+    return getAllUnits().where((unit) => unit.cefrLevel == level).toList();
   }
 
-  static List<Unit> getAllUnits() => [...a1Units, ...a2Units];
+  static List<Unit> getAllUnits() => [
+    ...a1Units,
+    ...a2Units,
+    ...ExpandedCourseData.units,
+  ];
 
   static Lesson? getLessonById(String id) {
     for (final unit in getAllUnits()) {
