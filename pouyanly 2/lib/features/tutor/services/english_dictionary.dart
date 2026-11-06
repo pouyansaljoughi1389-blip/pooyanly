@@ -62,6 +62,81 @@ class EnglishDictionary {
     'whether': DictionaryEntry('whether','آیا / اینکه آیا','/ˈweðər/','I do not know whether he agrees.','نمی‌دانم آیا او موافق است یا نه.'),
   };
 
+  // Extended high-frequency vocabulary for academic, travel, work and daily English.
+  static const Map<String, DictionaryEntry> _expanded = {
+    'accomplish': DictionaryEntry('accomplish','به انجام رساندن','/əˈkɑːmplɪʃ/','She accomplished her goal.','او به هدفش رسید.'),
+    'adapt': DictionaryEntry('adapt','سازگار شدن / تطبیق دادن','/əˈdæpt/','You can adapt to a new environment.','می‌توانی با محیط جدید سازگار شوی.'),
+    'adequate': DictionaryEntry('adequate','کافی و مناسب','/ˈædɪkwət/','We have adequate time.','زمان کافی داریم.'),
+    'admission': DictionaryEntry('admission','پذیرش / ورود','/ədˈmɪʃən/','She received university admission.','او از دانشگاه پذیرش گرفت.'),
+    'advice': DictionaryEntry('advice','توصیه / نصیحت','/ədˈvaɪs/','Thank you for your advice.','از توصیه‌ات ممنونم.'),
+    'affect': DictionaryEntry('affect','تأثیر گذاشتن بر','/əˈfekt/','Weather can affect our plans.','آب‌وهوا می‌تواند بر برنامه‌هایمان تأثیر بگذارد.'),
+    'alternative': DictionaryEntry('alternative','جایگزین / گزینهٔ دیگر','/ɔːlˈtɜːrnətɪv/','We need an alternative plan.','به یک برنامهٔ جایگزین نیاز داریم.'),
+    'analysis': DictionaryEntry('analysis','تحلیل / بررسی','/əˈnæləsɪs/','The analysis took two hours.','تحلیل دو ساعت طول کشید.'),
+    'annual': DictionaryEntry('annual','سالانه','/ˈænjuəl/','The annual meeting is in June.','جلسهٔ سالانه در ماه ژوئن است.'),
+    'anxious': DictionaryEntry('anxious','مضطرب / نگران','/ˈæŋkʃəs/','I feel anxious before exams.','قبل از امتحان‌ها مضطرب می‌شوم.'),
+    'apparent': DictionaryEntry('apparent','آشکار / ظاهری','/əˈpærənt/','The difference is apparent.','تفاوت آشکار است.'),
+    'application': DictionaryEntry('application','درخواست / کاربرد / برنامه','/ˌæplɪˈkeɪʃən/','I sent my university application.','درخواست دانشگاه را فرستادم.'),
+    'appreciate': DictionaryEntry('appreciate','قدردانی کردن / ارزش دانستن','/əˈpriːʃieɪt/','I appreciate your help.','از کمکت قدردانی می‌کنم.'),
+    'approximately': DictionaryEntry('approximately','تقریباً / حدوداً','/əˈprɑːksɪmətli/','It takes approximately ten minutes.','حدود ده دقیقه طول می‌کشد.'),
+    'argument': DictionaryEntry('argument','استدلال / بحث','/ˈɑːrɡjumənt/','Her argument is convincing.','استدلال او قانع‌کننده است.'),
+    'assess': DictionaryEntry('assess','ارزیابی کردن','/əˈses/','Teachers assess students fairly.','معلمان دانش‌آموزان را منصفانه ارزیابی می‌کنند.'),
+    'assumption': DictionaryEntry('assumption','فرض / پیش‌فرض','/əˈsʌmpʃən/','That assumption may be wrong.','آن فرض ممکن است اشتباه باشد.'),
+    'available': DictionaryEntry('available','در دسترس / موجود','/əˈveɪləbəl/','Is this room available?','آیا این اتاق خالی است؟'),
+    'aware': DictionaryEntry('aware','آگاه / مطلع','/əˈwer/','Are you aware of the change?','از این تغییر اطلاع داری؟'),
+    'background': DictionaryEntry('background','پیشینه / پس‌زمینه','/ˈbækɡraʊnd/','She has a background in science.','او در علوم پیشینه دارد.'),
+    'barrier': DictionaryEntry('barrier','مانع','/ˈbæriər/','Language can be a barrier.','زبان می‌تواند یک مانع باشد.'),
+    'behaviour': DictionaryEntry('behaviour','رفتار','/bɪˈheɪvjər/','Good behaviour matters.','رفتار خوب اهمیت دارد.'),
+    'circumstance': DictionaryEntry('circumstance','شرایط / اوضاع','/ˈsɜːrkəmstæns/','The circumstances have changed.','شرایط تغییر کرده‌اند.'),
+    'colleague': DictionaryEntry('colleague','همکار','/ˈkɑːliːɡ/','My colleague helped me.','همکارم به من کمک کرد.'),
+    'commitment': DictionaryEntry('commitment','تعهد / پایبندی','/kəˈmɪtmənt/','Learning requires commitment.','یادگیری به تعهد نیاز دارد.'),
+    'community': DictionaryEntry('community','جامعه / اجتماع','/kəˈmjuːnəti/','The community supports the project.','جامعه از پروژه حمایت می‌کند.'),
+    'consequence': DictionaryEntry('consequence','پیامد / نتیجه','/ˈkɑːnsɪkwens/','Every choice has a consequence.','هر انتخابی پیامدی دارد.'),
+    'consistent': DictionaryEntry('consistent','باثبات / منظم','/kənˈsɪstənt/','Consistent practice is useful.','تمرین منظم مفید است.'),
+    'contribute': DictionaryEntry('contribute','مشارکت کردن / کمک کردن','/kənˈtrɪbjuːt/','Everyone can contribute ideas.','همه می‌توانند ایده‌هایی مطرح کنند.'),
+    'convenient': DictionaryEntry('convenient','راحت / مناسب','/kənˈviːniənt/','Is tomorrow convenient for you?','آیا فردا برایت مناسب است؟'),
+    'cooperate': DictionaryEntry('cooperate','همکاری کردن','/koʊˈɑːpəreɪt/','The teams cooperate well.','تیم‌ها به‌خوبی همکاری می‌کنند.'),
+    'cope': DictionaryEntry('cope','کنار آمدن / از پس چیزی برآمدن','/koʊp/','She learned to cope with stress.','او یاد گرفت با استرس کنار بیاید.'),
+    'crucial': DictionaryEntry('crucial','بسیار مهم / حیاتی','/ˈkruːʃəl/','Sleep is crucial for learning.','خواب برای یادگیری بسیار مهم است.'),
+    'decline': DictionaryEntry('decline','کاهش یافتن / رد کردن','/dɪˈklaɪn/','Sales began to decline.','فروش شروع به کاهش کرد.'),
+    'demonstrate': DictionaryEntry('demonstrate','نشان دادن / اثبات کردن','/ˈdemənstreɪt/','The results demonstrate progress.','نتایج پیشرفت را نشان می‌دهند.'),
+    'derive': DictionaryEntry('derive','استخراج کردن / ناشی شدن','/dɪˈraɪv/','The word derives from Latin.','این واژه از لاتین ریشه گرفته است.'),
+    'distinguish': DictionaryEntry('distinguish','تمایز قائل شدن / تشخیص دادن','/dɪˈstɪŋɡwɪʃ/','Can you distinguish the sounds?','می‌توانی صداها را از هم تشخیص بدهی؟'),
+    'diverse': DictionaryEntry('diverse','متنوع / گوناگون','/daɪˈvɜːrs/','The city has a diverse population.','جمعیت شهر متنوع است.'),
+    'efficient': DictionaryEntry('efficient','کارآمد / پربازده','/ɪˈfɪʃənt/','This is an efficient method.','این روش کارآمدی است.'),
+    'emphasise': DictionaryEntry('emphasise','تأکید کردن','/ˈemfəsaɪz/','The teacher emphasised practice.','معلم بر تمرین تأکید کرد.'),
+    'enable': DictionaryEntry('enable','قادر ساختن / امکان دادن','/ɪˈneɪbəl/','Technology enables remote learning.','فناوری امکان یادگیری از راه دور را فراهم می‌کند.'),
+    'encounter': DictionaryEntry('encounter','مواجه شدن / برخورد کردن','/ɪnˈkaʊntər/','We encountered a problem.','با یک مشکل روبه‌رو شدیم.'),
+    'enhance': DictionaryEntry('enhance','ارتقا دادن / بهبود بخشیدن','/ɪnˈhæns/','Reading can enhance vocabulary.','مطالعه می‌تواند دایرهٔ واژگان را گسترش دهد.'),
+    'establish': DictionaryEntry('establish','ایجاد کردن / تأسیس کردن','/ɪˈstæblɪʃ/','They established a new company.','آن‌ها شرکت جدیدی تأسیس کردند.'),
+    'evaluate': DictionaryEntry('evaluate','ارزیابی کردن','/ɪˈvæljueɪt/','We evaluate the results.','نتایج را ارزیابی می‌کنیم.'),
+    'evidence': DictionaryEntry('evidence','مدرک / شواهد','/ˈevɪdəns/','There is no clear evidence.','شواهد روشنی وجود ندارد.'),
+    'expand': DictionaryEntry('expand','گسترش دادن / توسعه یافتن','/ɪkˈspænd/','The course will expand next year.','دوره سال آینده گسترش خواهد یافت.'),
+    'flexible': DictionaryEntry('flexible','انعطاف‌پذیر','/ˈfleksəbəl/','We need a flexible schedule.','به یک برنامهٔ منعطف نیاز داریم.'),
+    'former': DictionaryEntry('former','قبلی / سابق','/ˈfɔːrmər/','He is a former student.','او دانش‌آموز سابق است.'),
+    'fundamental': DictionaryEntry('fundamental','بنیادی / اساسی','/ˌfʌndəˈmentəl/','Grammar is fundamental to writing.','گرامر برای نوشتن بنیادی است.'),
+    'identify': DictionaryEntry('identify','شناسایی کردن','/aɪˈdentɪfaɪ/','Identify the main idea.','ایدهٔ اصلی را شناسایی کن.'),
+    'impact': DictionaryEntry('impact','تأثیر / اثر گذاشتن','/ˈɪmpækt/','Education has a lasting impact.','آموزش تأثیری ماندگار دارد.'),
+    'indicate': DictionaryEntry('indicate','نشان دادن / حاکی بودن','/ˈɪndɪkeɪt/','The sign indicates the exit.','تابلو خروجی را نشان می‌دهد.'),
+    'interpret': DictionaryEntry('interpret','تفسیر کردن / برداشت کردن','/ɪnˈtɜːrprɪt/','How do you interpret this sentence?','این جمله را چگونه تفسیر می‌کنی؟'),
+    'issue': DictionaryEntry('issue','موضوع / مسئله','/ˈɪʃuː/','We discussed the main issue.','دربارهٔ مسئلهٔ اصلی صحبت کردیم.'),
+    'justify': DictionaryEntry('justify','توجیه کردن / دلیل آوردن','/ˈdʒʌstɪfaɪ/','Can you justify your answer?','می‌توانی برای پاسخت دلیل بیاوری؟'),
+    'obtain': DictionaryEntry('obtain','به دست آوردن','/əbˈteɪn/','You can obtain more information online.','می‌توانی اطلاعات بیشتری را آنلاین به دست بیاوری.'),
+    'occur': DictionaryEntry('occur','رخ دادن / اتفاق افتادن','/əˈkɜːr/','The event occurs every year.','این رویداد هر سال رخ می‌دهد.'),
+    'participate': DictionaryEntry('participate','شرکت کردن / مشارکت داشتن','/pɑːrˈtɪsɪpeɪt/','Students participate in discussions.','دانش‌آموزان در بحث‌ها شرکت می‌کنند.'),
+    'perceive': DictionaryEntry('perceive','درک کردن / دریافتن','/pərˈsiːv/','People perceive the world differently.','مردم جهان را به شکل‌های متفاوتی درک می‌کنند.'),
+    'previous': DictionaryEntry('previous','قبلی / پیشین','/ˈpriːviəs/','Read the previous chapter.','فصل قبلی را بخوان.'),
+    'relevant': DictionaryEntry('relevant','مرتبط / مربوط','/ˈreləvənt/','Please provide relevant details.','لطفاً جزئیات مرتبط را ارائه کن.'),
+    'reliable': DictionaryEntry('reliable','قابل اعتماد','/rɪˈlaɪəbəl/','Use a reliable source.','از منبع قابل اعتماد استفاده کن.'),
+    'retain': DictionaryEntry('retain','حفظ کردن / نگه داشتن','/rɪˈteɪn/','Review helps you retain new words.','مرور کمک می‌کند واژه‌های جدید را حفظ کنی.'),
+    'reveal': DictionaryEntry('reveal','آشکار کردن / فاش کردن','/rɪˈviːl/','The study reveals a clear pattern.','این مطالعه الگویی روشن را آشکار می‌کند.'),
+    'shift': DictionaryEntry('shift','تغییر / جابه‌جایی','/ʃɪft/','There was a shift in opinion.','تغییری در دیدگاه رخ داد.'),
+    'specific': DictionaryEntry('specific','مشخص / معین','/spəˈsɪfɪk/','Give me a specific example.','یک مثال مشخص به من بده.'),
+    'sufficient': DictionaryEntry('sufficient','کافی','/səˈfɪʃənt/','We have sufficient evidence.','شواهد کافی داریم.'),
+    'tend': DictionaryEntry('tend','تمایل داشتن / معمولاً کاری کردن','/tend/','I tend to study at night.','معمولاً شب‌ها درس می‌خوانم.'),
+    'valid': DictionaryEntry('valid','معتبر / قابل قبول','/ˈvælɪd/','That is a valid point.','این نکته قابل قبولی است.'),
+    'widespread': DictionaryEntry('widespread','گسترده / فراگیر','/ˈwaɪdspred/','The problem is widespread.','این مشکل گسترده است.'),
+  };
+
   static String _normalise(String value) => value
       .toLowerCase()
       .replaceAll(RegExp(r'[^a-z0-9\s-]'), ' ')
@@ -86,6 +161,10 @@ class EnglishDictionary {
       if (normalized == word || normalized.contains(' $word ') ||
           normalized.startsWith('$word ') || normalized.endsWith(' $word')) return entry;
     }
+    for (final entry in _expanded.values) {
+      final word = _normalise(entry.word);
+      if (normalized == word || normalized.contains(' $word ') || normalized.startsWith('$word ') || normalized.endsWith(' $word')) return entry;
+    }
     return null;
   }
 
@@ -99,6 +178,9 @@ class EnglishDictionary {
         }
       }
       for (final entry in _extra.values) {
+        if (entry.meaning.contains(token)) return entry;
+      }
+      for (final entry in _expanded.values) {
         if (entry.meaning.contains(token)) return entry;
       }
     }
