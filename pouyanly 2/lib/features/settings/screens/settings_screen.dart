@@ -6,7 +6,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../../core/services/learning_reminder_service.dart';
 import '../../../core/widgets/liquid_glass.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -152,9 +151,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   try {
                                     await LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
                                   } catch (_) {}
-                                }
-                                if (_notificationsEnabled) {
-                                  LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
                                 }
                               },
                               child: AnimatedContainer(
