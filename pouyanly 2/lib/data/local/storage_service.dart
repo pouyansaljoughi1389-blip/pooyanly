@@ -10,6 +10,7 @@ class StorageService {
   static const _keyDark    = 'pouyanly_dark';
   static const _keyAssessmentHistory = 'pouyanly_assessment_history';
   static const _keyDailyMissions = 'pouyanly_daily_missions';
+  static const _keyWeeklyMissions = 'pouyanly_weekly_missions';
 
   late SharedPreferences _prefs;
 
@@ -73,6 +74,22 @@ class StorageService {
   }
 
   // ── Dark Mode ────────────────────────────────────────────────────
+  Map<String, dynamic> loadWeeklyMissionState() {
+    final raw = _prefs.getString(_keyWeeklyMissions);
+    if (raw == null) return <String, dynamic>{};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map<String, dynamic>) return decoded;
+      return <String, dynamic>{};
+    } catch (_) {
+      return <String, dynamic>{};
+    }
+  }
+
+  Future<void> saveWeeklyMissionState(Map<String, dynamic> state) async {
+    await _prefs.setString(_keyWeeklyMissions, jsonEncode(state));
+  }
+
   bool get isDarkMode => _prefs.getBool(_keyDark) ?? false;
 
   Future<void> setDarkMode(bool value) async {
