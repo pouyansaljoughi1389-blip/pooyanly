@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../../core/services/learning_reminder_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -145,8 +146,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     _activeDays.add(i);
                                   }
                                 });
+                                await _persistReminderSettings();
                                 if (_notificationsEnabled) {
-                                  LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
+                                  try {
+                                    await LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
+                                  } catch (_) {}
                                 }
                                 if (_notificationsEnabled) {
                                   LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
@@ -441,8 +445,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (picked != null) {
       setState(() => _reminderTime = picked);
+      await _persistReminderSettings();
       if (_notificationsEnabled) {
-        await LearningReminderService.scheduleWeekly(time: picked, activeDays: _activeDays);
+        try {
+          await LearningReminderService.scheduleWeekly(time: picked, activeDays: _activeDays);
+        } catch (_) {}
       }
     }
   }
