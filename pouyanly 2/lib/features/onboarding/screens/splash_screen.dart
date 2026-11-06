@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
+import '../../../core/services/learning_reminder_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -36,6 +37,11 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
     final user = prov.user;
+    if (user?.notificationsEnabled != false) {
+      await LearningReminderService.restore();
+    } else {
+      await LearningReminderService.cancelAll();
+    }
 
     if (user == null || !user.onboardingComplete) {
       context.go('/welcome');
