@@ -344,9 +344,27 @@ class UserProvider extends ChangeNotifier {
   }
 
   // ── Avatar ─────────────────────────────────────────────────────────
+  static const Map<String, int> avatarUnlockCosts = {
+    '🐼': 30, '🐯': 40, '🐸': 40, '🐧': 50,
+    '🦉': 60, '🐙': 70, '🐨': 60,
+  };
+
+  Future<bool> unlockAvatarEmoji(String emoji) async {
+    final current = _user;
+    final cost = avatarUnlockCosts[emoji];
+    if (current == null || cost == null) return false;
+    if (current.unlockedAvatarEmojis.contains(emoji)) return true;
+    if (current.coins < cost) return false;
+    _user = current.copyWith(
+      coins: current.coins - cost,
+      unlockedAvatarEmojis: [...current.unlockedAvatarEmojis, emoji],
+    );
+    await _save();
+    return true;
+  }
+
   Future<void> setAvatarEmoji(String emoji) async {
-    const allowed = {'🦊', '🐼', '🐯', '🐸', '🐧', '🦉', '🐙', '🐨'};
-    if (_user == null || !allowed.contains(emoji)) return;
+    if (_user == null || !_user!.unlockedAvatarEmojis.contains(emoji)) return;
     _user = _user!.copyWith(avatarEmoji: emoji);
     await _save();
   }
