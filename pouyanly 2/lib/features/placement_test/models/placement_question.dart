@@ -257,6 +257,8 @@ class PlacementTestData {
       explanationFarsi: 'Equivocal یعنی مبهم یا دوپهلو؛ به‌گونه‌ای که یک برداشت قطعی ارائه نمی‌کند.',
     ),
 
+  ];
+
   // ── Calculate a conservative, skill-aware placement result ─────────
   // Unanswered questions are excluded rather than counted as incorrect.
   // A learner must demonstrate the prerequisite level before a higher
