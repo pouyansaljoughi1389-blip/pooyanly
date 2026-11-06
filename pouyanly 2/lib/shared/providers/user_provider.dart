@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../data/models/user_model.dart';
+import '../../core/services/native_features.dart';
 import '../../data/local/storage_service.dart';
 import '../../features/lessons/models/lesson_data.dart';
 import '../../core/services/daily_progress_widget_service.dart';
@@ -36,6 +37,10 @@ class UserProvider extends ChangeNotifier {
   int get dailyLessonsCompleted => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['lessons'] as int? ?? 0) : 0;
   int get dailyXpEarned => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['xp'] as int? ?? 0) : 0;
   int get dailyProgressPercent => dailyLessonsCompleted > 0 ? 100 : 0;
+
+  int get todayXp => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['todayXp'] as int? ?? 0) : 0;
+  int get lessonsCompletedToday => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['lessonsToday'] as int? ?? 0) : 0;
+  double get dailyXpProgress => (todayXp / 50).clamp(0.0, 1.0).toDouble();
 
   Map<String, int> get dailyMissionProgress => {
     'lesson': _studiedToday(_user) ? 1 : 0,
@@ -338,6 +343,10 @@ class UserProvider extends ChangeNotifier {
 
     final safeXpGain = xpGain < 0 ? 0 : xpGain;
     final safeCoinGain = coinGain < 0 ? 0 : coinGain;
+    _ensureDailyMissionDay();
+    _dailyMissionState['todayXp'] = todayXp + safeXpGain;
+    _dailyMissionState['lessonsToday'] = lessonsCompletedToday + 1;
+    await StorageService.instance.saveDailyMissionState(_dailyMissionState);
     _user = currentUser.copyWith(
       completedLessonIds: ids,
       xp: currentUser.xp + safeXpGain,
@@ -459,7 +468,14 @@ class UserProvider extends ChangeNotifier {
 
   // ── Private ───────────────────────────────────────────────────────
   Future<void> _save() async {
-    if (_user != null) await StorageService.instance.saveUser(_user!);
+    if (_user != null) {
+      await StorageService.instance.saveUser(_user!);
+      await NativeFeatures.updateProgressWidget(
+        todayXp: todayXp,
+        dailyGoalXp: 50,
+        lessonsToday: lessonsCompletedToday,
+      );
+    }
     notifyListeners();
   }
 }
