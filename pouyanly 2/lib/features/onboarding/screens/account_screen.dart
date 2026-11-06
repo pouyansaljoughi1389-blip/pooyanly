@@ -11,68 +11,105 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  final _nameController = TextEditingController();
+  final _firstName = TextEditingController();
+  final _lastName = TextEditingController();
+  final _contact = TextEditingController();
   bool _busy = false;
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _firstName.dispose();
+    _lastName.dispose();
+    _contact.dispose();
     super.dispose();
   }
 
   Future<void> _continue() async {
     if (_busy) return;
+    final first = _firstName.text.trim();
+    final last = _lastName.text.trim();
+    final contact = _contact.text.trim();
+    final isEmail = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(contact);
+    final isPhone = RegExp(r'^\+?[0-9\s()\-]{7,20}$').hasMatch(contact);
+    if (first.isEmpty || last.isEmpty || (!isEmail && !isPhone)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('نام، نام خانوادگی و یک ایمیل یا شمارهٔ معتبر وارد کن.')),
+      );
+      return;
+    }
     setState(() => _busy = true);
-    final provider = context.read<UserProvider>();
-    final savedUser = provider.user;
-    if (savedUser != null && savedUser.onboardingComplete) {
-      if (!mounted) return;
-      context.go(savedUser.placementTestComplete ? '/home' : '/placement-test');
-      return;
-    }
-    final name = _nameController.text.trim();
-    if (name.isEmpty) {
-      setState(() => _busy = false);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('لطفاً نامت را وارد کن.')));
-      return;
-    }
-    await provider.createUser(name: name);
+    await context.read<UserProvider>().createUser(
+      firstName: first,
+      lastName: last,
+      contact: contact,
+      contactType: isEmail ? 'email' : 'phone',
+    );
     if (!mounted) return;
     context.go('/onboarding');
   }
 
   @override
   Widget build(BuildContext context) {
-    final hasSavedProfile = context.watch<UserProvider>().user?.onboardingComplete == true;
-    return Scaffold(
-      appBar: AppBar(title: const Text('حساب POUYANLY')),
-      body: ListView(padding: const EdgeInsets.all(22), children: [
-        Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(
-          gradient: AppColors.heroGradient, borderRadius: BorderRadius.circular(28),
-          boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(.22), blurRadius: 24, offset: const Offset(0, 10))]),
-          child: const Column(children: [
-            CircleAvatar(radius: 35, backgroundColor: Colors.white, child: Text('🦁', style: TextStyle(fontSize: 40))),
-            SizedBox(height: 12),
-            Text('خوش برگشتی!', style: TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontSize: 21, fontWeight: FontWeight.w900)),
-            SizedBox(height: 5),
-            Text('پیشرفتت روی همین دستگاه ذخیره می‌شود.', textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontSize: 12)),
-          ]),
+    final saved = context.watch<UserProvider>().user;
+    final hasSavedProfile = saved?.onboardingComplete == true;
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(title: const Text('ثبت‌نام در POUYANLY')),
+        body: ListView(
+          padding: const EdgeInsets.all(22),
+          children: [
+            Container(
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(.22), blurRadius: 24, offset: const Offset(0, 10))],
+              ),
+              child: const Column(children: [
+                Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 42),
+                SizedBox(height: 12),
+                Text('مسیر انگلیسی تو از اینجا شروع می‌شود', textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900)),
+                SizedBox(height: 7),
+                Text('اطلاعاتت را وارد کن تا پروفایل یادگیری ساخته شود.', textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Vazirmatn', color: Colors.white70, fontSize: 12)),
+              ]),
+            ),
+            const SizedBox(height: 24),
+            if (hasSavedProfile) ...[
+              Text('خوش برگشتی، \${saved?.name ?? 'زبان‌آموز'}!',
+                style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: () => context.go(saved?.placementTestComplete == true ? '/home' : '/placement-test'),
+                icon: const Icon(Icons.login_rounded),
+                label: const Text('ادامه با پروفایل این دستگاه'),
+              ),
+            ] else ...[
+              const Text('اطلاعات ثبت‌نام', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 17, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 14),
+              TextField(controller: _firstName, textCapitalization: TextCapitalization.words,
+                decoration: const InputDecoration(labelText: 'نام', prefixIcon: Icon(Icons.person_outline_rounded))),
+              const SizedBox(height: 12),
+              TextField(controller: _lastName, textCapitalization: TextCapitalization.words,
+                decoration: const InputDecoration(labelText: 'نام خانوادگی', prefixIcon: Icon(Icons.badge_outlined))),
+              const SizedBox(height: 12),
+              TextField(controller: _contact, keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(labelText: 'ایمیل یا شماره تلفن', hintText: 'name@example.com یا 09…', prefixIcon: Icon(Icons.alternate_email_rounded))),
+              const SizedBox(height: 10),
+              Text('فعلاً اطلاعات فقط به‌صورت محلی ذخیره می‌شوند؛ کد تأیید و اتصال به سرویس حساب کاربری در مرحلهٔ بعد اضافه خواهد شد.',
+                style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, height: 1.7, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              const SizedBox(height: 20),
+              SizedBox(width: double.infinity, child: FilledButton.icon(
+                onPressed: _busy ? null : _continue,
+                icon: const Icon(Icons.arrow_forward_rounded),
+                label: Text(_busy ? 'در حال ذخیره…' : 'ساخت پروفایل و ادامه'),
+              )),
+            ],
+          ],
         ),
-        const SizedBox(height: 24),
-        if (hasSavedProfile) ...[
-          const Text('یک حساب محلی ذخیره‌شده پیدا شد.', style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700)),
-          const SizedBox(height: 12),
-          SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: _continue, icon: const Icon(Icons.login_rounded), label: const Text('ادامه با حساب ذخیره‌شده'))),
-        ] else ...[
-          const Text('ساخت پروفایل روی این دستگاه', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 17, fontWeight: FontWeight.w900)),
-          const SizedBox(height: 8),
-          const Text('این نسخه هنوز حساب ابری، رمز عبور یا همگام‌سازی بین دستگاه‌ها ندارد. نامت را وارد کن تا پروفایل محلی ساخته شود.', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, height: 1.8)),
-          const SizedBox(height: 16),
-          TextField(controller: _nameController, textCapitalization: TextCapitalization.words, decoration: const InputDecoration(labelText: 'نام شما', hintText: 'مثلاً Pouyan')),
-          const SizedBox(height: 16),
-          SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: _busy ? null : _continue, icon: const Icon(Icons.person_add_alt_1_rounded), label: Text(_busy ? 'در حال ساخت...' : 'ساخت پروفایل و ادامه'))),
-        ],
-      ]),
+      ),
     );
   }
 }
