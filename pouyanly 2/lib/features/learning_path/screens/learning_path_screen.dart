@@ -56,7 +56,7 @@ class LearningPathScreen extends StatelessWidget {
           final completed = unit.lessons.where((l) => completedIds.contains(l.id)).length;
           final unlocked = index == 0 ||
               units.take(index).every((previous) => previous.lessons.every((l) => completedIds.contains(l.id)) && completedIds.contains('checkpoint_${previous.id}'));
-          return _MapUnitNode(unit: unit, completed: completed, isUnlocked: unlocked, completedIds: completedIds, alignLeft: index.isOdd);
+          return _MapUnitNode(unit: unit, completed: completed, isUnlocked: unlocked, completedIds: completedIds, alignLeft: index.isOdd, nextLessonId: nextLessonId, allLessonIds: allLessons.map((lesson) => lesson.id).toList());
         }, childCount: units.length))),
       ]),
     );
@@ -81,7 +81,9 @@ class _MapUnitNode extends StatefulWidget {
   final bool isUnlocked;
   final List<String> completedIds;
   final bool alignLeft;
-  const _MapUnitNode({required this.unit, required this.completed, required this.isUnlocked, required this.completedIds, required this.alignLeft});
+  final String? nextLessonId;
+  final List<String> allLessonIds;
+  const _MapUnitNode({required this.unit, required this.completed, required this.isUnlocked, required this.completedIds, required this.alignLeft, required this.nextLessonId, required this.allLessonIds});
   @override
   State<_MapUnitNode> createState() => _MapUnitNodeState();
 }
@@ -143,7 +145,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
                   final lessonDone = widget.completedIds.contains(lesson.id);
                   return ListTile(
                     dense: true,
-                    onTap: lessonDone || lesson.id == nextLessonId
+                    onTap: lessonDone || lesson.id == widget.nextLessonId
                         ? () => context.push('/lesson/' + lesson.id)
                         : () => ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('برای باز شدن این مرحله، ابتدا مرحلهٔ قبلی را کامل کن.')),
@@ -166,10 +168,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
                                   tooltip: 'رد کردن با ۱۰۰ XP',
                                   icon: const Icon(Icons.fast_forward_rounded),
                                   onPressed: () async {
-                                    final previousIds = allLessons
-                                        .takeWhile((item) => item.id != lesson.id)
-                                        .map((item) => item.id)
-                                        .toList();
+                                    final previousIds = widget.allLessonIds.takeWhile((id) => id != lesson.id).toList();
                                     final ok = await context.read<UserProvider>().skipLesson(
                                       lesson.id,
                                       xpCost: 100,
