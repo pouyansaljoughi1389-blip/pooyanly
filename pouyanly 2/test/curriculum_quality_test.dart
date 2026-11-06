@@ -31,6 +31,15 @@ void main() {
       }
     });
 
+    test('each expanded lesson offers substantial vocabulary and retrieval practice', () {
+      for (final unit in units.where((u) => u.cefrLevel != 'A1' || u.id.startsWith('a1_'))) {
+        for (final lesson in unit.lessons) {
+          expect(lesson.vocabulary.length, greaterThanOrEqualTo(5), reason: lesson.id);
+          expect(lesson.exercises.length, greaterThanOrEqualTo(5), reason: lesson.id);
+        }
+      }
+    });
+
     test('lesson and unit identifiers are unique', () {
       final unitIds = units.map((unit) => unit.id).toList();
       final lessonIds = lessons.map((lesson) => lesson.id).toList();
