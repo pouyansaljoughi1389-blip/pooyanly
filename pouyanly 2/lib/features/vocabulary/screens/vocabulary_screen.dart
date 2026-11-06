@@ -418,7 +418,7 @@ class _ReviewTabState extends State<_ReviewTab> {
           Row(
             children: [
               Expanded(child: _ReviewStat(
-                title: 'تسلط واژگان',
+                title: 'تسلط واژه‌های مرورشده',
                 value: '${reviewProvider.vocabularyMasteryPercent.toStringAsFixed(0)}٪',
                 icon: Icons.auto_graph_rounded,
               )),
