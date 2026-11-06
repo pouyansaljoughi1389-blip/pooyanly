@@ -13,6 +13,7 @@ import 'features/placement_test/screens/placement_result_screen.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/lessons/screens/lesson_screen.dart';
 import 'features/learning_path/screens/learning_path_screen.dart';
+import 'features/learning_path/screens/checkpoint_screen.dart';
 import 'features/settings/screens/settings_screen.dart';
 import 'features/tutor/screens/tutor_screen.dart';
 import 'features/community/screens/community_screen.dart';
@@ -47,6 +48,9 @@ final _router = GoRouter(
     GoRoute(
         path: '/learning-path',
         builder: (ctx, _) => const LearningPathScreen()),
+    GoRoute(
+        path: '/checkpoint/:unitId',
+        builder: (ctx, state) => CheckpointScreen(unitId: state.pathParameters['unitId'] ?? '')),
     GoRoute(
         path: '/lesson/:lessonId',
         builder: (ctx, state) => LessonScreen(
