@@ -23,6 +23,23 @@ void main() {
       expect(response, contains('B1'));
     });
 
+    test('looks up vocabulary from advanced course and dictionary', () {
+      final courseWord = TutorEngine.reply(
+        message: 'What does meticulous mean?',
+        skillScores: const {},
+        level: CefrLevel.b2,
+      );
+      expect(courseWord, contains('دقیق و موشکاف'));
+      expect(courseWord, startsWith('سلام، من پویان سلجوقی هستم.'));
+
+      final generalWord = TutorEngine.reply(
+        message: 'meaning of opportunity',
+        skillScores: const {},
+        level: CefrLevel.b2,
+      );
+      expect(generalWord, contains('فرصت'));
+    });
+
     test('handles empty input without throwing', () {
       expect(
         TutorEngine.reply(message: '  ', skillScores: const {}, level: CefrLevel.a1),
