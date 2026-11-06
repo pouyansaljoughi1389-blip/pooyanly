@@ -52,7 +52,9 @@ class AppTheme {
 
       // ── Card ──
       cardTheme: CardThemeData(
-        elevation: 0,
+        elevation: 3,
+        shadowColor: isDark ? Colors.black54 : AppColors.primary.withOpacity(0.10),
+        surfaceTintColor: Colors.transparent,
         color: isDark ? AppColors.cardDark : AppColors.cardLight,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -67,8 +69,9 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 3,
+          shadowColor: AppColors.primary.withOpacity(0.22),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
           textStyle: const TextStyle(
             fontFamily: 'Vazirmatn',
