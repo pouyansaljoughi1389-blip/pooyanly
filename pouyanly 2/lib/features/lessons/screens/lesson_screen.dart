@@ -67,12 +67,16 @@ class _LessonScreenState extends State<LessonScreen> {
 
   Future<void> _finishLesson() async {
     if (_lesson == null) return;
-    final xpGain = _lesson!.xpReward;
-    await context.read<UserProvider>().completeLesson(
-          _lesson!.id,
-          xpGain: xpGain,
-          coinGain: 5,
-        );
+    final total = _lesson!.exercises.length;
+    final passed = total > 0 && (_correct / total) >= 0.70;
+    if (passed) {
+      await context.read<UserProvider>().completeLesson(
+        _lesson!.id,
+        xpGain: _lesson!.xpReward,
+        coinGain: 5,
+      );
+    }
+    if (!mounted) return;
     setState(() => _phase = _LessonPhase.result);
   }
 
@@ -107,6 +111,7 @@ class _LessonScreenState extends State<LessonScreen> {
               lesson: _lesson!,
               correct: _correct,
               total: _lesson!.exercises.length,
+              passed: _lesson!.exercises.isNotEmpty && (_correct / _lesson!.exercises.length) >= 0.70,
             ),
         },
       ),
@@ -660,13 +665,14 @@ class _ResultPhase extends StatelessWidget {
   final Lesson lesson;
   final int correct;
   final int total;
+  final bool passed;
 
-  const _ResultPhase({required this.lesson, required this.correct, required this.total});
+  const _ResultPhase({required this.lesson, required this.correct, required this.total, required this.passed});
 
   @override
   Widget build(BuildContext context) {
     final accuracy = total > 0 ? (correct / total * 100).round() : 0;
-    final emoji = accuracy >= 80 ? '🎉' : accuracy >= 50 ? '👍' : '💪';
+    final emoji = passed ? (accuracy >= 90 ? '🏆' : '🎉') : '💪';
 
     return SafeArea(
       child: Padding(
@@ -677,12 +683,12 @@ class _ResultPhase extends StatelessWidget {
             Text(emoji, style: const TextStyle(fontSize: 72)),
             const SizedBox(height: 20),
             Text(
-              accuracy >= 80 ? 'عالی بود!' : accuracy >= 50 ? 'خوب بود!' : 'ادامه بده!',
+              passed ? 'آفرین! حدنصاب را گرفتی' : 'هنوز به حدنصاب نرسیدی',
               style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 28, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
             Text(
-              'درس "${lesson.titleFarsi}" تکمیل شد',
+              passed ? 'درس «${lesson.titleFarsi}» با موفقیت ثبت شد.' : 'برای باز شدن مرحلهٔ بعد باید حداقل ۷۰٪ پاسخ درست داشته باشی.',
               style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 15, color: AppColors.textSecondaryLight),
             ),
             const SizedBox(height: 32),
@@ -693,14 +699,14 @@ class _ResultPhase extends StatelessWidget {
                 const SizedBox(width: 16),
                 _StatBadge('$accuracy%', 'دقت', AppColors.primary),
                 const SizedBox(width: 16),
-                _StatBadge('+${lesson.xpReward}', 'XP', AppColors.warning),
+                _StatBadge(passed ? '+${lesson.xpReward}' : '۰', 'XP دریافتی', AppColors.warning),
               ],
             ),
             const SizedBox(height: 40),
             PButton(
-              label: 'ادامه',
-              onPressed: () => context.go('/home'),
-              icon: Icons.home_rounded,
+              label: passed ? 'ادامهٔ مسیر' : 'تلاش دوباره',
+              onPressed: () => context.go(passed ? '/home' : '/lesson/${lesson.id}'),
+              icon: passed ? Icons.arrow_forward_rounded : Icons.refresh_rounded,
             ),
             const SizedBox(height: 12),
             PButton(
