@@ -29,8 +29,17 @@ class _LiquidGlassState extends State<LiquidGlass> {
     return GestureDetector(
       onTap: widget.onTap,
       onTapDown: (_) => setState(() => _pressed = true),
-      onTapCancel: () => setState(() => _pressed = false),
-      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() { _pressed = false; _drag = Offset.zero; }),
+      onTapUp: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
+      onPanStart: (_) => setState(() => _pressed = true),
+      onPanUpdate: (details) => setState(() {
+        _drag = Offset(
+          (_drag.dx + details.delta.dx * .22).clamp(-8.0, 8.0),
+          (_drag.dy + details.delta.dy * .22).clamp(-8.0, 8.0),
+        );
+      }),
+      onPanEnd: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
+      onPanCancel: () => setState(() { _pressed = false; _drag = Offset.zero; }),
       child: AnimatedScale(
         scale: _pressed ? .975 : 1,
         duration: const Duration(milliseconds: 260),
@@ -174,6 +183,7 @@ class _JellyNavItem extends StatefulWidget {
 
 class _JellyNavItemState extends State<_JellyNavItem> {
   bool _pressed = false;
+  Offset _drag = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +198,9 @@ class _JellyNavItemState extends State<_JellyNavItem> {
         scale: _pressed ? .82 : (widget.active ? 1.04 : 1),
         duration: const Duration(milliseconds: 300),
         curve: Curves.elasticOut,
-        child: Column(
+        child: Transform.translate(
+          offset: _drag,
+          child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(widget.icon, size: 22, color: widget.active ? widget.color : inactive),
@@ -203,6 +215,7 @@ class _JellyNavItemState extends State<_JellyNavItem> {
               ),
             ),
           ],
+        ),
         ),
       ),
     );
