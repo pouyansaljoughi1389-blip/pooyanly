@@ -163,6 +163,43 @@ class _HomePage extends StatelessWidget {
                   const SizedBox(height: 20),
                 ],
 
+                // ── Listening practice ──
+                InkWell(
+                  onTap: () => context.push('/listening'),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.primary.withOpacity(0.35)),
+                    ),
+                    child: const Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: AppColors.primary,
+                          child: Icon(Icons.headphones_rounded, color: Colors.white),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('آزمایشگاه شنیداری', style: TextStyle(
+                                fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700)),
+                              Text('گوش کن، مفهوم را بفهم و پاسخ بده',
+                                style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11,
+                                  color: AppColors.textSecondaryLight)),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.arrow_back_ios_new_rounded, size: 16),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
                 // ── Tutor entry ──
                 InkWell(
                   onTap: () => context.push('/tutor'),
