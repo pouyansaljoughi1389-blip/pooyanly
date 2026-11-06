@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
+import '../../../core/services/learning_reminder_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -50,7 +51,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 SwitchListTile(
                   value: _notificationsEnabled,
-                  onChanged: (v) => setState(() => _notificationsEnabled = v),
+                  onChanged: (v) async {
+                    setState(() => _notificationsEnabled = v);
+                    if (v) {
+                      await LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
+                    } else {
+                      await LearningReminderService.cancelAll();
+                    }
+                  },
                   activeColor: AppColors.primary,
                   title: const Text(
                     'فعال‌سازی یادآور',
@@ -387,7 +395,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: child!,
       ),
     );
-    if (picked != null) setState(() => _reminderTime = picked);
+    if (picked != null) {
+      setState(() => _reminderTime = picked);
+      if (_notificationsEnabled) {
+        await LearningReminderService.scheduleWeekly(time: picked, activeDays: _activeDays);
+      }
+    }
   }
 
   void _confirmRedoPlacementTest(BuildContext context) {
