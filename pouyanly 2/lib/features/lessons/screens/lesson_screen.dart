@@ -156,8 +156,49 @@ class _VocabPhase extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
+          if (lesson.objectivesFarsi.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.07),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'هدف این درس',
+                      style: TextStyle(
+                        fontFamily: 'Vazirmatn',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      lesson.objectivesFarsi.first,
+                      style: const TextStyle(
+                        fontFamily: 'Vazirmatn',
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${lesson.estimatedMinutes} دقیقه • ${lesson.skillFocus.join('، ')}',
+                      style: const TextStyle(
+                        fontFamily: 'Vazirmatn',
+                        fontSize: 10,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           // Flashcard
-          Expanded(child: _FlashCard(vocab: vocab)),
 
           // Next button
           Padding(

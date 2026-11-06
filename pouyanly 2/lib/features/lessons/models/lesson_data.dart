@@ -71,6 +71,9 @@ class Lesson {
   final List<Exercise> exercises;
   final int xpReward;
   final String emoji;
+  final List<String> objectivesFarsi;
+  final List<String> skillFocus;
+  final int estimatedMinutes;
 
   const Lesson({
     required this.id,
@@ -81,6 +84,9 @@ class Lesson {
     required this.exercises,
     this.xpReward = 20,
     this.emoji = '📚',
+    this.objectivesFarsi = const [],
+    this.skillFocus = const [],
+    this.estimatedMinutes = 5,
   });
 }
 
@@ -121,6 +127,9 @@ class CourseData {
           id: 'a1_u1_l1',
           title: 'Hello & Goodbye',
           titleFarsi: 'سلام و خداحافظی',
+          objectivesFarsi: const ['بتوانی به انگلیسی سلام و خداحافظی کنی و خودت را با یک جمله معرفی کنی.'],
+          skillFocus: const ['vocabulary', 'speaking'],
+          estimatedMinutes: 6,
           cefrLevel: 'A1',
           emoji: '🙋',
           xpReward: 20,
@@ -211,6 +220,9 @@ class CourseData {
           id: 'a1_u1_l2',
           title: 'How are you?',
           titleFarsi: 'حال شما چطور است؟',
+          objectivesFarsi: const ['بتوانی دربارهٔ حال خودت سؤال کنی و با عبارت‌های ساده پاسخ بدهی.'],
+          skillFocus: const ['vocabulary', 'speaking'],
+          estimatedMinutes: 6,
           cefrLevel: 'A1',
           emoji: '😊',
           xpReward: 20,
@@ -291,6 +303,9 @@ class CourseData {
           id: 'a1_u2_l1',
           title: 'Numbers 1-10',
           titleFarsi: 'اعداد ۱ تا ۱۰',
+          objectivesFarsi: const ['بتوانی اعداد پایه را تشخیص بدهی و در جمله‌های ساده به کار ببری.'],
+          skillFocus: const ['vocabulary', 'reading'],
+          estimatedMinutes: 6,
           cefrLevel: 'A1',
           emoji: '🔢',
           xpReward: 20,
@@ -328,6 +343,9 @@ class CourseData {
           id: 'a1_u2_l2',
           title: 'Basic Colors',
           titleFarsi: 'رنگ‌های اصلی',
+          objectivesFarsi: const ['بتوانی نام رنگ‌های اصلی را بفهمی و برای توصیف اشیا استفاده کنی.'],
+          skillFocus: const ['vocabulary', 'speaking'],
+          estimatedMinutes: 6,
           cefrLevel: 'A1',
           emoji: '🎨',
           xpReward: 20,
@@ -366,6 +384,9 @@ class CourseData {
           id: 'a1_u3_l1',
           title: 'Family Members',
           titleFarsi: 'اعضای خانواده',
+          objectivesFarsi: const ['بتوانی اعضای خانواده را نام ببری و دربارهٔ رابطه‌های خانوادگی جملهٔ ساده بسازی.'],
+          skillFocus: const ['vocabulary', 'speaking'],
+          estimatedMinutes: 6,
           cefrLevel: 'A1',
           emoji: '👨‍👩‍👧',
           xpReward: 20,
@@ -417,6 +438,9 @@ class CourseData {
           id: 'a2_u1_l1',
           title: 'Daily Routines',
           titleFarsi: 'برنامه روزانه',
+          objectivesFarsi: const ['بتوانی کارهای روزمره را با فعل‌های رایج و زمان حال ساده توصیف کنی.'],
+          skillFocus: const ['vocabulary', 'grammar', 'writing'],
+          estimatedMinutes: 8,
           cefrLevel: 'A2',
           emoji: '⏰',
           xpReward: 25,
@@ -454,6 +478,9 @@ class CourseData {
           id: 'a2_u2_l1',
           title: 'At the Restaurant',
           titleFarsi: 'در رستوران',
+          objectivesFarsi: const ['بتوانی در رستوران منو بخواهی، غذا سفارش بدهی و صورت‌حساب درخواست کنی.'],
+          skillFocus: const ['vocabulary', 'functional_language', 'speaking'],
+          estimatedMinutes: 8,
           cefrLevel: 'A2',
           emoji: '🍽️',
           xpReward: 25,
