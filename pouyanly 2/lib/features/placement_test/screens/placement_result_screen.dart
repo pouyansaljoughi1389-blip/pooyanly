@@ -246,8 +246,6 @@ class PlacementResultScreen extends StatelessWidget {
         return 'سطح C2: مسیر تسلط پیشرفته روی دقت معنایی، گفتمان پیچیده و انتخاب سبک تمرکز دارد.';
       case CefrLevel.unknown:
         return 'برای تعیین سطح دقیق‌تر، آزمون را کامل کن.';
-      default:
-        return 'مسیر یادگیری از A1 شروع خواهد شد.';
     }
   }
 }
