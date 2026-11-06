@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/p_button.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../models/lesson_data.dart';
+import '../../vocabulary/services/vocabulary_audio_service.dart';
 
 enum _LessonPhase { vocabulary, exercise, result }
 
@@ -340,7 +341,13 @@ class _CardFront extends StatelessWidget {
             ),
             textDirection: TextDirection.ltr,
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 8),
+          IconButton(
+            tooltip: 'پخش تلفظ',
+            onPressed: () => VocabularyAudioService.instance.speak(vocab.english),
+            icon: const Icon(Icons.volume_up_rounded, color: Colors.white, size: 30),
+          ),
+          const SizedBox(height: 18),
           const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -408,6 +415,12 @@ class _CardBack extends StatelessWidget {
                       color: AppColors.textSecondaryLight,
                       fontStyle: FontStyle.italic,
                     ),
+                  ),
+                  IconButton(
+                    tooltip: 'پخش جمله نمونه',
+                    onPressed: () => VocabularyAudioService.instance.speak(
+                      vocab.exampleEn, rate: 0.38),
+                    icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary),
                   ),
                   const SizedBox(height: 6),
                   Text(
