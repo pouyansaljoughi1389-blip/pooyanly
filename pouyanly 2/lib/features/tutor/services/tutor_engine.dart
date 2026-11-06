@@ -38,8 +38,8 @@ class TutorEngine {
     if (lower.contains('معنی') || lower.contains('ترجمه') || lower.contains('یعنی') || lower.contains('translate')) {
       final phraseEntries = EnglishDictionary.findAll(input);
       if (phraseEntries.length > 1) {
-        final lines = phraseEntries.map((entry) => '• ${entry.word}: ${entry.meaning}').join('\\n');
-        return _opening + 'واژه‌های شناخته‌شده در عبارت شما:\\n$lines\\nاین ترجمه واژه‌به‌واژه است؛ برای ترجمهٔ دقیق جمله باید ساختار و بافت آن هم بررسی شود.';
+        final lines = phraseEntries.map((entry) => '• ${entry.word}: ${entry.meaning}').join('\n');
+        return _opening + 'واژه‌های شناخته‌شده در عبارت شما:\n$lines\nاین ترجمه واژه‌به‌واژه است؛ برای ترجمهٔ دقیق جمله باید ساختار و بافت آن هم بررسی شود.';
       }
       final entry = EnglishDictionary.find(input) ?? EnglishDictionary.findByPersian(input);
       if (entry != null) return _dictionaryReply(entry);
