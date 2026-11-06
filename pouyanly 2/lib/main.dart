@@ -6,6 +6,7 @@ import 'shared/providers/user_provider.dart';
 import 'data/local/storage_service.dart';
 import 'features/onboarding/screens/splash_screen.dart';
 import 'features/onboarding/screens/welcome_screen.dart';
+import 'features/onboarding/screens/account_screen.dart';
 import 'features/onboarding/screens/onboarding_screen.dart';
 import 'features/placement_test/screens/placement_test_screen.dart';
 import 'features/placement_test/screens/placement_result_screen.dart';
@@ -34,6 +35,7 @@ final _router = GoRouter(
   routes: [
     GoRoute(path: '/splash', builder: (ctx, _) => const SplashScreen()),
     GoRoute(path: '/welcome', builder: (ctx, _) => const WelcomeScreen()),
+    GoRoute(path: '/account', builder: (ctx, _) => const AccountScreen()),
     GoRoute(path: '/onboarding', builder: (ctx, _) => const OnboardingScreen()),
     GoRoute(
         path: '/placement-test',
