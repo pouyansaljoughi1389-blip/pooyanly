@@ -7,10 +7,18 @@ class UserProvider extends ChangeNotifier {
   UserModel? get user => _user;
   List<Map<String, dynamic>> _assessmentHistory = [];
   Map<String, dynamic> _dailyMissionState = {};
+  Map<String, dynamic> _weeklyMissionState = {};
 
   String get _todayKey {
     final now = DateTime.now();
     return '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
+
+  String get _weekKey {
+    final now = DateTime.now();
+    final monday = DateTime(now.year, now.month, now.day)
+        .subtract(Duration(days: now.weekday - DateTime.monday));
+    return '${monday.year.toString().padLeft(4, '0')}-${monday.month.toString().padLeft(2, '0')}-${monday.day.toString().padLeft(2, '0')}';
   }
 
   bool _studiedToday(UserModel? value) {
@@ -29,6 +37,29 @@ class UserProvider extends ChangeNotifier {
     'streak': _studiedToday(_user) && (_user?.streak ?? 0) >= 2 ? 1 : 0,
   };
 
+  Map<String, int> get weeklyMissionProgress {
+    if (_weeklyMissionState['week'] != _weekKey) return {'lessons': 0, 'vocabulary': 0, 'studyDays': 0};
+    return {
+      'lessons': (_weeklyMissionState['lessons'] as List<dynamic>? ?? const []).length,
+      'vocabulary': _weeklyMissionState['vocabularyReviews'] as int? ?? 0,
+      'studyDays': (_weeklyMissionState['studyDays'] as List<dynamic>? ?? const []).length,
+    };
+  }
+
+  Set<String> get claimedWeeklyMissions => _weeklyMissionState['week'] == _weekKey
+      ? Set<String>.from(_weeklyMissionState['claimed'] ?? const <String>[])
+      : <String>{};
+
+  int get vocabularyMistakeCount => _user?.vocabularyReviewMistakes.values
+      .fold(0, (sum, count) => sum + count) ?? 0;
+
+  double get vocabularyMasteryPercent {
+    final repetitions = _user?.vocabularyReviewRepetitions.values ?? const <int>[];
+    if (repetitions.isEmpty) return 0;
+    final score = repetitions.fold<int>(0, (sum, count) => sum + count.clamp(0, 5));
+    return (score / (repetitions.length * 5) * 100).roundToDouble();
+  }
+
   Set<String> get claimedDailyMissions =>
       _dailyMissionState['date'] == _todayKey
           ? Set<String>.from(_dailyMissionState['claimed'] ?? const <String>[])
@@ -40,7 +71,9 @@ class UserProvider extends ChangeNotifier {
     _user = StorageService.instance.loadUser();
     _assessmentHistory = StorageService.instance.loadAssessmentHistory();
     _dailyMissionState = StorageService.instance.loadDailyMissionState();
+    _weeklyMissionState = StorageService.instance.loadWeeklyMissionState();
     _ensureDailyMissionDay();
+    _ensureWeeklyMissionWeek();
     notifyListeners();
   }
 
@@ -111,6 +144,56 @@ class UserProvider extends ChangeNotifier {
         'claimed': <String>[],
       };
     }
+  }
+
+  void _ensureWeeklyMissionWeek() {
+    if (_weeklyMissionState['week'] != _weekKey) {
+      _weeklyMissionState = {
+        'week': _weekKey,
+        'lessons': <String>[],
+        'vocabularyReviews': 0,
+        'studyDays': <String>[],
+        'claimed': <String>[],
+      };
+    }
+  }
+
+  Future<void> _recordWeeklyLesson(String lessonId, DateTime at) async {
+    _ensureWeeklyMissionWeek();
+    final lessons = List<String>.from(_weeklyMissionState['lessons'] ?? const <String>[]);
+    if (!lessons.contains(lessonId)) lessons.add(lessonId);
+    _weeklyMissionState['lessons'] = lessons;
+    final day = '${at.year}-${at.month.toString().padLeft(2, '0')}-${at.day.toString().padLeft(2, '0')}';
+    final studyDays = List<String>.from(_weeklyMissionState['studyDays'] ?? const <String>[]);
+    if (!studyDays.contains(day)) studyDays.add(day);
+    _weeklyMissionState['studyDays'] = studyDays;
+    await StorageService.instance.saveWeeklyMissionState(_weeklyMissionState);
+  }
+
+  Future<void> _recordWeeklyVocabularyReview() async {
+    _ensureWeeklyMissionWeek();
+    _weeklyMissionState['vocabularyReviews'] =
+        (_weeklyMissionState['vocabularyReviews'] as int? ?? 0) + 1;
+    await StorageService.instance.saveWeeklyMissionState(_weeklyMissionState);
+  }
+
+  Future<bool> claimWeeklyMission(String missionId) async {
+    if (_user == null) return false;
+    _ensureWeeklyMissionWeek();
+    const rewards = <String, ({int target, int xp, int coins})>{
+      'lessons': (target: 3, xp: 60, coins: 15),
+      'vocabulary': (target: 20, xp: 50, coins: 12),
+      'studyDays': (target: 4, xp: 75, coins: 20),
+    };
+    final reward = rewards[missionId];
+    if (reward == null || claimedWeeklyMissions.contains(missionId)) return false;
+    if ((weeklyMissionProgress[missionId] ?? 0) < reward.target) return false;
+    final claimed = List<String>.from(_weeklyMissionState['claimed'] ?? const <String>[])..add(missionId);
+    _weeklyMissionState['claimed'] = claimed;
+    _user = _user!.copyWith(xp: _user!.xp + reward.xp, coins: _user!.coins + reward.coins);
+    await StorageService.instance.saveWeeklyMissionState(_weeklyMissionState);
+    await _save();
+    return true;
   }
 
   Future<void> _recordVocabularyMissionProgress() async {
@@ -202,6 +285,7 @@ class UserProvider extends ChangeNotifier {
           : currentUser.longestStreak,
       lastStudyDate: newLastStudyDate,
     );
+    await _recordWeeklyLesson(lessonId, now);
     await _save();
   }
 
@@ -249,7 +333,21 @@ class UserProvider extends ChangeNotifier {
       vocabularyReviewIntervals: intervals,
       vocabularyReviewDueDates: dueDates,
     );
+    if (!remembered) {
+      final mistakes = Map<String, int>.from(current.vocabularyReviewMistakes);
+      mistakes[key] = (mistakes[key] ?? 0) + 1;
+      _user = _user!.copyWith(vocabularyReviewMistakes: mistakes);
+    }
     await _recordVocabularyMissionProgress();
+    await _recordWeeklyVocabularyReview();
+    await _save();
+  }
+
+  // ── Avatar ─────────────────────────────────────────────────────────
+  Future<void> setAvatarEmoji(String emoji) async {
+    const allowed = {'🦊', '🐼', '🐯', '🐸', '🐧', '🦉', '🐙', '🐨'};
+    if (_user == null || !allowed.contains(emoji)) return;
+    _user = _user!.copyWith(avatarEmoji: emoji);
     await _save();
   }
 
