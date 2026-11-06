@@ -110,6 +110,18 @@ class Unit {
   });
 }
 
+/// Central pass rule shared by lesson UI and automated tests.
+class LessonPassPolicy {
+  LessonPassPolicy._();
+
+  static const double minimumAccuracy = 0.70;
+
+  static bool isPassed({required int correct, required int total}) {
+    if (total <= 0 || correct < 0 || correct > total) return false;
+    return correct / total >= minimumAccuracy;
+  }
+}
+
 // ─── Course Data ────────────────────────────────────────────────────────────
 
 class CourseData {
