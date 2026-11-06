@@ -30,11 +30,22 @@ class ExpandedCourseData {
         final options = <String>{word.fa, ...meanings.where((m) => m != word.fa), 'نمی‌دانم'}.toList();
         final optionSeed = topic.id.codeUnits.fold<int>(i + j, (sum, unit) => sum + unit);
         options.shuffle(math.Random(optionSeed));
+        final questionVariant = (i + j) % 3;
+        final question = questionVariant == 0
+            ? 'What does "${word.en}" mean?'
+            : questionVariant == 1
+                ? 'In this sentence, what does "${word.en}" mean: "${word.example}"?'
+                : 'Choose the closest meaning of "${word.en}" as used in the example.';
+        final questionFarsi = questionVariant == 0
+            ? 'معنی «${word.en}» کدام است؟'
+            : questionVariant == 1
+                ? 'در جملهٔ «${word.example}»، واژهٔ «${word.en}» چه معنایی دارد؟'
+                : 'با توجه به مثال، نزدیک‌ترین معنی «${word.en}» کدام است؟';
         exercises.add(Exercise(
           id: '${topic.id}_l${i + 1}_e${j + 1}',
           type: ExerciseType.multipleChoice,
-          question: 'What does "${word.en}" mean?',
-          questionFarsi: 'معنی «${word.en}» کدام است؟',
+          question: question,
+          questionFarsi: questionFarsi,
           options: options,
           correctAnswer: word.fa,
           explanationFarsi: '«${word.en}» یعنی «${word.fa}». نمونه: ${word.example} — ${word.exampleFa}',
@@ -45,14 +56,16 @@ class ExpandedCourseData {
       }
       lessons.add(Lesson(
         id: '${topic.id}_l${i + 1}',
-        title: topic.lessonTitles[i % topic.lessonTitles.length],
-        titleFarsi: topic.lessonTitlesFa[i % topic.lessonTitlesFa.length],
+        title: topic.lessonTitles[i % topic.lessonTitles.length] +
+            (i >= topic.lessonTitles.length ? ' — Applied practice' : ''),
+        titleFarsi: topic.lessonTitlesFa[i % topic.lessonTitlesFa.length] +
+            (i >= topic.lessonTitlesFa.length ? ' — تمرین کاربردی' : ''),
         cefrLevel: topic.level,
         vocabulary: vocabulary,
         exercises: exercises,
         xpReward: topic.level == 'B2' || topic.level == 'C1' || topic.level == 'C2' ? 35 : 25,
         emoji: topic.lessonEmojis[i % topic.lessonEmojis.length],
-        objectivesFarsi: [topic.objectives[i % topic.objectives.length]],
+        objectivesFarsi: [topic.objectives[i % topic.objectives.length] + (i >= topic.objectives.length ? ' در جمله‌ها و موقعیت‌های واقعی به کار ببری.' : '')],
         skillFocus: const ['vocabulary', 'reading', 'sentence building'],
         estimatedMinutes: topic.level == 'A1' || topic.level == 'A2' ? 8 : 12,
       ));
