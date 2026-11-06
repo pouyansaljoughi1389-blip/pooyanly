@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
+import '../../../core/services/native_features.dart';
 import '../../../core/services/learning_reminder_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -22,6 +23,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final List<String> _dayNamesLong = [
     'شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationsEnabled = context.read<UserProvider>().user?.notificationsEnabled ?? true;
+    NativeFeatures.loadReminderTime().then((value) {
+      if (mounted) setState(() => _reminderTime = TimeOfDay(hour: value['hour']!, minute: value['minute']!));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
