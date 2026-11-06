@@ -71,24 +71,15 @@ class LearningReminderService {
       if (index < 0 || index > 6) continue;
       final weekday = weekdays[index];
       var daysAhead = (weekday - now.weekday + 7) % 7;
+      var targetDay = DateTime(now.year, now.month, now.day).add(Duration(days: daysAhead));
       var scheduled = tz.TZDateTime(
-        tz.local,
-        now.year,
-        now.month,
-        now.day,
-        time.hour,
-        time.minute,
-      ).add(Duration(days: daysAhead));
+        tz.local, targetDay.year, targetDay.month, targetDay.day, time.hour, time.minute,
+      );
       if (!scheduled.isAfter(now)) {
-        daysAhead += 7;
+        targetDay = targetDay.add(const Duration(days: 7));
         scheduled = tz.TZDateTime(
-          tz.local,
-          now.year,
-          now.month,
-          now.day,
-          time.hour,
-          time.minute,
-        ).add(Duration(days: daysAhead));
+          tz.local, targetDay.year, targetDay.month, targetDay.day, time.hour, time.minute,
+        );
       }
       await _plugin.zonedSchedule(
         8100 + index,
