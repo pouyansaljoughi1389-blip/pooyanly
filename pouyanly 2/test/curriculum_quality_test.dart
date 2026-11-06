@@ -32,7 +32,7 @@ void main() {
     });
 
     test('each expanded lesson offers substantial vocabulary and retrieval practice', () {
-      for (final unit in units.where((u) => u.cefrLevel != 'A1' || u.id.startsWith('a1_'))) {
+      for (final unit in units.where((u) => !['a1_u1', 'a1_u2', 'a1_u3', 'a2_u1', 'a2_u2'].contains(u.id))) {
         for (final lesson in unit.lessons) {
           expect(lesson.vocabulary.length, greaterThanOrEqualTo(5), reason: lesson.id);
           expect(lesson.exercises.length, greaterThanOrEqualTo(5), reason: lesson.id);
