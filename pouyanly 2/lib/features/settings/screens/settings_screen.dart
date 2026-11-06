@@ -21,10 +21,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final Set<int> _activeDays = {1, 2, 3, 4, 5}; // Mon–Fri
 
   final List<String> _dayNames = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
-  final List<String> _dayNamesLong = [
-    'شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'
-  ];
-
   @override
   void initState() {
     super.initState();
