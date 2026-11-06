@@ -58,7 +58,7 @@ class TutorEngine {
   }
 
   static String _dictionaryReply(DictionaryEntry entry) =>
-      '«${entry.word}» یعنی «${entry.meaning}».\n'
+      _opening + '«${entry.word}» یعنی «${entry.meaning}».\n'
       'تلفظ: ${entry.pronunciation}\n'
       'مثال: ${entry.example}\n'
       'ترجمه: ${entry.exampleFa}';
