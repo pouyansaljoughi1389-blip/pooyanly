@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import '../../data/models/user_model.dart';
 import '../../data/local/storage_service.dart';
 import '../../features/lessons/models/lesson_data.dart';
+import '../../core/services/daily_progress_widget_service.dart';
+import '../../core/services/learning_reminder_service.dart';
 
 class UserProvider extends ChangeNotifier {
   UserModel? _user;
@@ -29,6 +32,10 @@ class UserProvider extends ChangeNotifier {
         date.month == DateTime.now().month &&
         date.day == DateTime.now().day;
   }
+
+  int get dailyLessonsCompleted => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['lessons'] as int? ?? 0) : 0;
+  int get dailyXpEarned => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['xp'] as int? ?? 0) : 0;
+  int get dailyProgressPercent => dailyLessonsCompleted > 0 ? 100 : 0;
 
   Map<String, int> get dailyMissionProgress => {
     'lesson': _studiedToday(_user) ? 1 : 0,
@@ -78,6 +85,9 @@ class UserProvider extends ChangeNotifier {
     _ensureDailyMissionDay();
     _ensureWeeklyMissionWeek();
     notifyListeners();
+    try {
+      await DailyProgressWidgetService.sync(lessons: dailyLessonsCompleted, xp: dailyXpEarned, percent: dailyProgressPercent);
+    } catch (_) {}
   }
 
   // ── Create ────────────────────────────────────────────────────────
@@ -124,6 +134,19 @@ class UserProvider extends ChangeNotifier {
           onboardingComplete: true,
         );
     await _save();
+    final reminderHour = switch (period) {
+      StudyPeriod.earlyMorning => 7,
+      StudyPeriod.morning => 9,
+      StudyPeriod.afternoon => 15,
+      StudyPeriod.evening => 19,
+      StudyPeriod.night => 21,
+    };
+    try {
+      await LearningReminderService.scheduleWeekly(
+        time: TimeOfDay(hour: reminderHour, minute: 0),
+        activeDays: {0, 1, 2, 3, 4, 5, 6},
+      );
+    } catch (_) {}
   }
 
   // ── Placement Test ────────────────────────────────────────────────
@@ -154,6 +177,8 @@ class UserProvider extends ChangeNotifier {
       _dailyMissionState = {
         'date': _todayKey,
         'vocabularyReviews': 0,
+        'lessons': 0,
+        'xp': 0,
         'claimed': <String>[],
       };
     }
@@ -323,8 +348,19 @@ class UserProvider extends ChangeNotifier {
           : currentUser.longestStreak,
       lastStudyDate: newLastStudyDate,
     );
+    _ensureDailyMissionDay();
+    _dailyMissionState['lessons'] = (_dailyMissionState['lessons'] as int? ?? 0) + 1;
+    _dailyMissionState['xp'] = (_dailyMissionState['xp'] as int? ?? 0) + safeXpGain;
+    await StorageService.instance.saveDailyMissionState(_dailyMissionState);
     await _recordWeeklyLesson(lessonId, now);
     await _save();
+    try {
+      await DailyProgressWidgetService.sync(
+        lessons: dailyLessonsCompleted,
+        xp: dailyXpEarned,
+        percent: dailyProgressPercent,
+      );
+    } catch (_) {}
   }
 
   // ── Spaced vocabulary review ───────────────────────────────────────
