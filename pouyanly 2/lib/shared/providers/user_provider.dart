@@ -6,12 +6,41 @@ class UserProvider extends ChangeNotifier {
   UserModel? _user;
   UserModel? get user => _user;
   List<Map<String, dynamic>> _assessmentHistory = [];
+  Map<String, dynamic> _dailyMissionState = {};
+
+  String get _todayKey {
+    final now = DateTime.now();
+    return '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
+
+  bool _studiedToday(UserModel? value) {
+    final date = value?.lastStudyDate;
+    if (date == null) return false;
+    return date.year == DateTime.now().year &&
+        date.month == DateTime.now().month &&
+        date.day == DateTime.now().day;
+  }
+
+  Map<String, int> get dailyMissionProgress => {
+    'lesson': _studiedToday(_user) ? 1 : 0,
+    'vocabulary': _dailyMissionState['date'] == _todayKey
+        ? (_dailyMissionState['vocabularyReviews'] as int? ?? 0)
+        : 0,
+    'streak': _studiedToday(_user) && (_user?.streak ?? 0) >= 2 ? 1 : 0,
+  };
+
+  Set<String> get claimedDailyMissions =>
+      _dailyMissionState['date'] == _todayKey
+          ? Set<String>.from(_dailyMissionState['claimed'] ?? const <String>[])
+          : <String>{};
   List<Map<String, dynamic>> get assessmentHistory => List.unmodifiable(_assessmentHistory);
 
   // ── Init ──────────────────────────────────────────────────────────
   Future<void> init() async {
     _user = StorageService.instance.loadUser();
     _assessmentHistory = StorageService.instance.loadAssessmentHistory();
+    _dailyMissionState = StorageService.instance.loadDailyMissionState();
+    _ensureDailyMissionDay();
     notifyListeners();
   }
 
@@ -71,6 +100,49 @@ class UserProvider extends ChangeNotifier {
       placementTestComplete: true,
     );
     await _save();
+  }
+
+  // ── Daily missions ────────────────────────────────────────────────
+  void _ensureDailyMissionDay() {
+    if (_dailyMissionState['date'] != _todayKey) {
+      _dailyMissionState = {
+        'date': _todayKey,
+        'vocabularyReviews': 0,
+        'claimed': <String>[],
+      };
+    }
+  }
+
+  Future<void> _recordVocabularyMissionProgress() async {
+    _ensureDailyMissionDay();
+    final count = (_dailyMissionState['vocabularyReviews'] as int? ?? 0) + 1;
+    _dailyMissionState['vocabularyReviews'] = count;
+    await StorageService.instance.saveDailyMissionState(_dailyMissionState);
+  }
+
+  Future<bool> claimDailyMission(String missionId) async {
+    if (_user == null) return false;
+    _ensureDailyMissionDay();
+    const rewards = <String, ({int target, int xp, int coins})>{
+      'lesson': (target: 1, xp: 20, coins: 5),
+      'vocabulary': (target: 5, xp: 15, coins: 3),
+      'streak': (target: 1, xp: 10, coins: 2),
+    };
+    final reward = rewards[missionId];
+    if (reward == null || claimedDailyMissions.contains(missionId)) return false;
+    final progress = dailyMissionProgress[missionId] ?? 0;
+    if (progress < reward.target) return false;
+
+    final claimed = List<String>.from(_dailyMissionState['claimed'] ?? const <String>[])
+      ..add(missionId);
+    _dailyMissionState['claimed'] = claimed;
+    _user = _user!.copyWith(
+      xp: _user!.xp + reward.xp,
+      coins: _user!.coins + reward.coins,
+    );
+    await StorageService.instance.saveDailyMissionState(_dailyMissionState);
+    await _save();
+    return true;
   }
 
   // ── XP & Coins ────────────────────────────────────────────────────
