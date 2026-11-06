@@ -410,10 +410,27 @@ class _ReviewTabState extends State<_ReviewTab> {
       setState(() { _reviewIndex++; _revealed = false; });
     }
 
+    final reviewProvider = context.watch<UserProvider>();
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          Row(
+            children: [
+              Expanded(child: _ReviewStat(
+                title: 'تسلط واژگان',
+                value: '${reviewProvider.vocabularyMasteryPercent.toStringAsFixed(0)}٪',
+                icon: Icons.auto_graph_rounded,
+              )),
+              const SizedBox(width: 10),
+              Expanded(child: _ReviewStat(
+                title: 'خطاهای ثبت‌شده',
+                value: '${reviewProvider.vocabularyMistakeCount}',
+                icon: Icons.refresh_rounded,
+              )),
+            ],
+          ),
+          const SizedBox(height: 14),
           Text('${_reviewIndex + 1} از ${items.length} لغتِ موعددار',
             style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
               color: AppColors.textSecondaryLight)),
@@ -493,6 +510,40 @@ class _ReviewTabState extends State<_ReviewTab> {
             ]),
           ],
           const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewStat extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  const _ReviewStat({required this.title, required this.value, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.dividerLight),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary, size: 20),
+          const SizedBox(width: 8),
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontFamily: 'Vazirmatn',
+                fontSize: 10, color: AppColors.textSecondaryLight)),
+              Text(value, style: const TextStyle(fontFamily: 'Vazirmatn',
+                fontSize: 17, fontWeight: FontWeight.w800)),
+            ],
+          )),
         ],
       ),
     );
