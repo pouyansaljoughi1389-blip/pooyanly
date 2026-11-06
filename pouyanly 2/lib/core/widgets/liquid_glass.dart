@@ -22,6 +22,7 @@ class LiquidGlass extends StatefulWidget {
 
 class _LiquidGlassState extends State<LiquidGlass> {
   bool _pressed = false;
+  Offset _drag = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +35,8 @@ class _LiquidGlassState extends State<LiquidGlass> {
       onPanStart: (_) => setState(() => _pressed = true),
       onPanUpdate: (details) => setState(() {
         _drag = Offset(
-          (_drag.dx + details.delta.dx * .22).clamp(-8.0, 8.0),
-          (_drag.dy + details.delta.dy * .22).clamp(-8.0, 8.0),
+          (_drag.dx + details.delta.dx * .22).clamp(-8.0, 8.0).toDouble(),
+          (_drag.dy + details.delta.dy * .22).clamp(-8.0, 8.0).toDouble(),
         );
       }),
       onPanEnd: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
@@ -44,7 +45,9 @@ class _LiquidGlassState extends State<LiquidGlass> {
         scale: _pressed ? .975 : 1,
         duration: const Duration(milliseconds: 260),
         curve: Curves.elasticOut,
-        child: ClipRRect(
+        child: Transform.translate(
+          offset: _drag,
+          child: ClipRRect(
           borderRadius: widget.borderRadius,
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
@@ -79,6 +82,7 @@ class _LiquidGlassState extends State<LiquidGlass> {
               ),
               child: widget.child,
             ),
+          ),
           ),
         ),
       ),
