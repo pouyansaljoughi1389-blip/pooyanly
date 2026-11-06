@@ -24,7 +24,7 @@ import 'features/about/screens/about_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StorageService.instance.init();
-  await NativeFeatures.scheduleDailyReminder(hour: 20, minute: 0);
+  await NativeFeatures.restoreDailyReminder();
   runApp(
     ChangeNotifierProvider(
       create: (_) => UserProvider(),
