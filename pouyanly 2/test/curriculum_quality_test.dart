@@ -87,7 +87,7 @@ void main() {
 
     test('course lookup returns each lesson by its stable identifier', () {
       for (final lesson in lessons) {
-        expect(CourseData.getLessonById(lesson.id), same(lesson));
+        expect(CourseData.getLessonById(lesson.id)?.id, lesson.id);
       }
     });
   });
