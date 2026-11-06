@@ -62,6 +62,11 @@ void main() {
       final provider = UserProvider();
       await provider.createUser();
       await provider.setAvatarEmoji('🐼');
+      expect(provider.user!.avatarEmoji, '🦊');
+      expect(await provider.unlockAvatarEmoji('🐼'), isFalse);
+      await provider.addCoins(30);
+      expect(await provider.unlockAvatarEmoji('🐼'), isTrue);
+      await provider.setAvatarEmoji('🐼');
       expect(provider.user!.avatarEmoji, '🐼');
 
       await provider.setAvatarEmoji('🚀');
@@ -69,6 +74,7 @@ void main() {
 
       final restored = StorageService.instance.loadUser();
       expect(restored!.avatarEmoji, '🐼');
+      expect(restored.unlockedAvatarEmojis, contains('🐼'));
     });
   });
 }
