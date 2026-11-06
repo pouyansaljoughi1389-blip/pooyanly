@@ -1,4 +1,3 @@
-import '../../lessons/models/lesson_data.dart';
 import '../../../data/models/user_model.dart';
 
 class PlacementQuestion {
