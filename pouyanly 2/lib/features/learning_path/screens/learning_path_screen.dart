@@ -128,35 +128,82 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
     return Padding(padding: EdgeInsets.only(bottom: 16, left: widget.alignLeft ? 30 : 0, right: widget.alignLeft ? 0 : 30),
       child: Column(children: [
         bubble,
-        if (expanded && widget.isUnlocked) Container(margin: const EdgeInsets.only(top: 10), padding: const EdgeInsets.symmetric(vertical: 5),
-          decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(.65), borderRadius: BorderRadius.circular(22), border: Border.all(color: levelColor.withOpacity(.2))),
-          child: Column(children: widget.unit.lessons.map((lesson) {
-            final lessonDone = widget.completedIds.contains(lesson.id);
-            return ListTile(dense: true, onTap: lessonDone || lesson.id == nextLessonId ? () => context.push('/lesson/' + lesson.id) : () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('برای باز شدن این مرحله، ابتدا مرحلهٔ قبلی را کامل کن.'))),
-              leading: CircleAvatar(radius: 17, backgroundColor: levelColor.withOpacity(.12), child: Text(lesson.emoji, style: const TextStyle(fontSize: 16))),
-              title: Text(lesson.titleFarsi, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, fontWeight: FontWeight.w700)),
-              subtitle: Text(lesson.vocabulary.length.toString() + ' واژه • ' + lesson.exercises.length.toString() + ' تمرین • ' + lesson.estimatedMinutes.toString() + ' دقیقه', style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10)),
-              trailing: lessonDone
-                  ? const Icon(Icons.check_circle_rounded, color: AppColors.success)
-                  : lesson.id == nextLessonId
-                      ? Row(mainAxisSize: MainAxisSize.min, children: [
-                          IconButton(tooltip: 'رد کردن با ۱۰۰ XP', icon: const Icon(Icons.fast_forward_rounded), onPressed: () async {
-                            final previousIds = allLessons.takeWhile((item) => item.id != lesson.id).map((item) => item.id).toList();
-                            final ok = await context.read<UserProvider>().skipLesson(lesson.id, xpCost: 100, previousLessonIds: previousIds);
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ok ? 'مرحله با پرداخت ۱۰۰ XP رد شد.' : 'برای رد کردن، حداقل ۱۰۰ XP لازم است.')));
-                          }),
-                          Icon(Icons.play_circle_fill_rounded, color: levelColor),
-                        ])
-                      : const Icon(Icons.lock_rounded, color: AppColors.textSecondaryLight));
-          }).toList()),
-          if (done) Padding(
-            padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-            child: SizedBox(width: double.infinity, child: FilledButton.icon(
-              onPressed: () => context.push('/checkpoint/${widget.unit.id}'),
-              icon: const Icon(Icons.workspace_premium_rounded),
-              label: Text(widget.completedIds.contains('checkpoint_${widget.unit.id}') ? 'آزمون جزیره را گذرانده‌ای' : 'آزمون جامع جزیره • ۸ سؤال'),
-            )),
+        if (expanded && widget.isUnlocked)
+          Container(
+            margin: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(.65),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: levelColor.withOpacity(.2)),
+            ),
+            child: Column(
+              children: [
+                ...widget.unit.lessons.map((lesson) {
+                  final lessonDone = widget.completedIds.contains(lesson.id);
+                  return ListTile(
+                    dense: true,
+                    onTap: lessonDone || lesson.id == nextLessonId
+                        ? () => context.push('/lesson/' + lesson.id)
+                        : () => ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('برای باز شدن این مرحله، ابتدا مرحلهٔ قبلی را کامل کن.')),
+                            ),
+                    leading: CircleAvatar(
+                      radius: 17,
+                      backgroundColor: levelColor.withOpacity(.12),
+                      child: Text(lesson.emoji, style: const TextStyle(fontSize: 16)),
+                    ),
+                    title: Text(lesson.titleFarsi, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, fontWeight: FontWeight.w700)),
+                    subtitle: Text(
+                      '${lesson.vocabulary.length} واژه • ${lesson.exercises.length} تمرین • ${lesson.estimatedMinutes} دقیقه',
+                      style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10),
+                    ),
+                    trailing: lessonDone
+                        ? const Icon(Icons.check_circle_rounded, color: AppColors.success)
+                        : lesson.id == nextLessonId
+                            ? Row(mainAxisSize: MainAxisSize.min, children: [
+                                IconButton(
+                                  tooltip: 'رد کردن با ۱۰۰ XP',
+                                  icon: const Icon(Icons.fast_forward_rounded),
+                                  onPressed: () async {
+                                    final previousIds = allLessons
+                                        .takeWhile((item) => item.id != lesson.id)
+                                        .map((item) => item.id)
+                                        .toList();
+                                    final ok = await context.read<UserProvider>().skipLesson(
+                                      lesson.id,
+                                      xpCost: 100,
+                                      previousLessonIds: previousIds,
+                                    );
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(ok ? 'مرحله با پرداخت ۱۰۰ XP رد شد.' : 'برای رد کردن، حداقل ۱۰۰ XP و تکمیل مراحل قبلی لازم است.')),
+                                    );
+                                  },
+                                ),
+                                Icon(Icons.play_circle_fill_rounded, color: levelColor),
+                              ])
+                            : const Icon(Icons.lock_rounded, color: AppColors.textSecondaryLight),
+                  );
+                }),
+                if (done)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: () => context.push('/checkpoint/${widget.unit.id}'),
+                        icon: const Icon(Icons.workspace_premium_rounded),
+                        label: Text(
+                          widget.completedIds.contains('checkpoint_${widget.unit.id}')
+                              ? 'آزمون جزیره را گذرانده‌ای'
+                              : 'آزمون جامع جزیره • ۸ سؤال',
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         SizedBox(
           height: 42,
