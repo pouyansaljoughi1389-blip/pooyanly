@@ -101,7 +101,7 @@ class UserProvider extends ChangeNotifier {
         newStreak = 1;
       } else if (dayDifference < 0) {
         // Device date moved backwards: do not rewind the saved study date.
-        newLastStudyDate = last;
+        newLastStudyDate = last!;
       }
       // dayDifference == 0 means another lesson on the same calendar day.
     }
