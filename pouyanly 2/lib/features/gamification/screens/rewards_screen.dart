@@ -82,11 +82,30 @@ class RewardsScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       Wrap(spacing: 8, runSpacing: 6,
                         children: ['🦊', '🐼', '🐯', '🐸', '🐧', '🦉', '🐙', '🐨']
-                          .map((emoji) => ChoiceChip(
-                            label: Text(emoji, style: const TextStyle(fontSize: 20)),
-                            selected: user.avatarEmoji == emoji,
-                            onSelected: (_) => context.read<UserProvider>().setAvatarEmoji(emoji),
-                          )).toList()),
+                          .map((emoji) {
+                            final unlocked = user.unlockedAvatarEmojis.contains(emoji);
+                            final cost = UserProvider.avatarUnlockCosts[emoji] ?? 0;
+                            return ChoiceChip(
+                              label: Text(unlocked ? emoji : '$emoji $cost🪙',
+                                style: const TextStyle(fontSize: 16)),
+                              selected: user.avatarEmoji == emoji,
+                              onSelected: (_) async {
+                                final provider = context.read<UserProvider>();
+                                if (unlocked) {
+                                  await provider.setAvatarEmoji(emoji);
+                                } else {
+                                  final success = await provider.unlockAvatarEmoji(emoji);
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: Text(success
+                                      ? 'آواتار باز شد؛ دوباره انتخابش کن.'
+                                      : 'سکهٔ کافی برای بازکردن این آواتار نداری.',
+                                      style: const TextStyle(fontFamily: 'Vazirmatn')),
+                                  ));
+                                }
+                              },
+                            );
+                          }).toList()),
                     ],
                   ),
                 ),
