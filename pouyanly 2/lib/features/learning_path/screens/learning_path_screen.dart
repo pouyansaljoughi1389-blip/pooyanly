@@ -162,7 +162,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
                     ),
                     trailing: lessonDone
                         ? const Icon(Icons.check_circle_rounded, color: AppColors.success)
-                        : lesson.id == nextLessonId
+                        : lesson.id == widget.nextLessonId
                             ? Row(mainAxisSize: MainAxisSize.min, children: [
                                 IconButton(
                                   tooltip: 'رد کردن با ۱۰۰ XP',
