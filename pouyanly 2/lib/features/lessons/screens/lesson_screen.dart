@@ -93,6 +93,7 @@ class _LessonScreenState extends State<LessonScreen> {
               lesson: _lesson!,
               index: _vocabIndex,
               onNext: _nextVocab,
+              onSkip: () => setState(() => _phase = _LessonPhase.exercise),
             ),
           _LessonPhase.exercise => _ExercisePhase(
               lesson: _lesson!,
@@ -119,8 +120,9 @@ class _VocabPhase extends StatelessWidget {
   final Lesson lesson;
   final int index;
   final VoidCallback onNext;
+  final VoidCallback onSkip;
 
-  const _VocabPhase({required this.lesson, required this.index, required this.onNext});
+  const _VocabPhase({required this.lesson, required this.index, required this.onNext, required this.onSkip});
 
   @override
   Widget build(BuildContext context) {
@@ -209,6 +211,11 @@ class _VocabPhase extends StatelessWidget {
               onPressed: onNext,
               icon: Icons.arrow_forward_rounded,
             ),
+          ),
+          TextButton.icon(
+            onPressed: onSkip,
+            icon: const Icon(Icons.fast_forward_rounded, size: 17),
+            label: const Text('مرور واژه‌ها را رد کن و به تمرین برو'),
           ),
         ],
       ),
