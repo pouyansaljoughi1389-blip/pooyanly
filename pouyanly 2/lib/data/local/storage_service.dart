@@ -9,6 +9,7 @@ class StorageService {
   static const _keyUser    = 'pouyanly_user';
   static const _keyDark    = 'pouyanly_dark';
   static const _keyAssessmentHistory = 'pouyanly_assessment_history';
+  static const _keyDailyMissions = 'pouyanly_daily_missions';
 
   late SharedPreferences _prefs;
 
