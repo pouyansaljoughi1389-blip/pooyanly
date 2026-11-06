@@ -81,6 +81,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (current != null) {
                       await context.read<UserProvider>().updateUser(current.copyWith(notificationsEnabled: v));
                     }
+                    await _persistReminderSettings();
                     if (v) {
                       await LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
                     } else {
@@ -433,6 +434,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _persistReminderSettings() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('learningReminderEnabled', _notificationsEnabled);
     await prefs.setInt('learningReminderHour', _reminderTime.hour);
     await prefs.setInt('learningReminderMinute', _reminderTime.minute);
     await prefs.setStringList(
