@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../lessons/models/lesson_data.dart';
+import '../services/vocabulary_audio_service.dart';
 
 class VocabularyScreen extends StatefulWidget {
   const VocabularyScreen({super.key});
@@ -201,6 +202,25 @@ class _VocabTileState extends State<_VocabTile> {
                       ],
                     ),
                   ),
+                  IconButton(
+                    tooltip: 'پخش تلفظ انگلیسی',
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () async {
+                      final played = await VocabularyAudioService.instance
+                          .speak(widget.item.english);
+                      if (!played && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('موتور تبدیل متن به گفتار در دسترس نیست.'),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.volume_up_rounded,
+                      color: AppColors.primary,
+                    ),
+                  ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
@@ -239,15 +259,39 @@ class _VocabTileState extends State<_VocabTile> {
                 const SizedBox(height: 12),
                 const Divider(height: 1),
                 const SizedBox(height: 12),
-                Text(
-                  widget.item.exampleEn,
-                  style: const TextStyle(
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.item.exampleEn,
+                        style: const TextStyle(
                     fontFamily: 'Vazirmatn',
                     fontSize: 13,
                     fontStyle: FontStyle.italic,
                     color: AppColors.textSecondaryLight,
                   ),
-                  textDirection: TextDirection.ltr,
+                        textDirection: TextDirection.ltr,
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'پخش جمله نمونه',
+                      onPressed: () async {
+                        final played = await VocabularyAudioService.instance
+                            .speak(widget.item.exampleEn, rate: 0.38);
+                        if (!played && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('موتور تبدیل متن به گفتار در دسترس نیست.'),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.volume_up_rounded,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
