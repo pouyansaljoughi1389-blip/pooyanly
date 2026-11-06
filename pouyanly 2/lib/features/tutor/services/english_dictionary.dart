@@ -168,6 +168,19 @@ class EnglishDictionary {
     return null;
   }
 
+  /// Returns all known dictionary words found in an English phrase, in source order.
+  static List<DictionaryEntry> findAll(String query) {
+    final matches = RegExp(r"[A-Za-z]+(?:['-][A-Za-z]+)*").allMatches(query);
+    final results = <DictionaryEntry>[];
+    final seen = <String>{};
+    for (final match in matches) {
+      final token = match.group(0)!;
+      final entry = find(token);
+      if (entry != null && seen.add(_normalise(entry.word))) results.add(entry);
+    }
+    return results;
+  }
+
   static DictionaryEntry? findByPersian(String query) {
     final tokens = query.trim().split(RegExp(r'\s+')).where((t) => t.length > 1).toList().reversed;
     if (tokens.isEmpty) return null;
