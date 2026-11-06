@@ -40,7 +40,7 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+        backgroundColor: Colors.transparent,
         foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
         titleTextStyle: TextStyle(
           fontFamily: 'Vazirmatn',
@@ -55,7 +55,7 @@ class AppTheme {
         elevation: 3,
         shadowColor: isDark ? Colors.black54 : AppColors.primary.withOpacity(0.10),
         surfaceTintColor: Colors.transparent,
-        color: isDark ? AppColors.cardDark : AppColors.cardLight,
+        color: isDark ? AppColors.cardDark.withOpacity(0.78) : AppColors.cardLight.withOpacity(0.78),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
@@ -133,7 +133,7 @@ class AppTheme {
 
       // ── BottomNavigationBar ──
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        backgroundColor: Colors.transparent,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
         showSelectedLabels: true,
@@ -166,6 +166,8 @@ class AppTheme {
         bodySmall: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
         labelLarge: const TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700, fontSize: 14),
       ),
+
+      dialogTheme: DialogThemeData(backgroundColor: isDark ? AppColors.cardDark.withOpacity(0.96) : AppColors.cardLight.withOpacity(0.96), surfaceTintColor: Colors.transparent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24))),
 
       dividerTheme: DividerThemeData(
         color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
