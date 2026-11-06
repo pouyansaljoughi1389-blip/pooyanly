@@ -81,10 +81,20 @@ class UserProvider extends ChangeNotifier {
   }
 
   // ── Create ────────────────────────────────────────────────────────
-  Future<void> createUser({String? name}) async {
+  Future<void> createUser({
+    required String firstName,
+    required String lastName,
+    required String contact,
+    required String contactType,
+  }) async {
+    final fullName = '$firstName $lastName'.trim();
     _user = UserModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: name,
+      name: fullName,
+      firstName: firstName,
+      lastName: lastName,
+      contact: contact,
+      contactType: contactType,
       createdAt: DateTime.now(),
     );
     await _save();
