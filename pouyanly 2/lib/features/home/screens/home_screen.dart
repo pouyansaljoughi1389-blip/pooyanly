@@ -21,18 +21,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _tab = 0;
 
-  final List<Widget> _tabs = const [
-    _HomePage(),
-    LearningPathScreen(),
-    VocabularyScreen(),
-    RewardsScreen(),
-    ProfileScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final tabs = <Widget>[
+      _HomePage(onReviewTap: () => setState(() => _tab = 2)),
+      const LearningPathScreen(),
+      const VocabularyScreen(),
+      const RewardsScreen(),
+      const ProfileScreen(),
+    ];
     return Scaffold(
-      body: IndexedStack(index: _tab, children: _tabs),
+      body: IndexedStack(index: _tab, children: tabs),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _tab,
         onTap: (i) => setState(() => _tab = i),
@@ -51,7 +50,8 @@ class _HomeScreenState extends State<HomeScreen> {
 // ── Home Tab ────────────────────────────────────────────────────────────────
 
 class _HomePage extends StatelessWidget {
-  const _HomePage();
+  final VoidCallback onReviewTap;
+  const _HomePage({required this.onReviewTap});
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +158,10 @@ class _HomePage extends StatelessWidget {
                 ],
 
                 // ── Quick Review Card ──
-                _QuickReviewCard(completedCount: user.completedLessonIds.length),
+                _QuickReviewCard(
+                  completedCount: user.completedLessonIds.length,
+                  onTap: onReviewTap,
+                ),
                 const SizedBox(height: 20),
 
                 // ── Stats Row ──
@@ -294,7 +297,8 @@ class _LessonCard extends StatelessWidget {
 
 class _QuickReviewCard extends StatelessWidget {
   final int completedCount;
-  const _QuickReviewCard({required this.completedCount});
+  final VoidCallback onTap;
+  const _QuickReviewCard({required this.completedCount, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -327,7 +331,7 @@ class _QuickReviewCard extends StatelessWidget {
           ),
           if (completedCount > 0)
             GestureDetector(
-              onTap: () {},
+              onTap: onTap,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
