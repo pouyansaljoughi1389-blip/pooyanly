@@ -108,6 +108,10 @@ enum CefrLevel {
 class UserModel {
   final String id;
   final String? name;
+  final String? firstName;
+  final String? lastName;
+  final String? contact;
+  final String? contactType;
   final LearningGoal? goal;
   final EngLevel? selfAssessedLevel;
   final StudyTime? dailyStudyTime;
@@ -135,6 +139,10 @@ class UserModel {
   const UserModel({
     required this.id,
     this.name,
+    this.firstName,
+    this.lastName,
+    this.contact,
+    this.contactType,
     this.goal,
     this.selfAssessedLevel,
     this.dailyStudyTime,
@@ -169,6 +177,10 @@ class UserModel {
   UserModel copyWith({
     String? id,
     String? name,
+    String? firstName,
+    String? lastName,
+    String? contact,
+    String? contactType,
     LearningGoal? goal,
     EngLevel? selfAssessedLevel,
     StudyTime? dailyStudyTime,
@@ -196,6 +208,10 @@ class UserModel {
     return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      contact: contact ?? this.contact,
+      contactType: contactType ?? this.contactType,
       goal: goal ?? this.goal,
       selfAssessedLevel: selfAssessedLevel ?? this.selfAssessedLevel,
       dailyStudyTime: dailyStudyTime ?? this.dailyStudyTime,
@@ -226,6 +242,10 @@ class UserModel {
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
+    'firstName': firstName,
+    'lastName': lastName,
+    'contact': contact,
+    'contactType': contactType,
     'goal': goal?.name,
     'selfAssessedLevel': selfAssessedLevel?.name,
     'dailyStudyTime': dailyStudyTime?.name,
@@ -254,6 +274,10 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> j) => UserModel(
     id: j['id'] ?? '',
     name: j['name'],
+    firstName: j['firstName'],
+    lastName: j['lastName'],
+    contact: j['contact'],
+    contactType: j['contactType'],
     goal: j['goal'] != null
         ? LearningGoal.values.firstWhere((e) => e.name == j['goal'],
             orElse: () => LearningGoal.general)
