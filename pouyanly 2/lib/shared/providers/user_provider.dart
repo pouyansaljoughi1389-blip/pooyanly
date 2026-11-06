@@ -91,18 +91,23 @@ class UserProvider extends ChangeNotifier {
 
   // ── Create ────────────────────────────────────────────────────────
   Future<void> createUser({
-    required String firstName,
-    required String lastName,
-    required String contact,
-    required String contactType,
+    String? name,
+    String? firstName,
+    String? lastName,
+    String? contact,
+    String? contactType,
   }) async {
-    final fullName = '$firstName $lastName'.trim();
+    final cleanFirst = firstName?.trim();
+    final cleanLast = lastName?.trim();
+    final fullName = [cleanFirst, cleanLast]
+        .where((part) => part != null && part.isNotEmpty)
+        .join(' ');
     _user = UserModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: fullName,
-      firstName: firstName,
-      lastName: lastName,
-      contact: contact,
+      name: fullName.isNotEmpty ? fullName : (name ?? 'زبان‌آموز'),
+      firstName: cleanFirst?.isEmpty == true ? null : cleanFirst,
+      lastName: cleanLast?.isEmpty == true ? null : cleanLast,
+      contact: contact?.trim().isEmpty == true ? null : contact?.trim(),
       contactType: contactType,
       createdAt: DateTime.now(),
     );
