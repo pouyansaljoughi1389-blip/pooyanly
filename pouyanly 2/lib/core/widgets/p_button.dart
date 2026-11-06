@@ -51,7 +51,7 @@ class PButton extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: effectiveColor,
             side: BorderSide(color: effectiveColor, width: 1.5),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(21)),
           ),
           child: _buildChild(effectiveColor),
         ),
@@ -79,8 +79,9 @@ class PButton extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   color: effectiveColor.withOpacity(0.35),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+                  blurRadius: 20,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
