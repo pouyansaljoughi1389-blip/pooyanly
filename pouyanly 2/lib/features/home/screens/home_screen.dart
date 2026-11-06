@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _tabs = [
       const LearningPathScreen(),
-      _HomePage(onReviewTap: () => setState(() => _tab = 2),
+      _HomePage(onReviewTap: () => setState(() => _tab = 2)),
       const VocabularyScreen(),
       const RewardsScreen(),
       const ProfileScreen(),
