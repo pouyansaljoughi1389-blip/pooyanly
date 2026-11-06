@@ -303,6 +303,17 @@ class UserProvider extends ChangeNotifier {
   Future<void> completeCheckpoint(String unitId) async {
     final current = _user;
     if (current == null || unitId.trim().isEmpty) return;
+    Unit? targetUnit;
+    for (final unit in CourseData.getAllUnits()) {
+      if (unit.id == unitId) {
+        targetUnit = unit;
+        break;
+      }
+    }
+    if (targetUnit == null ||
+        !targetUnit.lessons.every((lesson) => current.completedLessonIds.contains(lesson.id))) {
+      return;
+    }
     final checkpointId = 'checkpoint_$unitId';
     if (current.completedLessonIds.contains(checkpointId)) return;
     _user = current.copyWith(
