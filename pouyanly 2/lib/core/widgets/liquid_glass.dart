@@ -121,7 +121,7 @@ class LiquidGlassNavigationBar extends StatelessWidget {
               children: [
                 AnimatedAlign(
                   alignment: Alignment(
-                    -1 + (2 * selectedIndex / (_items.length - 1)),
+                    1 - (2 * selectedIndex / (_items.length - 1)),
                     0,
                   ),
                   duration: const Duration(milliseconds: 620),
