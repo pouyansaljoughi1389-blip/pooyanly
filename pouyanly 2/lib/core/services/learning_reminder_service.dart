@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LearningReminderService {
   LearningReminderService._();
@@ -30,6 +31,22 @@ class LearningReminderService {
         ?.requestNotificationsPermission();
   }
 
+  static Future<void> restore() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('learningReminderEnabled') == false) return;
+    final days = (prefs.getStringList('learningReminderDays') ?? ['1', '2', '3', '4', '5'])
+        .map((value) => int.tryParse(value))
+        .whereType<int>()
+        .toSet();
+    await scheduleWeekly(
+      time: TimeOfDay(
+        hour: prefs.getInt('learningReminderHour') ?? 20,
+        minute: prefs.getInt('learningReminderMinute') ?? 0,
+      ),
+      activeDays: days,
+    );
+  }
+
   static Future<void> cancelAll() async {
     await initialize();
     for (var id = 8100; id < 8107; id++) {
@@ -45,6 +62,11 @@ class LearningReminderService {
   }) async {
     await requestPermission();
     await cancelAll();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('learningReminderEnabled', activeDays.isNotEmpty);
+    await prefs.setInt('learningReminderHour', time.hour);
+    await prefs.setInt('learningReminderMinute', time.minute);
+    await prefs.setStringList('learningReminderDays', activeDays.map((day) => day.toString()).toList());
     if (activeDays.isEmpty) return;
 
     const details = NotificationDetails(
