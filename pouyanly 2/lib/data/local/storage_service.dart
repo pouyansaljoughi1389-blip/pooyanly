@@ -54,6 +54,24 @@ class StorageService {
     await _prefs.setString(_keyAssessmentHistory, jsonEncode(history));
   }
 
+
+  // ── Daily mission state ──────────────────────────────────────────
+  Map<String, dynamic> loadDailyMissionState() {
+    final raw = _prefs.getString(_keyDailyMissions);
+    if (raw == null) return <String, dynamic>{};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map<String, dynamic>) return decoded;
+      return <String, dynamic>{};
+    } catch (_) {
+      return <String, dynamic>{};
+    }
+  }
+
+  Future<void> saveDailyMissionState(Map<String, dynamic> state) async {
+    await _prefs.setString(_keyDailyMissions, jsonEncode(state));
+  }
+
   // ── Dark Mode ────────────────────────────────────────────────────
   bool get isDarkMode => _prefs.getBool(_keyDark) ?? false;
 
