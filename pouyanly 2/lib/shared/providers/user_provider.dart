@@ -36,7 +36,7 @@ class UserProvider extends ChangeNotifier {
 
   int get dailyLessonsCompleted => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['lessons'] as int? ?? 0) : 0;
   int get dailyXpEarned => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['xp'] as int? ?? 0) : 0;
-  int get dailyProgressPercent => dailyLessonsCompleted > 0 ? 100 : 0;
+  int get dailyProgressPercent => ((dailyXpEarned / 50) * 100).round().clamp(0, 100);
 
   int get todayXp => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['todayXp'] as int? ?? 0) : 0;
   int get lessonsCompletedToday => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['lessonsToday'] as int? ?? 0) : 0;
