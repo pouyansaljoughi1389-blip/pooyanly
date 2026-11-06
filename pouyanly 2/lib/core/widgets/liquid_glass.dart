@@ -27,24 +27,13 @@ class _LiquidGlassState extends State<LiquidGlass> {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    return GestureDetector(
-      onTap: widget.onTap,
-      onPanStart: (_) => setState(() => _pressed = true),
-      onPanUpdate: (details) => setState(() {
-        _drag = Offset(
-          (_drag.dx + details.delta.dx * .22).clamp(-8.0, 8.0).toDouble(),
-          (_drag.dy + details.delta.dy * .22).clamp(-8.0, 8.0).toDouble(),
-        );
-      }),
-      onPanEnd: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
-      onPanCancel: () => setState(() { _pressed = false; _drag = Offset.zero; }),
-      child: AnimatedScale(
-        scale: _pressed ? .975 : 1,
-        duration: const Duration(milliseconds: 260),
-        curve: Curves.elasticOut,
-        child: Transform.translate(
-          offset: _drag,
-          child: ClipRRect(
+    final surface = AnimatedScale(
+      scale: _pressed ? .975 : 1,
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.elasticOut,
+      child: Transform.translate(
+        offset: _drag,
+        child: ClipRRect(
           borderRadius: widget.borderRadius,
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
@@ -80,13 +69,26 @@ class _LiquidGlassState extends State<LiquidGlass> {
               child: widget.child,
             ),
           ),
-          ),
         ),
       ),
     );
+
+    if (widget.onTap == null) return surface;
+    return GestureDetector(
+      onTap: widget.onTap,
+      onPanStart: (_) => setState(() => _pressed = true),
+      onPanUpdate: (details) => setState(() {
+        _drag = Offset(
+          (_drag.dx + details.delta.dx * .22).clamp(-8.0, 8.0).toDouble(),
+          (_drag.dy + details.delta.dy * .22).clamp(-8.0, 8.0).toDouble(),
+        );
+      }),
+      onPanEnd: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
+      onPanCancel: () => setState(() { _pressed = false; _drag = Offset.zero; }),
+      child: surface,
+    );
   }
 }
-
 class LiquidGlassNavigationBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTap;
