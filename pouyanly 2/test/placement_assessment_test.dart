@@ -4,13 +4,13 @@ import 'package:pouyanly/features/placement_test/models/placement_question.dart'
 
 void main() {
   group('Placement assessment', () {
-    test('all correct answers reach the highest level currently assessed', () {
+    test('all correct answers reach the highest assessed level C2', () {
       final answers = {
         for (final question in PlacementTestData.questions)
           question.id: question.correctAnswer,
       };
       final result = PlacementTestData.calculateResult(answers);
-      expect(result['cefrLevel'], CefrLevel.b2);
+      expect(result['cefrLevel'], CefrLevel.c2);
       expect(result['answeredCount'], PlacementTestData.questions.length);
       expect(result['skillScores'].keys,
           containsAll(['vocabulary', 'grammar', 'reading']));
