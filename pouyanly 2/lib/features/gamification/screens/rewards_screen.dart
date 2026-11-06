@@ -105,6 +105,7 @@ class RewardsScreen extends StatelessWidget {
                   current: missionProgress['lesson'] ?? 0,
                   total: 1,
                   reward: 20,
+                  coinReward: 5,
                   claimed: claimedMissions.contains('lesson'),
                   onClaim: () => _claimMission(context, 'lesson'),
                 ),
@@ -114,6 +115,7 @@ class RewardsScreen extends StatelessWidget {
                   current: missionProgress['vocabulary'] ?? 0,
                   total: 5,
                   reward: 15,
+                  coinReward: 3,
                   claimed: claimedMissions.contains('vocabulary'),
                   onClaim: () => _claimMission(context, 'vocabulary'),
                 ),
@@ -123,6 +125,7 @@ class RewardsScreen extends StatelessWidget {
                   current: missionProgress['streak'] ?? 0,
                   total: 1,
                   reward: 10,
+                  coinReward: 2,
                   claimed: claimedMissions.contains('streak'),
                   onClaim: () => _claimMission(context, 'streak'),
                 ),
@@ -132,15 +135,15 @@ class RewardsScreen extends StatelessWidget {
                 _SectionTitle('ماموریت‌های هفتگی'),
                 const SizedBox(height: 10),
                 _MissionCard(title: 'تکمیل ۳ درس', emoji: '📖',
-                  current: weeklyProgress['lessons'] ?? 0, total: 3, reward: 60,
+                  current: weeklyProgress['lessons'] ?? 0, total: 3, reward: 60, coinReward: 15,
                   claimed: claimedWeekly.contains('lessons'),
                   onClaim: () => _claimWeeklyMission(context, 'lessons')),
                 _MissionCard(title: 'مرور ۲۰ واژه', emoji: '🧠',
-                  current: weeklyProgress['vocabulary'] ?? 0, total: 20, reward: 50,
+                  current: weeklyProgress['vocabulary'] ?? 0, total: 20, reward: 50, coinReward: 12,
                   claimed: claimedWeekly.contains('vocabulary'),
                   onClaim: () => _claimWeeklyMission(context, 'vocabulary')),
                 _MissionCard(title: 'مطالعه در ۴ روز متفاوت', emoji: '📅',
-                  current: weeklyProgress['studyDays'] ?? 0, total: 4, reward: 75,
+                  current: weeklyProgress['studyDays'] ?? 0, total: 4, reward: 75, coinReward: 20,
                   claimed: claimedWeekly.contains('studyDays'),
                   onClaim: () => _claimWeeklyMission(context, 'studyDays')),
                 const SizedBox(height: 24),
@@ -242,6 +245,7 @@ class _MissionCard extends StatelessWidget {
   final int current;
   final int total;
   final int reward;
+  final int coinReward;
   final bool claimed;
   final VoidCallback onClaim;
 
@@ -251,6 +255,7 @@ class _MissionCard extends StatelessWidget {
     required this.current,
     required this.total,
     required this.reward,
+    this.coinReward = 0,
     required this.claimed,
     required this.onClaim,
   });
@@ -290,7 +295,7 @@ class _MissionCard extends StatelessWidget {
                         color: AppColors.xpColor.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text('+$reward XP',
+                      child: Text('+$reward XP${coinReward > 0 ? ' • +$coinReward 🪙' : ''}',
                           style: const TextStyle(
                               fontFamily: 'Vazirmatn',
                               fontSize: 11,
