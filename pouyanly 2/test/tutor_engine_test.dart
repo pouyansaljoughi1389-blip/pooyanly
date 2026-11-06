@@ -29,7 +29,7 @@ void main() {
         skillScores: const {},
         level: CefrLevel.b2,
       );
-      expect(courseWord, contains('دقیق و موشکاف'));
+      expect(courseWord, contains('بسیار دقیق'));
       expect(courseWord, startsWith('سلام، من پویان سلجوقی هستم.'));
 
       final generalWord = TutorEngine.reply(
