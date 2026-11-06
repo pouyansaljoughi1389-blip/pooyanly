@@ -90,7 +90,7 @@ class EnglishDictionary {
   }
 
   static DictionaryEntry? findByPersian(String query) {
-    final tokens = query.trim().split(RegExp(r'\\s+')).where((t) => t.length > 1).toList().reversed;
+    final tokens = query.trim().split(RegExp(r'\s+')).where((t) => t.length > 1).toList().reversed;
     if (tokens.isEmpty) return null;
     for (final token in tokens) {
       for (final item in CourseData.getAllUnits().expand((u) => u.lessons).expand((l) => l.vocabulary)) {
