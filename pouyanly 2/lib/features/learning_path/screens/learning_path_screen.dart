@@ -13,6 +13,8 @@ class LearningPathScreen extends StatelessWidget {
     final user = context.watch<UserProvider>().user;
     final units = CourseData.getAllUnits();
     final completedIds = user?.completedLessonIds ?? const <String>[];
+    const levelOrder = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
+    final placementRank = levelOrder[user?.cefrLevel.label ?? 'A1'] ?? 0;
     final completedLessons = units.expand((u) => u.lessons).where((l) => completedIds.contains(l.id)).length;
     final totalLessons = units.fold<int>(0, (sum, unit) => sum + unit.lessons.length);
     return Directionality(
@@ -41,7 +43,10 @@ class LearningPathScreen extends StatelessWidget {
         SliverPadding(padding: const EdgeInsets.fromLTRB(14, 24, 14, 30), sliver: SliverList(delegate: SliverChildBuilderDelegate((context, index) {
           final unit = units[index];
           final completed = unit.lessons.where((l) => completedIds.contains(l.id)).length;
-          final unlocked = index == 0 || units[index - 1].lessons.every((l) => completedIds.contains(l.id));
+          final unitRank = levelOrder[unit.cefrLevel] ?? 0;
+          final unlocked = unitRank <= placementRank ||
+              index == 0 ||
+              units[index - 1].lessons.every((l) => completedIds.contains(l.id));
           return _MapUnitNode(unit: unit, completed: completed, isUnlocked: unlocked, completedIds: completedIds, alignLeft: index.isOdd);
         }, childCount: units.length))),
       ]),
