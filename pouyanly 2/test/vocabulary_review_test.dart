@@ -40,6 +40,18 @@ void main() {
     expect(provider.user!.vocabularyReviewIntervals['goodbye'], 1);
   });
 
+  test('forgotten words are counted and mastery is measurable', () async {
+    final provider = UserProvider();
+    await provider.createUser();
+
+    await provider.reviewVocabulary('Remember', remembered: true);
+    await provider.reviewVocabulary('Remember', remembered: false);
+
+    expect(provider.vocabularyMistakeCount, 1);
+    expect(provider.vocabularyMasteryPercent, 0);
+    expect(provider.user!.vocabularyReviewMistakes['remember'], 1);
+  });
+
   test('review scheduling survives user JSON persistence', () async {
     final provider = UserProvider();
     await provider.createUser();
