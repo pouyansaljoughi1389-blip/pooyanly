@@ -6,7 +6,7 @@ import 'english_dictionary.dart';
 class TutorEngine {
   TutorEngine._();
 
-  static const _opening = 'سلام، من پویان سلجوقی هستم. در پاسخ به سؤال شما: ';
+  static const _opening = 'سلام، من پویان سلجوقی هستم. در جواب به سؤال شما: ';
 
   static String reply({
     required String message,
@@ -35,7 +35,12 @@ class TutorEngine {
     if (lower.contains('will') || lower.contains('going to') || lower.contains('آینده')) {
       return _opening + 'برای آینده، will اغلب برای تصمیم لحظه‌ای یا پیش‌بینی و be going to برای قصد قبلی یا نشانهٔ فعلی به کار می‌رود. مثال: “I’ll help you” و “I’m going to study tonight.”';
     }
-    if (lower.contains('معنی') || lower.contains('ترجمه') || lower.contains('یعنی')) {
+    if (lower.contains('معنی') || lower.contains('ترجمه') || lower.contains('یعنی') || lower.contains('translate')) {
+      final phraseEntries = EnglishDictionary.findAll(input);
+      if (phraseEntries.length > 1) {
+        final lines = phraseEntries.map((entry) => '• ${entry.word}: ${entry.meaning}').join('\\n');
+        return _opening + 'واژه‌های شناخته‌شده در عبارت شما:\\n$lines\\nاین ترجمه واژه‌به‌واژه است؛ برای ترجمهٔ دقیق جمله باید ساختار و بافت آن هم بررسی شود.';
+      }
       final entry = EnglishDictionary.find(input) ?? EnglishDictionary.findByPersian(input);
       if (entry != null) return _dictionaryReply(entry);
     }
