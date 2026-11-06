@@ -4,7 +4,6 @@ import '../../data/models/user_model.dart';
 import '../../data/local/storage_service.dart';
 import '../../features/lessons/models/lesson_data.dart';
 import '../../core/services/daily_progress_widget_service.dart';
-import '../../core/services/learning_reminder_service.dart';
 
 class UserProvider extends ChangeNotifier {
   UserModel? _user;
@@ -35,7 +34,7 @@ class UserProvider extends ChangeNotifier {
 
   int get dailyLessonsCompleted => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['lessons'] as int? ?? 0) : 0;
   int get dailyXpEarned => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['xp'] as int? ?? 0) : 0;
-  int get dailyProgressPercent => ((dailyXpEarned / 50) * 100).round().clamp(0, 100);
+  int get dailyProgressPercent => ((dailyXpEarned / 50) * 100).round().clamp(0, 100).toInt();
 
   Map<String, int> get dailyMissionProgress => {
     'lesson': _studiedToday(_user) ? 1 : 0,
