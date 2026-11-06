@@ -78,7 +78,7 @@ class _AccountScreenState extends State<AccountScreen> {
             ),
             const SizedBox(height: 24),
             if (hasSavedProfile) ...[
-              Text('خوش برگشتی، \${saved?.name ?? 'زبان‌آموز'}!',
+              Text('خوش برگشتی، ${saved?.name ?? 'زبان‌آموز'}!',
                 style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w900)),
               const SizedBox(height: 12),
               FilledButton.icon(
