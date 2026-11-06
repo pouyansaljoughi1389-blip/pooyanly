@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'lesson_data.dart';
 
 /// Expanded, offline CEFR curriculum. Each topic now contains six sequential lessons;
@@ -25,6 +27,8 @@ class ExpandedCourseData {
       for (var j = 0; j < words.length; j++) {
         final word = words[j];
         final options = <String>{word.fa, ...meanings.where((m) => m != word.fa), 'نمی‌دانم'}.toList();
+        final optionSeed = topic.id.codeUnits.fold<int>(i + j, (sum, unit) => sum + unit);
+        options.shuffle(math.Random(optionSeed));
         exercises.add(Exercise(
           id: '${topic.id}_l${i + 1}_e${j + 1}',
           type: ExerciseType.multipleChoice,
