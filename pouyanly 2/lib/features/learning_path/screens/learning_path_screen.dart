@@ -15,7 +15,12 @@ class LearningPathScreen extends StatelessWidget {
     final completedIds = user?.completedLessonIds ?? const <String>[];
     const levelOrder = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
     final placementRank = levelOrder[user?.cefrLevel.label ?? 'A1'] ?? 0;
-    final completedLessons = units.expand((u) => u.lessons).where((l) => completedIds.contains(l.id)).length;
+    final allLessons = units.expand((u) => u.lessons).toList();
+    final completedLessons = allLessons.where((l) => completedIds.contains(l.id)).length;
+    String? nextLessonId;
+    for (final lesson in allLessons) {
+      if (!completedIds.contains(lesson.id)) { nextLessonId = lesson.id; break; }
+    }
     final totalLessons = units.fold<int>(0, (sum, unit) => sum + unit.lessons.length);
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -43,10 +48,8 @@ class LearningPathScreen extends StatelessWidget {
         SliverPadding(padding: const EdgeInsets.fromLTRB(14, 24, 14, 30), sliver: SliverList(delegate: SliverChildBuilderDelegate((context, index) {
           final unit = units[index];
           final completed = unit.lessons.where((l) => completedIds.contains(l.id)).length;
-          final unitRank = levelOrder[unit.cefrLevel] ?? 0;
-          final unlocked = unitRank <= placementRank ||
-              index == 0 ||
-              units[index - 1].lessons.every((l) => completedIds.contains(l.id));
+          final unlocked = index == 0 ||
+              units.take(index).every((previous) => previous.lessons.every((l) => completedIds.contains(l.id)));
           return _MapUnitNode(unit: unit, completed: completed, isUnlocked: unlocked, completedIds: completedIds, alignLeft: index.isOdd);
         }, childCount: units.length))),
       ]),
@@ -121,11 +124,22 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
           decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(.65), borderRadius: BorderRadius.circular(22), border: Border.all(color: levelColor.withOpacity(.2))),
           child: Column(children: widget.unit.lessons.map((lesson) {
             final lessonDone = widget.completedIds.contains(lesson.id);
-            return ListTile(dense: true, onTap: () => context.push('/lesson/' + lesson.id),
+            return ListTile(dense: true, onTap: lessonDone || lesson.id == nextLessonId ? () => context.push('/lesson/' + lesson.id) : () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('برای باز شدن این مرحله، ابتدا مرحلهٔ قبلی را کامل کن.'))),
               leading: CircleAvatar(radius: 17, backgroundColor: levelColor.withOpacity(.12), child: Text(lesson.emoji, style: const TextStyle(fontSize: 16))),
               title: Text(lesson.titleFarsi, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, fontWeight: FontWeight.w700)),
               subtitle: Text(lesson.vocabulary.length.toString() + ' واژه • ' + lesson.exercises.length.toString() + ' تمرین • ' + lesson.estimatedMinutes.toString() + ' دقیقه', style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10)),
-              trailing: Icon(lessonDone ? Icons.check_circle_rounded : Icons.play_circle_fill_rounded, color: lessonDone ? AppColors.success : levelColor));
+              trailing: lessonDone
+                  ? const Icon(Icons.check_circle_rounded, color: AppColors.success)
+                  : lesson.id == nextLessonId
+                      ? Row(mainAxisSize: MainAxisSize.min, children: [
+                          IconButton(tooltip: 'رد کردن با ۱۰۰ XP', icon: const Icon(Icons.fast_forward_rounded), onPressed: () async {
+                            final ok = await context.read<UserProvider>().skipLesson(lesson.id, xpCost: 100);
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ok ? 'مرحله با پرداخت ۱۰۰ XP رد شد.' : 'برای رد کردن، حداقل ۱۰۰ XP لازم است.')));
+                          }),
+                          Icon(Icons.play_circle_fill_rounded, color: levelColor),
+                        ])
+                      : const Icon(Icons.lock_rounded, color: AppColors.textSecondaryLight));
           }).toList())),
         SizedBox(
           height: 42,
