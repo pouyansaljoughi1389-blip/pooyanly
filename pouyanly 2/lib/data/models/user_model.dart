@@ -125,6 +125,8 @@ class UserModel {
   final Map<String, String> vocabularyReviewDueDates;
   final Map<String, int> vocabularyReviewIntervals;
   final Map<String, int> vocabularyReviewRepetitions;
+  final Map<String, int> vocabularyReviewMistakes;
+  final String avatarEmoji;
   final bool notificationsEnabled;
   final bool isDarkMode;
   final DateTime createdAt;
@@ -149,6 +151,8 @@ class UserModel {
     this.vocabularyReviewDueDates = const {},
     this.vocabularyReviewIntervals = const {},
     this.vocabularyReviewRepetitions = const {},
+    this.vocabularyReviewMistakes = const {},
+    this.avatarEmoji = '🦊',
     this.notificationsEnabled = true,
     this.isDarkMode = false,
     required this.createdAt,
@@ -180,6 +184,8 @@ class UserModel {
     Map<String, String>? vocabularyReviewDueDates,
     Map<String, int>? vocabularyReviewIntervals,
     Map<String, int>? vocabularyReviewRepetitions,
+    Map<String, int>? vocabularyReviewMistakes,
+    String? avatarEmoji,
     bool? notificationsEnabled,
     bool? isDarkMode,
     DateTime? createdAt,
@@ -204,6 +210,8 @@ class UserModel {
       vocabularyReviewDueDates: vocabularyReviewDueDates ?? this.vocabularyReviewDueDates,
       vocabularyReviewIntervals: vocabularyReviewIntervals ?? this.vocabularyReviewIntervals,
       vocabularyReviewRepetitions: vocabularyReviewRepetitions ?? this.vocabularyReviewRepetitions,
+      vocabularyReviewMistakes: vocabularyReviewMistakes ?? this.vocabularyReviewMistakes,
+      avatarEmoji: avatarEmoji ?? this.avatarEmoji,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       isDarkMode: isDarkMode ?? this.isDarkMode,
       createdAt: createdAt ?? this.createdAt,
@@ -231,6 +239,8 @@ class UserModel {
     'vocabularyReviewDueDates': vocabularyReviewDueDates,
     'vocabularyReviewIntervals': vocabularyReviewIntervals,
     'vocabularyReviewRepetitions': vocabularyReviewRepetitions,
+    'vocabularyReviewMistakes': vocabularyReviewMistakes,
+    'avatarEmoji': avatarEmoji,
     'notificationsEnabled': notificationsEnabled,
     'isDarkMode': isDarkMode,
     'createdAt': createdAt.toIso8601String(),
@@ -270,6 +280,8 @@ class UserModel {
     vocabularyReviewDueDates: Map<String, String>.from(j['vocabularyReviewDueDates'] ?? {}),
     vocabularyReviewIntervals: Map<String, int>.from(j['vocabularyReviewIntervals'] ?? {}),
     vocabularyReviewRepetitions: Map<String, int>.from(j['vocabularyReviewRepetitions'] ?? {}),
+    vocabularyReviewMistakes: Map<String, int>.from(j['vocabularyReviewMistakes'] ?? {}),
+    avatarEmoji: j['avatarEmoji'] ?? '🦊',
     notificationsEnabled: j['notificationsEnabled'] ?? true,
     isDarkMode: j['isDarkMode'] ?? false,
     createdAt: DateTime.tryParse(j['createdAt'] ?? '') ?? DateTime.now(),
