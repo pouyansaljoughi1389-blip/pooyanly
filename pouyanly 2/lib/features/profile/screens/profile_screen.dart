@@ -152,6 +152,12 @@ class ProfileScreen extends StatelessWidget {
                       onTap: () => context.go('/settings'),
                     ),
                     _SettingRow(
+                      icon: Icons.info_outline_rounded,
+                      label: 'دربارهٔ POUYANLY',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.push('/about'),
+                    ),
+                    _SettingRow(
                       icon: Icons.map_rounded,
                       label: 'انجام دوباره آزمون سطح',
                       trailing: const Icon(Icons.chevron_right),
