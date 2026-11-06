@@ -1,6 +1,6 @@
 import 'lesson_data.dart';
 
-/// Expanded, offline CEFR curriculum. Each unit contains three short lessons;
+/// Expanded, offline CEFR curriculum. Each topic now contains six sequential lessons;
 /// lesson IDs are stable so saved progress survives app updates.
 class ExpandedCourseData {
   ExpandedCourseData._();
@@ -9,7 +9,7 @@ class ExpandedCourseData {
 
   static Unit _buildUnit(_Topic topic) {
     final lessons = <Lesson>[];
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 6; i++) {
       final words = List.generate(6, (index) => topic.words[(i * 2 + index) % topic.words.length]);
       final vocabulary = words.map((word) => VocabularyItem(
         english: word.en,
@@ -40,14 +40,14 @@ class ExpandedCourseData {
       }
       lessons.add(Lesson(
         id: '${topic.id}_l${i + 1}',
-        title: topic.lessonTitles[i],
-        titleFarsi: topic.lessonTitlesFa[i],
+        title: topic.lessonTitles[i % topic.lessonTitles.length],
+        titleFarsi: topic.lessonTitlesFa[i % topic.lessonTitlesFa.length],
         cefrLevel: topic.level,
         vocabulary: vocabulary,
         exercises: exercises,
         xpReward: topic.level == 'B2' || topic.level == 'C1' || topic.level == 'C2' ? 35 : 25,
-        emoji: topic.lessonEmojis[i],
-        objectivesFarsi: [topic.objectives[i]],
+        emoji: topic.lessonEmojis[i % topic.lessonEmojis.length],
+        objectivesFarsi: [topic.objectives[i % topic.objectives.length]],
         skillFocus: const ['vocabulary', 'reading', 'sentence building'],
         estimatedMinutes: topic.level == 'A1' || topic.level == 'A2' ? 8 : 12,
       ));
