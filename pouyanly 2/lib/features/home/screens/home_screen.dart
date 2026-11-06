@@ -10,6 +10,7 @@ import '../../vocabulary/screens/vocabulary_screen.dart';
 import '../../gamification/screens/rewards_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../lessons/models/lesson_data.dart';
+import '../../../core/widgets/liquid_glass.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,16 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _tab, children: _tabs),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _tab,
-        onTap: (i) => setState(() => _tab = i),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.map_rounded), label: 'مسیر'),
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'خانه'),
-          BottomNavigationBarItem(icon: Icon(Icons.menu_book_rounded), label: 'لغت'),
-          BottomNavigationBarItem(icon: Icon(Icons.emoji_events_rounded), label: 'جوایز'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'من'),
-        ],
+      bottomNavigationBar: LiquidGlassNavigationBar(
+        selectedIndex: _tab,
+        onTap: (index) => setState(() => _tab = index),
       ),
     );
   }
