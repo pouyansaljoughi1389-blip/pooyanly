@@ -192,8 +192,17 @@ class _JellyNavItemState extends State<_JellyNavItem> {
       behavior: HitTestBehavior.opaque,
       onTap: widget.onTap,
       onTapDown: (_) => setState(() => _pressed = true),
-      onTapCancel: () => setState(() => _pressed = false),
-      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() { _pressed = false; _drag = Offset.zero; }),
+      onTapUp: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
+      onPanStart: (_) => setState(() => _pressed = true),
+      onPanUpdate: (details) => setState(() {
+        _drag = Offset(
+          (_drag.dx + details.delta.dx * .22).clamp(-8.0, 8.0),
+          (_drag.dy + details.delta.dy * .22).clamp(-8.0, 8.0),
+        );
+      }),
+      onPanEnd: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
+      onPanCancel: () => setState(() { _pressed = false; _drag = Offset.zero; }),
       child: AnimatedScale(
         scale: _pressed ? .82 : (widget.active ? 1.04 : 1),
         duration: const Duration(milliseconds: 300),
