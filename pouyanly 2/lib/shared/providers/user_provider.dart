@@ -5,10 +5,13 @@ import '../../data/local/storage_service.dart';
 class UserProvider extends ChangeNotifier {
   UserModel? _user;
   UserModel? get user => _user;
+  List<Map<String, dynamic>> _assessmentHistory = [];
+  List<Map<String, dynamic>> get assessmentHistory => List.unmodifiable(_assessmentHistory);
 
   // ── Init ──────────────────────────────────────────────────────────
   Future<void> init() async {
     _user = StorageService.instance.loadUser();
+    _assessmentHistory = StorageService.instance.loadAssessmentHistory();
     notifyListeners();
   }
 
@@ -52,7 +55,16 @@ class UserProvider extends ChangeNotifier {
   Future<void> completePlacementTest({
     required CefrLevel cefrLevel,
     required Map<String, int> skillScores,
+    Map<String, double> levelScores = const {},
   }) async {
+    final snapshot = <String, dynamic>{
+      'takenAt': DateTime.now().toIso8601String(),
+      'cefrLevel': cefrLevel.name,
+      'skillScores': skillScores,
+      'levelScores': levelScores,
+    };
+    _assessmentHistory = [..._assessmentHistory, snapshot];
+    await StorageService.instance.appendAssessment(snapshot);
     _user = _user?.copyWith(
       cefrLevel: cefrLevel,
       skillScores: skillScores,

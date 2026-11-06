@@ -163,6 +163,42 @@ class _HomePage extends StatelessWidget {
                   const SizedBox(height: 20),
                 ],
 
+                // ── Tutor entry ──
+                InkWell(
+                  onTap: () => context.push('/tutor'),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.primary.withOpacity(0.35)),
+                    ),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          backgroundColor: AppColors.primary,
+                          child: Icon(Icons.auto_awesome_rounded, color: Colors.white),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('معلم زبان POUYANLY',
+                                  style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700)),
+                              Text('تمرین کن و بازخورد بگیر • نسخهٔ آزمایشی',
+                                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: AppColors.textSecondaryLight)),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
                 // ── Quick Review Card ──
                 _QuickReviewCard(
                   completedCount: user.completedLessonIds.length,

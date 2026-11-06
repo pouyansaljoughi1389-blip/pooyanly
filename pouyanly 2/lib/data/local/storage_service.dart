@@ -8,6 +8,7 @@ class StorageService {
 
   static const _keyUser    = 'pouyanly_user';
   static const _keyDark    = 'pouyanly_dark';
+  static const _keyAssessmentHistory = 'pouyanly_assessment_history';
 
   late SharedPreferences _prefs;
 
@@ -32,6 +33,24 @@ class StorageService {
 
   Future<void> clearUser() async {
     await _prefs.remove(_keyUser);
+  }
+
+  // ── Placement assessment history ────────────────────────────────
+  List<Map<String, dynamic>> loadAssessmentHistory() {
+    final raw = _prefs.getString(_keyAssessmentHistory);
+    if (raw == null) return [];
+    try {
+      final decoded = jsonDecode(raw) as List<dynamic>;
+      return decoded.whereType<Map>()
+          .map((item) => Map<String, dynamic>.from(item)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> appendAssessment(Map<String, dynamic> snapshot) async {
+    final history = loadAssessmentHistory()..add(snapshot);
+    await _prefs.setString(_keyAssessmentHistory, jsonEncode(history));
   }
 
   // ── Dark Mode ────────────────────────────────────────────────────

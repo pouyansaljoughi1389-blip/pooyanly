@@ -46,6 +46,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
     await context.read<UserProvider>().completePlacementTest(
           cefrLevel: result['cefrLevel'],
           skillScores: Map<String, int>.from(result['skillScores']),
+          levelScores: Map<String, double>.from(result['levelScores']),
         );
     if (mounted) context.go('/placement-result');
   }
