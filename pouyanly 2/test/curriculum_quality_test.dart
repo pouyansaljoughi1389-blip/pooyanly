@@ -12,7 +12,7 @@ void main() {
         expect(levelUnits, isNotEmpty, reason: 'Missing $level pathway');
         expect(levelUnits.expand((unit) => unit.lessons).length, greaterThanOrEqualTo(3));
       }
-      expect(lessons.length, greaterThanOrEqualTo(60));
+      expect(lessons.length, 233, reason: 'The learning map must contain exactly 233 lessons');
       final levels = units.map((unit) => unit.cefrLevel).toList();
       expect(levels, orderedEquals([...levels]..sort((a, b) {
         const order = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
