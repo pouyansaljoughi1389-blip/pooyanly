@@ -90,15 +90,17 @@ class EnglishDictionary {
   }
 
   static DictionaryEntry? findByPersian(String query) {
-    final normalized = query.trim();
-    if (normalized.isEmpty) return null;
-    for (final item in CourseData.getAllUnits().expand((u) => u.lessons).expand((l) => l.vocabulary)) {
-      if (item.farsi.contains(normalized)) {
-        return DictionaryEntry(item.english, item.farsi, item.pronunciation, item.exampleEn, item.exampleFa);
+    final tokens = query.trim().split(RegExp(r'\\s+')).where((t) => t.length > 1).toList().reversed;
+    if (tokens.isEmpty) return null;
+    for (final token in tokens) {
+      for (final item in CourseData.getAllUnits().expand((u) => u.lessons).expand((l) => l.vocabulary)) {
+        if (item.farsi.contains(token)) {
+          return DictionaryEntry(item.english, item.farsi, item.pronunciation, item.exampleEn, item.exampleFa);
+        }
       }
-    }
-    for (final entry in _extra.values) {
-      if (entry.meaning.contains(normalized)) return entry;
+      for (final entry in _extra.values) {
+        if (entry.meaning.contains(token)) return entry;
+      }
     }
     return null;
   }
