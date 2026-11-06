@@ -16,10 +16,10 @@ class LearningPathScreen extends StatelessWidget {
     units.sort((a, b) {
       final byLevel = (levelRank[a.cefrLevel] ?? 99).compareTo(levelRank[b.cefrLevel] ?? 99);
       if (byLevel != 0) return byLevel;
-      return _goalPriority(a, user?.goal?.name).compareTo(_goalPriority(b, user?.goal?.name));
+      final byGoal = _goalPriority(a, user?.goal?.name).compareTo(_goalPriority(b, user?.goal?.name));
+      return byGoal != 0 ? byGoal : a.id.compareTo(b.id);
     });
     final completedIds = user?.completedLessonIds ?? const <String>[];
-    const levelOrder = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
     
     final allLessons = units.expand((u) => u.lessons).toList();
     final completedLessons = allLessons.where((l) => completedIds.contains(l.id)).length;
@@ -141,7 +141,8 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
                   : lesson.id == nextLessonId
                       ? Row(mainAxisSize: MainAxisSize.min, children: [
                           IconButton(tooltip: 'رد کردن با ۱۰۰ XP', icon: const Icon(Icons.fast_forward_rounded), onPressed: () async {
-                            final ok = await context.read<UserProvider>().skipLesson(lesson.id, xpCost: 100);
+                            final previousIds = allLessons.takeWhile((item) => item.id != lesson.id).map((item) => item.id).toList();
+                            final ok = await context.read<UserProvider>().skipLesson(lesson.id, xpCost: 100, previousLessonIds: previousIds);
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ok ? 'مرحله با پرداخت ۱۰۰ XP رد شد.' : 'برای رد کردن، حداقل ۱۰۰ XP لازم است.')));
                           }),
