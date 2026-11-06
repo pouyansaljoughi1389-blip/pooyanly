@@ -202,6 +202,7 @@ class _VocabPhase extends StatelessWidget {
               ),
             ),
           // Flashcard
+          Expanded(child: _FlashCard(vocab: vocab)),
 
           // Next button
           Padding(
