@@ -26,8 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _tabs = [
-      _HomePage(onReviewTap: () => setState(() => _tab = 2)),
       const LearningPathScreen(),
+      _HomePage(onReviewTap: () => setState(() => _tab = 2),
       const VocabularyScreen(),
       const RewardsScreen(),
       const ProfileScreen(),
@@ -42,8 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _tab,
         onTap: (i) => setState(() => _tab = i),
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'خانه'),
           BottomNavigationBarItem(icon: Icon(Icons.map_rounded), label: 'مسیر'),
+          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'خانه'),
           BottomNavigationBarItem(icon: Icon(Icons.menu_book_rounded), label: 'لغت'),
           BottomNavigationBarItem(icon: Icon(Icons.emoji_events_rounded), label: 'جوایز'),
           BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'من'),
