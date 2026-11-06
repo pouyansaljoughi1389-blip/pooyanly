@@ -12,9 +12,15 @@ class LearningPathScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
     final units = CourseData.getAllUnits();
+    final levelRank = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
+    units.sort((a, b) {
+      final byLevel = (levelRank[a.cefrLevel] ?? 99).compareTo(levelRank[b.cefrLevel] ?? 99);
+      if (byLevel != 0) return byLevel;
+      return _goalPriority(a, user?.goal?.name).compareTo(_goalPriority(b, user?.goal?.name));
+    });
     final completedIds = user?.completedLessonIds ?? const <String>[];
     const levelOrder = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
-    final placementRank = levelOrder[user?.cefrLevel.label ?? 'A1'] ?? 0;
+    
     final allLessons = units.expand((u) => u.lessons).toList();
     final completedLessons = allLessons.where((l) => completedIds.contains(l.id)).length;
     String? nextLessonId;
@@ -88,6 +94,8 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
     final levelColor = AppColors.cefrColor(widget.unit.cefrLevel);
     final statusColor = done ? AppColors.success : widget.isUnlocked ? levelColor : AppColors.textSecondaryLight;
     final bubble = Material(
+      elevation: widget.isUnlocked ? 9 : 1,
+      shadowColor: statusColor.withOpacity(.32),
       color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.circular(26),
       child: InkWell(
@@ -177,4 +185,20 @@ class _RouteConnectorPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RouteConnectorPainter oldDelegate) =>
       oldDelegate.toLeft != toLeft || oldDelegate.color != color;
+}
+
+
+int _goalPriority(Unit unit, String? goal) {
+  final text = '${unit.title} ${unit.titleFarsi}'.toLowerCase();
+  final keywords = switch (goal) {
+    'travel' => ['travel', 'transport', 'food', 'hotel', 'shopping', 'greetings', 'directions', 'سفر', 'خرید'],
+    'work' => ['work', 'business', 'professional', 'technology', 'communication', 'کار', 'شغل'],
+    'study' => ['academic', 'education', 'research', 'university', 'science', 'study', 'دانشگاه', 'تحصیل'],
+    'immigration' => ['home', 'health', 'service', 'travel', 'communication', 'daily', 'خانه', 'مهاجرت'],
+    'entertainment' => ['movie', 'music', 'hobby', 'culture', 'media', 'story', 'فیلم', 'سرگرمی'],
+    'exam' => ['academic', 'grammar', 'vocabulary', 'reading', 'writing', 'exam', 'آزمون', 'گرامر'],
+    _ => const <String>[],
+  };
+  if (keywords.isEmpty) return 0;
+  return keywords.any(text.contains) ? 0 : 1;
 }
