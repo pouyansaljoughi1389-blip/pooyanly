@@ -10,6 +10,8 @@ class RewardsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
     if (user == null) return const SizedBox.shrink();
+    final missionProgress = context.watch<UserProvider>().dailyMissionProgress;
+    final claimedMissions = context.watch<UserProvider>().claimedDailyMissions;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -48,23 +50,29 @@ class RewardsScreen extends StatelessWidget {
                 _MissionCard(
                   title: 'تکمیل یک درس',
                   emoji: '📚',
-                  current: user.completedLessonIds.isNotEmpty ? 1 : 0,
+                  current: missionProgress['lesson'] ?? 0,
                   total: 1,
                   reward: 20,
+                  claimed: claimedMissions.contains('lesson'),
+                  onClaim: () => _claimMission(context, 'lesson'),
                 ),
                 _MissionCard(
                   title: 'مرور ۵ کلمه',
                   emoji: '🔁',
-                  current: 0,
+                  current: missionProgress['vocabulary'] ?? 0,
                   total: 5,
                   reward: 15,
+                  claimed: claimedMissions.contains('vocabulary'),
+                  onClaim: () => _claimMission(context, 'vocabulary'),
                 ),
                 _MissionCard(
-                  title: 'ثبت Streak امروز',
+                  title: 'حفظ روند مطالعهٔ دو روزه',
                   emoji: '🔥',
-                  current: user.streak > 0 ? 1 : 0,
+                  current: missionProgress['streak'] ?? 0,
                   total: 1,
                   reward: 10,
+                  claimed: claimedMissions.contains('streak'),
+                  onClaim: () => _claimMission(context, 'streak'),
                 ),
                 const SizedBox(height: 24),
 
@@ -137,12 +145,27 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
+void _claimMission(BuildContext context, String missionId) async {
+  final claimed = await context.read<UserProvider>().claimDailyMission(missionId);
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        claimed ? 'جایزه به حساب تو اضافه شد!' : 'این مأموریت هنوز کامل نشده یا جایزه‌اش دریافت شده است.',
+        style: const TextStyle(fontFamily: 'Vazirmatn'),
+      ),
+    ),
+  );
+}
+
 class _MissionCard extends StatelessWidget {
   final String title;
   final String emoji;
   final int current;
   final int total;
   final int reward;
+  final bool claimed;
+  final VoidCallback onClaim;
 
   const _MissionCard({
     required this.title,
@@ -150,6 +173,8 @@ class _MissionCard extends StatelessWidget {
     required this.current,
     required this.total,
     required this.reward,
+    required this.claimed,
+    required this.onClaim,
   });
 
   @override
@@ -219,10 +244,22 @@ class _MissionCard extends StatelessWidget {
                             color: AppColors.textSecondaryLight)),
                   ],
                 ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: claimed
+                      ? const Text('جایزه دریافت شد ✓',
+                          style: TextStyle(fontFamily: 'Vazirmatn', color: AppColors.success, fontSize: 11))
+                      : TextButton(
+                          onPressed: done ? onClaim : null,
+                          child: Text(done ? 'دریافت جایزه' : 'پس از تکمیل فعال می‌شود',
+                              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11)),
+                        ),
+                ),
               ],
             ),
           ),
-          if (done) ...[
+          if (done && !claimed) ...[
             const SizedBox(width: 8),
             const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 24),
           ],
