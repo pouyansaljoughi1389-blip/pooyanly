@@ -121,6 +121,53 @@ class UserProvider extends ChangeNotifier {
     await _save();
   }
 
+  // ── Spaced vocabulary review ───────────────────────────────────────
+  String _vocabularyKey(String word) => word.trim().toLowerCase();
+
+  bool isVocabularyDue(String word, {DateTime? at}) {
+    final dueValue = _user?.vocabularyReviewDueDates[_vocabularyKey(word)];
+    if (dueValue == null) return true;
+    final due = DateTime.tryParse(dueValue);
+    if (due == null) return true;
+    final now = at ?? DateTime.now();
+    return !DateTime(due.year, due.month, due.day).isAfter(
+      DateTime(now.year, now.month, now.day),
+    );
+  }
+
+  Future<void> reviewVocabulary(String word, {required bool remembered}) async {
+    final current = _user;
+    if (current == null || word.trim().isEmpty) return;
+    final key = _vocabularyKey(word);
+    final repetitions = Map<String, int>.from(current.vocabularyReviewRepetitions);
+    final intervals = Map<String, int>.from(current.vocabularyReviewIntervals);
+    final dueDates = Map<String, String>.from(current.vocabularyReviewDueDates);
+
+    final nextRepetition = remembered ? (repetitions[key] ?? 0) + 1 : 0;
+    final previousInterval = intervals[key] ?? 0;
+    final nextInterval = !remembered
+        ? 1
+        : nextRepetition == 1
+            ? 1
+            : nextRepetition == 2
+                ? 3
+                : (previousInterval * 2).clamp(1, 180);
+
+    final now = DateTime.now();
+    final due = DateTime(now.year, now.month, now.day)
+        .add(Duration(days: nextInterval));
+    repetitions[key] = nextRepetition;
+    intervals[key] = nextInterval;
+    dueDates[key] = due.toIso8601String();
+
+    _user = current.copyWith(
+      vocabularyReviewRepetitions: repetitions,
+      vocabularyReviewIntervals: intervals,
+      vocabularyReviewDueDates: dueDates,
+    );
+    await _save();
+  }
+
   // ── Dark Mode ─────────────────────────────────────────────────────
   Future<void> toggleDarkMode() async {
     if (_user == null) return;

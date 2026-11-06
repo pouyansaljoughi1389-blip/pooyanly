@@ -280,28 +280,41 @@ class _ReviewTabState extends State<_ReviewTab> {
   int _reviewIndex = 0;
   bool _revealed = false;
 
-  List<VocabularyItem> get _reviewItems {
-    // In a real app, SRS algorithm picks items due for review.
-    // Here we show first 10 items as a demo.
+  List<VocabularyItem> get _allReviewItems {
     final all = <VocabularyItem>[];
-    for (final unit in CourseData.a1Units) {
+    for (final unit in CourseData.getAllUnits()) {
       for (final lesson in unit.lessons) {
         all.addAll(lesson.vocabulary);
-        if (all.length >= 10) break;
       }
-      if (all.length >= 10) break;
     }
     return all;
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = _reviewItems;
+    final provider = context.watch<UserProvider>();
+    final items = _allReviewItems
+        .where((item) => provider.isVocabularyDue(item.english))
+        .toList();
 
     if (items.isEmpty) {
-      return const Center(
-        child: Text('هنوز لغتی برای مرور وجود ندارد',
-            style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15)),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Text('🎉', style: TextStyle(fontSize: 56)),
+              SizedBox(height: 16),
+              Text('همه‌چیز مرتبه!', style: TextStyle(
+                fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
+              SizedBox(height: 8),
+              Text('فعلاً لغت عقب‌افتاده‌ای نداری. فردا دوباره سر بزن.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontFamily: 'Vazirmatn', color: AppColors.textSecondaryLight)),
+            ],
+          ),
+        ),
       );
     }
 
@@ -310,14 +323,17 @@ class _ReviewTabState extends State<_ReviewTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('🎉', style: TextStyle(fontSize: 60)),
+            const Text('🏆', style: TextStyle(fontSize: 58)),
             const SizedBox(height: 16),
             const Text('مرور امروز تمام شد!',
-                style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w700)),
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 8),
+            Text('${items.length} لغت را مرور کردی.',
+              style: const TextStyle(fontFamily: 'Vazirmatn')),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => setState(() => _reviewIndex = 0),
-              child: const Text('مرور دوباره', style: TextStyle(fontFamily: 'Vazirmatn')),
+              onPressed: () => setState(() { _reviewIndex = 0; _revealed = false; }),
+              child: const Text('بررسی دوباره', style: TextStyle(fontFamily: 'Vazirmatn')),
             ),
           ],
         ),
@@ -325,19 +341,23 @@ class _ReviewTabState extends State<_ReviewTab> {
     }
 
     final item = items[_reviewIndex];
+    Future<void> submitReview(bool remembered) async {
+      await context.read<UserProvider>().reviewVocabulary(
+        item.english,
+        remembered: remembered,
+      );
+      if (!mounted) return;
+      setState(() { _reviewIndex++; _revealed = false; });
+    }
 
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          // Counter
-          Text(
-            '${_reviewIndex + 1} از ${items.length}',
-            style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight),
-          ),
+          Text('${_reviewIndex + 1} از ${items.length} لغتِ موعددار',
+            style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
+              color: AppColors.textSecondaryLight)),
           const SizedBox(height: 16),
-
-          // Card
           Expanded(
             child: GestureDetector(
               onTap: () => setState(() => _revealed = true),
@@ -345,87 +365,72 @@ class _ReviewTabState extends State<_ReviewTab> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  gradient: _revealed ? AppColors.primaryGradient : const LinearGradient(colors: [Color(0xFFf8f7ff), Color(0xFFf0eeff)]),
+                  gradient: _revealed ? AppColors.primaryGradient :
+                    const LinearGradient(colors: [Color(0xFFF8F7FF), Color(0xFFF0EEFF)]),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 2),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      item.english,
-                      style: TextStyle(
-                        fontFamily: 'Vazirmatn',
-                        fontSize: 40,
+                    Text(item.english, textDirection: TextDirection.ltr,
+                      style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 38,
                         fontWeight: FontWeight.w800,
-                        color: _revealed ? Colors.white : AppColors.primary,
-                      ),
-                      textDirection: TextDirection.ltr,
-                    ),
+                        color: _revealed ? Colors.white : AppColors.primary)),
                     const SizedBox(height: 8),
-                    Text(
-                      item.pronunciation,
-                      style: TextStyle(
-                        fontFamily: 'Vazirmatn',
-                        fontSize: 15,
-                        color: _revealed ? Colors.white70 : AppColors.textSecondaryLight,
-                      ),
-                      textDirection: TextDirection.ltr,
-                    ),
+                    Text(item.pronunciation, textDirection: TextDirection.ltr,
+                      style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15,
+                        color: _revealed ? Colors.white70 : AppColors.textSecondaryLight)),
                     if (_revealed) ...[
                       const SizedBox(height: 24),
                       const Divider(color: Colors.white30),
                       const SizedBox(height: 16),
-                      Text(
-                        item.farsi,
-                        style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 32, fontWeight: FontWeight.w700, color: Colors.white),
-                      ),
+                      Text(item.farsi, textAlign: TextAlign.center,
+                        style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 30,
+                          fontWeight: FontWeight.w700, color: Colors.white)),
                       const SizedBox(height: 12),
-                      Text(item.exampleFa,
-                          style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Colors.white70),
-                          textAlign: TextAlign.center),
+                      Text(item.exampleEn, textDirection: TextDirection.ltr,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 14,
+                          color: Colors.white)),
+                      const SizedBox(height: 8),
+                      Text(item.exampleFa, textAlign: TextAlign.center,
+                        style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
+                          color: Colors.white70)),
                     ] else ...[
                       const SizedBox(height: 24),
-                      const Text('برای دیدن معنی ضربه بزنید',
-                          style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
+                      const Text('معنی را در ذهنت حدس بزن؛ سپس کارت را لمس کن.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
+                          color: AppColors.textSecondaryLight)),
                     ],
                   ],
                 ),
               ),
             ),
           ),
-
           if (_revealed) ...[
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => setState(() { _reviewIndex++; _revealed = false; }),
-                    icon: const Icon(Icons.close_rounded, color: AppColors.error),
-                    label: const Text('اشتباه بودم', style: TextStyle(fontFamily: 'Vazirmatn', color: AppColors.error)),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.error),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => setState(() { _reviewIndex++; _revealed = false; }),
-                    icon: const Icon(Icons.check_rounded),
-                    label: const Text('بلد بودم', style: TextStyle(fontFamily: 'Vazirmatn')),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.success,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            const SizedBox(height: 18),
+            Row(children: [
+              Expanded(child: OutlinedButton.icon(
+                onPressed: () => submitReview(false),
+                icon: const Icon(Icons.refresh_rounded, color: AppColors.error),
+                label: const Text('هنوز یاد نگرفتم',
+                  style: TextStyle(fontFamily: 'Vazirmatn', color: AppColors.error)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.error),
+                  padding: const EdgeInsets.symmetric(vertical: 14)),
+              )),
+              const SizedBox(width: 12),
+              Expanded(child: ElevatedButton.icon(
+                onPressed: () => submitReview(true),
+                icon: const Icon(Icons.check_rounded),
+                label: const Text('بلدم', style: TextStyle(fontFamily: 'Vazirmatn')),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.success,
+                  padding: const EdgeInsets.symmetric(vertical: 14)),
+              )),
+            ]),
           ],
           const SizedBox(height: 20),
         ],

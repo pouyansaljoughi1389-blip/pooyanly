@@ -122,6 +122,9 @@ class UserModel {
   final bool placementTestComplete;
   final Map<String, int> skillScores;
   final List<String> completedLessonIds;
+  final Map<String, String> vocabularyReviewDueDates;
+  final Map<String, int> vocabularyReviewIntervals;
+  final Map<String, int> vocabularyReviewRepetitions;
   final bool notificationsEnabled;
   final bool isDarkMode;
   final DateTime createdAt;
@@ -143,6 +146,9 @@ class UserModel {
     this.placementTestComplete = false,
     this.skillScores = const {},
     this.completedLessonIds = const [],
+    this.vocabularyReviewDueDates = const {},
+    this.vocabularyReviewIntervals = const {},
+    this.vocabularyReviewRepetitions = const {},
     this.notificationsEnabled = true,
     this.isDarkMode = false,
     required this.createdAt,
@@ -171,6 +177,9 @@ class UserModel {
     bool? placementTestComplete,
     Map<String, int>? skillScores,
     List<String>? completedLessonIds,
+    Map<String, String>? vocabularyReviewDueDates,
+    Map<String, int>? vocabularyReviewIntervals,
+    Map<String, int>? vocabularyReviewRepetitions,
     bool? notificationsEnabled,
     bool? isDarkMode,
     DateTime? createdAt,
@@ -192,6 +201,9 @@ class UserModel {
       placementTestComplete: placementTestComplete ?? this.placementTestComplete,
       skillScores: skillScores ?? this.skillScores,
       completedLessonIds: completedLessonIds ?? this.completedLessonIds,
+      vocabularyReviewDueDates: vocabularyReviewDueDates ?? this.vocabularyReviewDueDates,
+      vocabularyReviewIntervals: vocabularyReviewIntervals ?? this.vocabularyReviewIntervals,
+      vocabularyReviewRepetitions: vocabularyReviewRepetitions ?? this.vocabularyReviewRepetitions,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       isDarkMode: isDarkMode ?? this.isDarkMode,
       createdAt: createdAt ?? this.createdAt,
@@ -216,6 +228,9 @@ class UserModel {
     'placementTestComplete': placementTestComplete,
     'skillScores': skillScores,
     'completedLessonIds': completedLessonIds,
+    'vocabularyReviewDueDates': vocabularyReviewDueDates,
+    'vocabularyReviewIntervals': vocabularyReviewIntervals,
+    'vocabularyReviewRepetitions': vocabularyReviewRepetitions,
     'notificationsEnabled': notificationsEnabled,
     'isDarkMode': isDarkMode,
     'createdAt': createdAt.toIso8601String(),
@@ -252,6 +267,9 @@ class UserModel {
     placementTestComplete: j['placementTestComplete'] ?? false,
     skillScores: Map<String, int>.from(j['skillScores'] ?? {}),
     completedLessonIds: List<String>.from(j['completedLessonIds'] ?? []),
+    vocabularyReviewDueDates: Map<String, String>.from(j['vocabularyReviewDueDates'] ?? {}),
+    vocabularyReviewIntervals: Map<String, int>.from(j['vocabularyReviewIntervals'] ?? {}),
+    vocabularyReviewRepetitions: Map<String, int>.from(j['vocabularyReviewRepetitions'] ?? {}),
     notificationsEnabled: j['notificationsEnabled'] ?? true,
     isDarkMode: j['isDarkMode'] ?? false,
     createdAt: DateTime.tryParse(j['createdAt'] ?? '') ?? DateTime.now(),
