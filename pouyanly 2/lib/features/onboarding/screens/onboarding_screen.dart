@@ -156,7 +156,7 @@ class _GoalPage extends StatelessWidget {
               hintText: 'مثلاً Pouyan یا هر نامی که دوست داری',
               prefixIcon: Icon(Icons.badge_outlined),
             ),
-            onChanged: (_) {},
+            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 14),
           Expanded(
