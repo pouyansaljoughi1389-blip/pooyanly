@@ -1,5 +1,4 @@
 import '../../../data/models/user_model.dart';
-import '../../lessons/models/lesson_data.dart';
 import 'english_dictionary.dart';
 
 /// Offline tutor. It searches the bundled course lexicon and teaches common
