@@ -256,6 +256,19 @@ class UserProvider extends ChangeNotifier {
     return true;
   }
 
+  Future<void> completeCheckpoint(String unitId) async {
+    final current = _user;
+    if (current == null || unitId.trim().isEmpty) return;
+    final checkpointId = 'checkpoint_$unitId';
+    if (current.completedLessonIds.contains(checkpointId)) return;
+    _user = current.copyWith(
+      completedLessonIds: [...current.completedLessonIds, checkpointId],
+      xp: current.xp + 50,
+      coins: current.coins + 10,
+    );
+    await _save();
+  }
+
   // ── Lesson Completion ─────────────────────────────────────────────
   Future<void> completeLesson(String lessonId, {int xpGain = 20, int coinGain = 5}) async {
     final currentUser = _user;
