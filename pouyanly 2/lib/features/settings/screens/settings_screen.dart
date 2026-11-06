@@ -118,6 +118,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     _activeDays.add(i);
                                   }
                                 });
+                                if (_notificationsEnabled) {
+                                  LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
+                                }
                               },
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
@@ -152,6 +155,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ],
             ),
+
+            const SizedBox(height: 20),
+            _SectionHeader(title: 'ویجت صفحهٔ اصلی اندروید', icon: Icons.widgets_rounded),
+            const SizedBox(height: 8),
+            _SettingCard(children: const [
+              ListTile(
+                leading: Icon(Icons.auto_graph_rounded, color: AppColors.primary),
+                title: Text('نمایش پیشرفت روزانه', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 14, fontWeight: FontWeight.w700)),
+                subtitle: Text('در صفحهٔ اصلی گوشی، روی فضای خالی چند لحظه نگه دار؛ سپس «ابزارک‌ها» و POUYANLY را انتخاب کن.', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, height: 1.6)),
+              ),
+            ]),
 
             const SizedBox(height: 24),
 
