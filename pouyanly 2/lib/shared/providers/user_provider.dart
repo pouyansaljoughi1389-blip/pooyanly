@@ -4,7 +4,6 @@ import '../../data/models/user_model.dart';
 import '../../data/local/storage_service.dart';
 import '../../features/lessons/models/lesson_data.dart';
 import '../../core/services/daily_progress_widget_service.dart';
-import '../../core/services/learning_reminder_service.dart';
 
 class UserProvider extends ChangeNotifier {
   UserModel? _user;
