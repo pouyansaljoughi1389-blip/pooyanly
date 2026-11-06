@@ -123,7 +123,7 @@ class _HomePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${user.dailyStudyTime?.farsiLabel ?? '۱۰ دقیقه در روز'} • ${userProvider.todayXp}/۵۰ XP',
+                        '${user.dailyStudyTime?.farsiLabel ?? '۱۰ دقیقه در روز'} • ${userProvider.dailyXpEarned}/۵۰ XP',
                         style: const TextStyle(
                           fontFamily: 'Vazirmatn',
                           fontSize: 18,
@@ -135,7 +135,7 @@ class _HomePage extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(100),
                         child: LinearProgressIndicator(
-                          value: userProvider.dailyXpProgress,
+                          value: (userProvider.dailyProgressPercent / 100),
                           minHeight: 8,
                           backgroundColor: Colors.white24,
                           valueColor: const AlwaysStoppedAnimation(Colors.white),
