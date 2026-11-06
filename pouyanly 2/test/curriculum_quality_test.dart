@@ -6,6 +6,20 @@ void main() {
     final units = CourseData.getAllUnits();
     final lessons = units.expand((unit) => unit.lessons).toList();
 
+    test('expanded pathway includes substantial A1 through C2 content', () {
+      for (final level in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']) {
+        final levelUnits = CourseData.getUnitsForLevel(level);
+        expect(levelUnits, isNotEmpty, reason: 'Missing $level pathway');
+        expect(levelUnits.expand((unit) => unit.lessons).length, greaterThanOrEqualTo(3));
+      }
+      expect(lessons.length, greaterThanOrEqualTo(60));
+      final levels = units.map((unit) => unit.cefrLevel).toList();
+      expect(levels, orderedEquals([...levels]..sort((a, b) {
+        const order = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
+        return order[a]!.compareTo(order[b]!);
+      })));
+    });
+
     test('every published lesson has a measurable objective and skill focus', () {
       expect(lessons, isNotEmpty);
       for (final lesson in lessons) {
