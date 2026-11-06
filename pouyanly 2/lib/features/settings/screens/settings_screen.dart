@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
-import '../../../core/services/native_features.dart';
 import '../../../core/services/learning_reminder_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -28,8 +28,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     _notificationsEnabled = context.read<UserProvider>().user?.notificationsEnabled ?? true;
-    NativeFeatures.loadReminderTime().then((value) {
-      if (mounted) setState(() => _reminderTime = TimeOfDay(hour: value['hour']!, minute: value['minute']!));
+    SharedPreferences.getInstance().then((prefs) {
+      if (!mounted) return;
+      setState(() {
+        _reminderTime = TimeOfDay(
+          hour: prefs.getInt('learningReminderHour') ?? 20,
+          minute: prefs.getInt('learningReminderMinute') ?? 0,
+        );
+        _activeDays
+          ..clear()
+          ..addAll((prefs.getStringList('learningReminderDays') ?? ['1', '2', '3', '4', '5'])
+              .map((value) => int.tryParse(value)).whereType<int>());
+      });
+      if (_notificationsEnabled) {
+        LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
+      }
     });
   }
 
@@ -63,6 +76,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _notificationsEnabled,
                   onChanged: (v) async {
                     setState(() => _notificationsEnabled = v);
+                    final current = context.read<UserProvider>().user;
+                    if (current != null) {
+                      await context.read<UserProvider>().updateUser(current.copyWith(notificationsEnabled: v));
+                    }
                     if (v) {
                       await LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
                     } else {
@@ -128,6 +145,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     _activeDays.add(i);
                                   }
                                 });
+                                if (_notificationsEnabled) {
+                                  LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
+                                }
                                 if (_notificationsEnabled) {
                                   LearningReminderService.scheduleWeekly(time: _reminderTime, activeDays: _activeDays);
                                 }
