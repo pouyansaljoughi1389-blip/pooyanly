@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/services/native_features.dart';
 import 'shared/providers/user_provider.dart';
 import 'data/local/storage_service.dart';
 import 'features/onboarding/screens/splash_screen.dart';
@@ -23,6 +24,7 @@ import 'features/about/screens/about_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StorageService.instance.init();
+  await NativeFeatures.scheduleDailyReminder(hour: 20, minute: 0);
   runApp(
     ChangeNotifierProvider(
       create: (_) => UserProvider(),
