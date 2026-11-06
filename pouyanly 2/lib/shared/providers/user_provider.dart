@@ -56,7 +56,7 @@ class UserProvider extends ChangeNotifier {
   double get vocabularyMasteryPercent {
     final repetitions = _user?.vocabularyReviewRepetitions.values ?? const <int>[];
     if (repetitions.isEmpty) return 0;
-    final score = repetitions.fold<int>(0, (sum, count) => sum + count.clamp(0, 5));
+    final score = repetitions.fold<int>(0, (sum, count) => sum + count.clamp(0, 5).toInt());
     return (score / (repetitions.length * 5) * 100).roundToDouble();
   }
 
