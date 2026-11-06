@@ -127,8 +127,40 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
               subtitle: Text(lesson.vocabulary.length.toString() + ' واژه • ' + lesson.exercises.length.toString() + ' تمرین • ' + lesson.estimatedMinutes.toString() + ' دقیقه', style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10)),
               trailing: Icon(lessonDone ? Icons.check_circle_rounded : Icons.play_circle_fill_rounded, color: lessonDone ? AppColors.success : levelColor));
           }).toList())),
-        Align(alignment: widget.alignLeft ? Alignment.centerLeft : Alignment.centerRight, child: Container(width: 18, height: 18, margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 28),
-          decoration: BoxDecoration(shape: BoxShape.circle, color: statusColor, border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 4), boxShadow: [BoxShadow(color: statusColor.withOpacity(.25), blurRadius: 9)]))),
+        SizedBox(
+          height: 42,
+          width: double.infinity,
+          child: CustomPaint(
+            painter: _RouteConnectorPainter(toLeft: widget.alignLeft, color: statusColor),
+          ),
+        ),
       ]));
   }
+}
+
+
+class _RouteConnectorPainter extends CustomPainter {
+  final bool toLeft;
+  final Color color;
+  const _RouteConnectorPainter({required this.toLeft, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final start = Offset(size.width / 2, 0);
+    final end = Offset(size.width / 2 + (toLeft ? -30 : 30), size.height);
+    final path = Path()
+      ..moveTo(start.dx, start.dy)
+      ..cubicTo(start.dx, size.height * .45, end.dx, size.height * .55, end.dx, end.dy);
+    final paint = Paint()
+      ..color = color.withOpacity(.42)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5
+      ..strokeCap = StrokeCap.round;
+    canvas.drawPath(path, paint);
+    canvas.drawCircle(end, 5, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(covariant _RouteConnectorPainter oldDelegate) =>
+      oldDelegate.toLeft != toLeft || oldDelegate.color != color;
 }
