@@ -158,7 +158,7 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
               PButton(
                 label: 'شروع یادگیری',
-                onPressed: () => context.go('/onboarding'),
+                onPressed: () => context.go('/account'),
                 icon: Icons.arrow_forward_rounded,
               ),
               const SizedBox(height: 10),
@@ -169,7 +169,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'رایگان  •  بدون نیاز به ثبت‌نام اولیه',
+                'ساخت پروفایل  •  مسیر شخصی‌سازی‌شده',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Vazirmatn',
