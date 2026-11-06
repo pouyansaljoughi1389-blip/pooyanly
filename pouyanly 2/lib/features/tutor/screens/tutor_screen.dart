@@ -22,7 +22,7 @@ class _TutorScreenState extends State<TutorScreen> {
   final _scrollController = ScrollController();
   final List<_TutorMessage> _messages = [
     const _TutorMessage(
-      'سلام! من پویان سلجوقی هستم. در جواب به سؤال شما کمک می‌کنم. معنی یک واژه، تلفظ و مثالش را بپرس یا یک نکتهٔ گرامری مطرح کن.',
+      'سلام، من پویان سلجوقی هستم. در جواب به سؤال شما کمک می‌کنم. معنی یک واژه، عبارت یا نکتهٔ گرامری را بپرس.',
       fromTutor: true,
     ),
   ];
