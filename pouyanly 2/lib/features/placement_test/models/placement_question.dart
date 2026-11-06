@@ -189,7 +189,6 @@ class PlacementTestData {
       correctAnswer: 'با وجود',
       explanationFarsi: '"Despite" یعنی "با وجود" یا "علیرغم". این کلمه برای بیان تضاد به کار می‌رود.',
     ),
-  ];
 
     // ── Extended B2, C1 and C2 screening ──
     const PlacementQuestion(
