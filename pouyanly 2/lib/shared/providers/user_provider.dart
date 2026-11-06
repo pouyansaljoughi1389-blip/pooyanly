@@ -249,6 +249,7 @@ class UserProvider extends ChangeNotifier {
       vocabularyReviewIntervals: intervals,
       vocabularyReviewDueDates: dueDates,
     );
+    await _recordVocabularyMissionProgress();
     await _save();
   }
 
