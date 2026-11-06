@@ -40,14 +40,28 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+        backgroundColor: isDark ? const Color(0xD92A1D48) : const Color(0xB86E4AB6),
+        foregroundColor: Colors.white,
         titleTextStyle: TextStyle(
           fontFamily: 'Vazirmatn',
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+          color: Colors.white,
         ),
+      ),
+
+      drawerTheme: DrawerThemeData(
+        backgroundColor: isDark ? const Color(0xF0211738) : const Color(0xF2EEE6FF),
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.horizontal(left: Radius.circular(28)),
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.transparent),
+      popupMenuTheme: PopupMenuThemeData(
+        color: isDark ? const Color(0xF0211738) : const Color(0xF2F2EBFF),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       ),
 
       // ── Card ──
