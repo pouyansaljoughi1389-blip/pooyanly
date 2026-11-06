@@ -50,8 +50,10 @@ class UserProvider extends ChangeNotifier {
       ? Set<String>.from(_weeklyMissionState['claimed'] ?? const <String>[])
       : <String>{};
 
-  int get vocabularyMistakeCount => _user?.vocabularyReviewMistakes.values
-      .fold(0, (sum, count) => sum + count) ?? 0;
+  int get vocabularyMistakeCount {
+    final mistakes = _user?.vocabularyReviewMistakes ?? const <String, int>{};
+    return mistakes.values.fold<int>(0, (sum, count) => sum + count);
+  }
 
   double get vocabularyMasteryPercent {
     final repetitions = _user?.vocabularyReviewRepetitions.values ?? const <int>[];
