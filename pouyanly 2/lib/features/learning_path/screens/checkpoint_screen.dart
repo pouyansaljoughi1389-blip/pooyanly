@@ -68,6 +68,23 @@ class _CheckpointScreenState extends State<CheckpointScreen> {
     if (unit == null || questions.isEmpty) {
       return Scaffold(appBar: AppBar(title: const Text('آزمون جزیره')), body: const Center(child: Text('آزمون این بخش پیدا نشد.')));
     }
+    final completedIds = context.watch<UserProvider>().user?.completedLessonIds ?? const <String>[];
+    final unitLessonsPassed = unit.lessons.every((lesson) => completedIds.contains(lesson.id));
+    if (!unitLessonsPassed) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('آزمون جامع بخش')),
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(28),
+            child: Text(
+              'برای شرکت در آزمون جامع، ابتدا باید تمام درس‌های این بخش را با حدنصاب قبولی بگذرانی.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15, height: 1.8),
+            ),
+          ),
+        ),
+      );
+    }
     final question = questions[_index];
     final selected = _answers[_index];
     return Directionality(
