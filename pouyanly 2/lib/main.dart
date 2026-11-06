@@ -15,6 +15,7 @@ import 'features/learning_path/screens/learning_path_screen.dart';
 import 'features/settings/screens/settings_screen.dart';
 import 'features/tutor/screens/tutor_screen.dart';
 import 'features/community/screens/community_screen.dart';
+import 'features/listening/screens/listening_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +50,7 @@ final _router = GoRouter(
             lessonId: state.pathParameters['lessonId'] ?? '')),
     GoRoute(path: '/tutor', builder: (ctx, _) => const TutorScreen()),
     GoRoute(path: '/community', builder: (ctx, _) => const CommunityScreen()),
+    GoRoute(path: '/listening', builder: (ctx, _) => const ListeningScreen()),
     GoRoute(
         path: '/settings',
         builder: (ctx, _) => const SettingsScreen()),
