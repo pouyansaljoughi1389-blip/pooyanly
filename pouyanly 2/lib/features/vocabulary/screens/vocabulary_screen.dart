@@ -279,6 +279,24 @@ class _ReviewTab extends StatefulWidget {
 class _ReviewTabState extends State<_ReviewTab> {
   int _reviewIndex = 0;
   bool _revealed = false;
+  bool _sessionInitialized = false;
+  List<VocabularyItem> _sessionItems = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_sessionInitialized) {
+      _refreshSession();
+      _sessionInitialized = true;
+    }
+  }
+
+  void _refreshSession() {
+    final provider = context.read<UserProvider>();
+    _sessionItems = _allReviewItems
+        .where((item) => provider.isVocabularyDue(item.english))
+        .toList();
+  }
 
   List<VocabularyItem> get _allReviewItems {
     final all = <VocabularyItem>[];
@@ -292,10 +310,8 @@ class _ReviewTabState extends State<_ReviewTab> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<UserProvider>();
-    final items = _allReviewItems
-        .where((item) => provider.isVocabularyDue(item.english))
-        .toList();
+    context.watch<UserProvider>();
+    final items = _sessionItems;
 
     if (items.isEmpty) {
       return Center(
@@ -332,7 +348,7 @@ class _ReviewTabState extends State<_ReviewTab> {
               style: const TextStyle(fontFamily: 'Vazirmatn')),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => setState(() { _reviewIndex = 0; _revealed = false; }),
+              onPressed: () => setState(() { _refreshSession(); _reviewIndex = 0; _revealed = false; }),
               child: const Text('بررسی دوباره', style: TextStyle(fontFamily: 'Vazirmatn')),
             ),
           ],

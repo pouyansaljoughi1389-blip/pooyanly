@@ -151,7 +151,7 @@ class UserProvider extends ChangeNotifier {
             ? 1
             : nextRepetition == 2
                 ? 3
-                : (previousInterval * 2).clamp(1, 180);
+                : (previousInterval * 2).clamp(1, 180).toInt();
 
     final now = DateTime.now();
     final due = DateTime(now.year, now.month, now.day)
