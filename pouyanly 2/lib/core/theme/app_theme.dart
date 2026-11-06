@@ -55,7 +55,7 @@ class AppTheme {
         elevation: 0,
         color: isDark ? AppColors.cardDark : AppColors.cardLight,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           side: BorderSide(
             color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
           ),
@@ -68,7 +68,7 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
           textStyle: const TextStyle(
             fontFamily: 'Vazirmatn',
@@ -110,7 +110,7 @@ class AppTheme {
         filled: true,
         fillColor: isDark ? AppColors.cardDark : AppColors.cardLight,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: isDark ? AppColors.dividerDark : AppColors.dividerLight),
         ),
         enabledBorder: OutlineInputBorder(
