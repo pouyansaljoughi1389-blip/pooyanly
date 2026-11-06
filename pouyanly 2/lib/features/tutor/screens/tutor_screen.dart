@@ -22,7 +22,7 @@ class _TutorScreenState extends State<TutorScreen> {
   final _scrollController = ScrollController();
   final List<_TutorMessage> _messages = [
     const _TutorMessage(
-      'سلام! من بخش تمرین معلم POUYANLY هستم. یک سؤال گرامری بپرس یا یک جملهٔ انگلیسی بنویس تا با هم تمرین کنیم.',
+      'سلام! من پویان سلجوقی هستم. در جواب به سؤال شما کمک می‌کنم. معنی یک واژه، تلفظ و مثالش را بپرس یا یک نکتهٔ گرامری مطرح کن.',
       fromTutor: true,
     ),
   ];
@@ -76,7 +76,7 @@ class _TutorScreenState extends State<TutorScreen> {
               padding: const EdgeInsets.all(12),
               color: AppColors.primary.withOpacity(0.08),
               child: const Text(
-                'نسخهٔ آزمایشی آفلاین • پاسخ‌ها آموزشی و ازپیش‌تعریف‌شده‌اند؛ هنوز مدل هوش مصنوعی آنلاین متصل نیست.',
+                'فرهنگ لغت و پاسخ‌های آموزشی آفلاین • برای پاسخ آزاد به هر موضوعی هنوز مدل هوش مصنوعی مولد متصل نیست.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11),
               ),
