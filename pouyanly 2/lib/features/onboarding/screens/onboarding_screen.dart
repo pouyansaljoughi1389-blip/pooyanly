@@ -103,7 +103,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 controller: _pageCtrl,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _GoalPage(selected: _goal, onSelect: (g) => setState(() => _goal = g), nameController: _nameController),
+                  _GoalPage(selected: _goal, onSelect: (g) => setState(() => _goal = g), nameController: _nameController, onNameChanged: (_) => setState(() {})),
                   _LevelPage(selected: _level, onSelect: (l) => setState(() => _level = l)),
                   _TimePage(selected: _time, onSelect: (t) => setState(() => _time = t)),
                   _PeriodPage(selected: _period, onSelect: (p) => setState(() => _period = p)),
@@ -133,7 +133,8 @@ class _GoalPage extends StatelessWidget {
   final LearningGoal? selected;
   final ValueChanged<LearningGoal> onSelect;
   final TextEditingController nameController;
-  const _GoalPage({required this.selected, required this.onSelect, required this.nameController});
+  final ValueChanged<String> onNameChanged;
+  const _GoalPage({required this.selected, required this.onSelect, required this.nameController, required this.onNameChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +157,7 @@ class _GoalPage extends StatelessWidget {
               hintText: 'مثلاً Pouyan یا هر نامی که دوست داری',
               prefixIcon: Icon(Icons.badge_outlined),
             ),
-            onChanged: (_) => setState(() {}),
+            onChanged: onNameChanged,
           ),
           const SizedBox(height: 14),
           Expanded(
