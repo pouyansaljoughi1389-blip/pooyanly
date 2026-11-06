@@ -4,13 +4,13 @@ class AppColors {
   AppColors._();
 
   // ── Primary Palette ──────────────────────────────────────────────
-  static const Color primary        = Color(0xFF6C63FF);
-  static const Color primaryLight   = Color(0xFF9D97FF);
-  static const Color primaryDark    = Color(0xFF4A42D6);
+  static const Color primary        = Color(0xFF5B5FEF);
+  static const Color primaryLight   = Color(0xFF898DFF);
+  static const Color primaryDark    = Color(0xFF4145C8);
 
-  static const Color secondary      = Color(0xFF00C896);
-  static const Color secondaryLight = Color(0xFF4DDBAF);
-  static const Color secondaryDark  = Color(0xFF009E76);
+  static const Color secondary      = Color(0xFF13BFA4);
+  static const Color secondaryLight = Color(0xFF55D9C0);
+  static const Color secondaryDark  = Color(0xFF079A83);
 
   static const Color accent         = Color(0xFFFF6B6B);
   static const Color accentLight    = Color(0xFFFF9E9E);
@@ -36,24 +36,24 @@ class AppColors {
   static const Color streakColor = Color(0xFFFF6B35);
 
   // ── Light Theme Neutrals ─────────────────────────────────────────
-  static const Color backgroundLight     = Color(0xFFF8F7FF);
+  static const Color backgroundLight     = Color(0xFFF5F6FC);
   static const Color surfaceLight        = Color(0xFFFFFFFF);
   static const Color cardLight           = Color(0xFFFFFFFF);
-  static const Color textPrimaryLight    = Color(0xFF1A1A2E);
+  static const Color textPrimaryLight    = Color(0xFF171B30);
   static const Color textSecondaryLight  = Color(0xFF6B7280);
   static const Color dividerLight        = Color(0xFFE5E7EB);
 
   // ── Dark Theme Neutrals ──────────────────────────────────────────
-  static const Color backgroundDark     = Color(0xFF0F0F1A);
+  static const Color backgroundDark     = Color(0xFF0D1020);
   static const Color surfaceDark        = Color(0xFF1A1A2E);
-  static const Color cardDark           = Color(0xFF252538);
+  static const Color cardDark           = Color(0xFF202640);
   static const Color textPrimaryDark    = Color(0xFFF1F1FF);
   static const Color textSecondaryDark  = Color(0xFF9CA3AF);
   static const Color dividerDark        = Color(0xFF374151);
 
   // ── Gradients ────────────────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF6C63FF), Color(0xFF9D97FF)],
+    colors: [Color(0xFF5057E8), Color(0xFF898DFF)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -65,7 +65,7 @@ class AppColors {
   );
 
   static const LinearGradient heroGradient = LinearGradient(
-    colors: [Color(0xFF6C63FF), Color(0xFF00C896)],
+    colors: [Color(0xFF5057E8), Color(0xFF18BFA5)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
