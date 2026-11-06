@@ -55,7 +55,7 @@ class LearningPathScreen extends StatelessWidget {
           final unit = units[index];
           final completed = unit.lessons.where((l) => completedIds.contains(l.id)).length;
           final unlocked = index == 0 ||
-              units.take(index).every((previous) => previous.lessons.every((l) => completedIds.contains(l.id)));
+              units.take(index).every((previous) => previous.lessons.every((l) => completedIds.contains(l.id)) && completedIds.contains('checkpoint_${previous.id}'));
           return _MapUnitNode(unit: unit, completed: completed, isUnlocked: unlocked, completedIds: completedIds, alignLeft: index.isOdd);
         }, childCount: units.length))),
       ]),
@@ -149,7 +149,15 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
                           Icon(Icons.play_circle_fill_rounded, color: levelColor),
                         ])
                       : const Icon(Icons.lock_rounded, color: AppColors.textSecondaryLight));
-          }).toList())),
+          }).toList()),
+          if (done) Padding(
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+            child: SizedBox(width: double.infinity, child: FilledButton.icon(
+              onPressed: () => context.push('/checkpoint/${widget.unit.id}'),
+              icon: const Icon(Icons.workspace_premium_rounded),
+              label: Text(widget.completedIds.contains('checkpoint_${widget.unit.id}') ? 'آزمون جزیره را گذرانده‌ای' : 'آزمون جامع جزیره • ۸ سؤال'),
+            )),
+          ),
         SizedBox(
           height: 42,
           width: double.infinity,
