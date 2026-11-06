@@ -62,6 +62,18 @@ void main() {
       }
     });
 
+
+    test('correct answers are not fixed to the first option', () {
+      final positions = <int>{};
+      for (final lesson in lessons) {
+        for (final exercise in lesson.exercises) {
+          positions.add(exercise.options.indexOf(exercise.correctAnswer));
+        }
+      }
+      expect(positions.length, greaterThan(1),
+          reason: 'Correct answers must appear in different option positions');
+    });
+
     test('vocabulary examples and translations are complete', () {
       for (final lesson in lessons) {
         for (final item in lesson.vocabulary) {
