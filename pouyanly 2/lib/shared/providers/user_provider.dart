@@ -245,15 +245,11 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Skip only the next sequential lesson; skipping costs XP and grants no lesson reward.
-  Future<bool> skipLesson(String lessonId, {int xpCost = 100}) async {
+  Future<bool> skipLesson(String lessonId, {int xpCost = 100, required List<String> previousLessonIds}) async {
     final current = _user;
     if (current == null || current.xp < xpCost || current.completedLessonIds.contains(lessonId)) return false;
-    final lessons = CourseData.getAllUnits().expand((unit) => unit.lessons).toList();
-    final targetIndex = lessons.indexWhere((lesson) => lesson.id == lessonId);
-    if (targetIndex < 0) return false;
-    for (var i = 0; i < targetIndex; i++) {
-      if (!current.completedLessonIds.contains(lessons[i].id)) return false;
-    }
+    if (!CourseData.getAllUnits().expand((unit) => unit.lessons).any((lesson) => lesson.id == lessonId)) return false;
+    if (previousLessonIds.any((id) => !current.completedLessonIds.contains(id))) return false;
     final completed = List<String>.from(current.completedLessonIds)..add(lessonId);
     _user = current.copyWith(xp: current.xp - xpCost, completedLessonIds: completed);
     await _save();
