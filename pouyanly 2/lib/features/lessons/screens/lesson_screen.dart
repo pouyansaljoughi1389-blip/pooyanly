@@ -68,7 +68,7 @@ class _LessonScreenState extends State<LessonScreen> {
   Future<void> _finishLesson() async {
     if (_lesson == null) return;
     final total = _lesson!.exercises.length;
-    final passed = total > 0 && (_correct / total) >= 0.70;
+    final passed = LessonPassPolicy.isPassed(correct: _correct, total: total);
     if (passed) {
       await context.read<UserProvider>().completeLesson(
         _lesson!.id,
@@ -111,7 +111,7 @@ class _LessonScreenState extends State<LessonScreen> {
               lesson: _lesson!,
               correct: _correct,
               total: _lesson!.exercises.length,
-              passed: _lesson!.exercises.isNotEmpty && (_correct / _lesson!.exercises.length) >= 0.70,
+              passed: LessonPassPolicy.isPassed(correct: _correct, total: _lesson!.exercises.length),
             ),
         },
       ),
