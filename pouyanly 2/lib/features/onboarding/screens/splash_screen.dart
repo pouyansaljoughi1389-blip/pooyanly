@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
     final user = prov.user;
-    if (user?.notificationsEnabled != false) {
+    if (user != null && user.notificationsEnabled) {
       await LearningReminderService.restore();
     } else {
       await LearningReminderService.cancelAll();
