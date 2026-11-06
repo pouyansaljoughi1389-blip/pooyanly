@@ -20,18 +20,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _tab = 0;
+  late final List<Widget> _tabs;
 
   @override
-  Widget build(BuildContext context) {
-    final tabs = <Widget>[
+  void initState() {
+    super.initState();
+    _tabs = [
       _HomePage(onReviewTap: () => setState(() => _tab = 2)),
       const LearningPathScreen(),
       const VocabularyScreen(),
       const RewardsScreen(),
       const ProfileScreen(),
     ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _tab, children: tabs),
+      body: IndexedStack(index: _tab, children: _tabs),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _tab,
         onTap: (i) => setState(() => _tab = i),
