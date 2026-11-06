@@ -486,7 +486,7 @@ class _OfflineLeagueCard extends StatelessWidget {
     else if (xp < 1500) { tier = 'نقره‌ای'; next = 1500; }
     else if (xp < 3500) { tier = 'طلایی'; next = 3500; }
     else { tier = 'الماسی'; next = 3500; }
-    final progress = xp >= 3500 ? 1.0 : (xp / next).clamp(0.0, 1.0);
+    final progress = xp >= 3500 ? 1.0 : (xp / next).clamp(0.0, 1.0).toDouble();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(gradient: AppColors.primaryGradient,
