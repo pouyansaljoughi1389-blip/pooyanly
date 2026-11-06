@@ -431,6 +431,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return '$h:$m';
   }
 
+  Future<void> _persistReminderSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('learningReminderHour', _reminderTime.hour);
+    await prefs.setInt('learningReminderMinute', _reminderTime.minute);
+    await prefs.setStringList(
+      'learningReminderDays',
+      _activeDays.map((day) => day.toString()).toList(),
+    );
+  }
+
   Future<void> _pickTime(BuildContext context) async {
     final picked = await showTimePicker(
       context: context,
