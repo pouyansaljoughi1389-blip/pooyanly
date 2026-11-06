@@ -76,34 +76,47 @@ class UserProvider extends ChangeNotifier {
 
   // ── Lesson Completion ─────────────────────────────────────────────
   Future<void> completeLesson(String lessonId, {int xpGain = 20, int coinGain = 5}) async {
-    if (_user == null) return;
-    final ids = List<String>.from(_user!.completedLessonIds);
-    if (!ids.contains(lessonId)) ids.add(lessonId);
+    final currentUser = _user;
+    if (currentUser == null || lessonId.trim().isEmpty) return;
 
+    // A completed lesson must never grant XP or coins more than once.
+    if (currentUser.completedLessonIds.contains(lessonId)) return;
+
+    final ids = List<String>.from(currentUser.completedLessonIds)..add(lessonId);
     final now = DateTime.now();
-    final last = _user!.lastStudyDate;
-    int newStreak = _user!.streak;
+    final today = DateTime(now.year, now.month, now.day);
+    final last = currentUser.lastStudyDate;
+    final lastDay = last == null ? null : DateTime(last.year, last.month, last.day);
 
-    if (last == null) {
+    var newStreak = currentUser.streak;
+    var newLastStudyDate = now;
+
+    if (lastDay == null) {
       newStreak = 1;
     } else {
-      final diff = now.difference(last).inDays;
-      if (diff == 0) {
-        // Same day — no change
-      } else if (diff == 1) {
+      final dayDifference = today.difference(lastDay).inDays;
+      if (dayDifference == 1) {
         newStreak += 1;
-      } else {
-        newStreak = 1; // Streak broken
+      } else if (dayDifference > 1) {
+        newStreak = 1;
+      } else if (dayDifference < 0) {
+        // Device date moved backwards: do not rewind the saved study date.
+        newLastStudyDate = last;
       }
+      // dayDifference == 0 means another lesson on the same calendar day.
     }
 
-    _user = _user!.copyWith(
+    final safeXpGain = xpGain < 0 ? 0 : xpGain;
+    final safeCoinGain = coinGain < 0 ? 0 : coinGain;
+    _user = currentUser.copyWith(
       completedLessonIds: ids,
-      xp: _user!.xp + xpGain,
-      coins: _user!.coins + coinGain,
+      xp: currentUser.xp + safeXpGain,
+      coins: currentUser.coins + safeCoinGain,
       streak: newStreak,
-      longestStreak: newStreak > _user!.longestStreak ? newStreak : _user!.longestStreak,
-      lastStudyDate: now,
+      longestStreak: newStreak > currentUser.longestStreak
+          ? newStreak
+          : currentUser.longestStreak,
+      lastStudyDate: newLastStudyDate,
     );
     await _save();
   }
