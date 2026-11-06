@@ -169,14 +169,35 @@ class EnglishDictionary {
   }
 
   /// Returns all known dictionary words found in an English phrase, in source order.
+  /// Finds the longest known dictionary expressions first, so phrases such as
+  /// "traffic jam" and "public transport" are not split into unrelated words.
   static List<DictionaryEntry> findAll(String query) {
-    final matches = RegExp(r"[A-Za-z]+(?:['-][A-Za-z]+)*").allMatches(query);
+    final tokens = RegExp(r"[A-Za-z]+(?:['-][A-Za-z]+)*")
+        .allMatches(query)
+        .map((match) => match.group(0)!)
+        .toList();
     final results = <DictionaryEntry>[];
     final seen = <String>{};
-    for (final match in matches) {
-      final token = match.group(0)!;
-      final entry = find(token);
-      if (entry != null && seen.add(_normalise(entry.word))) results.add(entry);
+    var index = 0;
+    while (index < tokens.length) {
+      DictionaryEntry? matched;
+      var matchedLength = 0;
+      final maxLength = (tokens.length - index).clamp(1, 4);
+      for (var length = maxLength; length >= 1; length--) {
+        final phrase = tokens.skip(index).take(length).join(' ');
+        final candidate = find(phrase);
+        if (candidate != null && _normalise(candidate.word) == _normalise(phrase)) {
+          matched = candidate;
+          matchedLength = length;
+          break;
+        }
+      }
+      if (matched != null) {
+        if (seen.add(_normalise(matched.word))) results.add(matched);
+        index += matchedLength;
+      } else {
+        index++;
+      }
     }
     return results;
   }
