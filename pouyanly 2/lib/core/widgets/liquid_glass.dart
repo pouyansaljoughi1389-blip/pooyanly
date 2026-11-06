@@ -29,9 +29,6 @@ class _LiquidGlassState extends State<LiquidGlass> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: widget.onTap,
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapCancel: () => setState(() { _pressed = false; _drag = Offset.zero; }),
-      onTapUp: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
       onPanStart: (_) => setState(() => _pressed = true),
       onPanUpdate: (details) => setState(() {
         _drag = Offset(
