@@ -83,14 +83,13 @@ class UserProvider extends ChangeNotifier {
     _weeklyMissionState = StorageService.instance.loadWeeklyMissionState();
     _ensureDailyMissionDay();
     _ensureWeeklyMissionWeek();
-    await DailyProgressWidgetService.sync(
-      lessons: dailyLessonsCompleted,
-      xp: dailyXpEarned,
-      percent: dailyProgressPercent,
-    );
     notifyListeners();
     try {
-      await DailyProgressWidgetService.sync(lessons: dailyLessonsCompleted, xp: dailyXpEarned, percent: dailyProgressPercent);
+      await DailyProgressWidgetService.sync(
+        lessons: dailyLessonsCompleted,
+        xp: dailyXpEarned,
+        percent: dailyProgressPercent,
+      );
     } catch (_) {}
   }
 
