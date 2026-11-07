@@ -9,167 +9,264 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          // ── Hero Top ──
-          Expanded(
-            flex: 5,
-            child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(gradient: AppColors.heroGradient),
-              child: SafeArea(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Brand hero
+              Container(
+                height: 286,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  gradient: AppColors.heroGradient,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.24),
+                      blurRadius: 28,
+                      offset: const Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Stack(
                   children: [
-                    Container(
-                      width: 110,
-                      height: 110,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(32),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 30,
-                            offset: const Offset(0, 12),
+                    Positioned(
+                      top: -62,
+                      left: -42,
+                      child: _GlowCircle(size: 190, opacity: 0.10),
+                    ),
+                    Positioned(
+                      bottom: -86,
+                      right: -36,
+                      child: _GlowCircle(size: 210, opacity: 0.12),
+                    ),
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 94,
+                            height: 94,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(28),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.16),
+                                  blurRadius: 24,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                              child: Text('🦁', style: TextStyle(fontSize: 54)),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          const Text(
+                            'POUYANLY',
+                            style: TextStyle(
+                              fontFamily: 'Vazirmatn',
+                              fontSize: 31,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 2.2,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            'یادگیری انگلیسی، هوشمند و لذت‌بخش',
+                            style: TextStyle(
+                              fontFamily: 'Vazirmatn',
+                              fontSize: 13,
+                              color: Color(0xE6FFFFFF),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 13,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.16),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.24),
+                              ),
+                            ),
+                            child: const Text(
+                              'از اولین کلمه تا مکالمه روان',
+                              style: TextStyle(
+                                fontFamily: 'Vazirmatn',
+                                fontSize: 10,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ],
-                      ),
-                      child: const Center(
-                        child: Text('🦁', style: TextStyle(fontSize: 60)),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'POUYANLY',
-                      style: TextStyle(
-                        fontFamily: 'Vazirmatn',
-                        fontSize: 34,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'یادگیری هوشمند زبان انگلیسی',
-                      style: TextStyle(
-                        fontFamily: 'Vazirmatn',
-                        fontSize: 15,
-                        color: Color(0xCCFFFFFF),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ),
-
-          // ── Features + Buttons ──
-          Expanded(
-            flex: 6,
-            child: Container(
-              width: double.infinity,
-              color: Theme.of(context).scaffoldBackgroundColor,
-              padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
-              child: Column(
-                children: [
-                  _FeatureRow(
-                    emoji: '🎯',
-                    title: 'مسیر یادگیری شخصی',
-                    subtitle: 'برنامه درسی متناسب با سطح و هدف شما',
-                  ),
-                  const SizedBox(height: 16),
-                  _FeatureRow(
-                    emoji: '🔥',
-                    title: 'سیستم Streak و جوایز',
-                    subtitle: 'هر روز یاد بگیر، امتیاز بگیر، پیشرفت کن',
-                  ),
-                  const SizedBox(height: 16),
-                  _FeatureRow(
-                    emoji: '🧠',
-                    title: 'تکرار فاصله‌دار هوشمند',
-                    subtitle: 'کلمات را با SRS برای همیشه به خاطر بسپار',
-                  ),
-                  const Spacer(),
-                  PButton(
-                    label: 'شروع یادگیری',
-                    onPressed: () => context.go('/onboarding'),
-                  ),
-                  const SizedBox(height: 12),
-                  PButton(
-                    label: 'قبلاً ثبت‌نام کرده‌ام',
-                    outlined: true,
-                    onPressed: () => context.go('/home'),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'رایگان · بدون نیاز به ثبت‌نام اولیه',
-                    style: TextStyle(
-                      fontFamily: 'Vazirmatn',
-                      fontSize: 12,
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 26),
+              const Text(
+                'هر روز کمی بهتر شو',
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  fontFamily: 'Vazirmatn',
+                  fontSize: 21,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
-            ),
+              const SizedBox(height: 6),
+              Text(
+                'یک مسیر یادگیری متناسب با هدف و سطح خودت بساز.',
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  fontFamily: 'Vazirmatn',
+                  fontSize: 13,
+                  height: 1.7,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 18),
+              const _FeatureTile(
+                icon: Icons.route_rounded,
+                color: AppColors.primary,
+                title: 'مسیر یادگیری شخصی',
+                subtitle: 'درس‌ها متناسب با سطح و هدف تو چیده می‌شوند.',
+              ),
+              const SizedBox(height: 10),
+              const _FeatureTile(
+                icon: Icons.local_fire_department_rounded,
+                color: AppColors.streakColor,
+                title: 'انگیزه و استمرار',
+                subtitle: 'با XP، امتیاز و زنجیره مطالعه پیشرفتت را ببین.',
+              ),
+              const SizedBox(height: 10),
+              const _FeatureTile(
+                icon: Icons.psychology_alt_rounded,
+                color: AppColors.secondary,
+                title: 'مرور هوشمند',
+                subtitle: 'واژه‌ها را در زمان مناسب دوباره تمرین کن.',
+              ),
+              const SizedBox(height: 24),
+              PButton(
+                label: 'شروع یادگیری',
+                onPressed: () => context.go('/onboarding'),
+                icon: Icons.arrow_forward_rounded,
+              ),
+              const SizedBox(height: 10),
+              PButton(
+                label: 'قبلاً ثبت‌نام کرده‌ام',
+                outlined: true,
+                onPressed: () => context.go('/home'),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'رایگان  •  بدون نیاز به ثبت‌نام اولیه',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Vazirmatn',
+                  fontSize: 11,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _FeatureRow extends StatelessWidget {
-  final String emoji;
+class _GlowCircle extends StatelessWidget {
+  final double size;
+  final double opacity;
+
+  const _GlowCircle({required this.size, required this.opacity});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white.withOpacity(opacity),
+      ),
+    );
+  }
+}
+
+class _FeatureTile extends StatelessWidget {
+  final IconData icon;
+  final Color color;
   final String title;
   final String subtitle;
 
-  const _FeatureRow({
-    required this.emoji,
+  const _FeatureTile({
+    required this.icon,
+    required this.color,
     required this.title,
     required this.subtitle,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Center(child: Text(emoji, style: const TextStyle(fontSize: 24))),
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.55),
         ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: 'Vazirmatn',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontFamily: 'Vazirmatn',
-                  fontSize: 12,
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-            ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.11),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: color, size: 24),
           ),
-        ),
-      ],
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontFamily: 'Vazirmatn',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontFamily: 'Vazirmatn',
+                    fontSize: 11,
+                    height: 1.5,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

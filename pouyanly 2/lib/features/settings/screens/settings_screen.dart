@@ -250,6 +250,72 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
 
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.18),
+                    blurRadius: 22,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white.withOpacity(0.24)),
+                    ),
+                    child: const Icon(Icons.code_rounded, color: Colors.white, size: 27),
+                  ),
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'ساخته‌شده توسط',
+                          style: TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        SizedBox(height: 3),
+                        Text(
+                          'پویان سلجوقی',
+                          style: TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'با علاقه به یادگیری و فناوری',
+                          style: TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 11,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.auto_awesome_rounded, color: Colors.white70, size: 22),
+                ],
+              ),
+            ),
+
             const SizedBox(height: 40),
 
             // ─── Danger Zone ───
