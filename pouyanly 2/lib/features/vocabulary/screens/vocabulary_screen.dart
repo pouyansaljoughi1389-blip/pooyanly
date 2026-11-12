@@ -42,6 +42,7 @@ class _VocabularyScreenState extends State<VocabularyScreen>
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -428,10 +429,25 @@ class _ReviewTabState extends State<_ReviewTab> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  gradient: _revealed ? AppColors.primaryGradient :
-                    const LinearGradient(colors: [Color(0xFFF8F7FF), Color(0xFFF0EEFF)]),
+                  gradient: _revealed
+                      ? LinearGradient(
+                          colors: [
+                            scheme.primary,
+                            scheme.primary.withValues(alpha: .82),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : LinearGradient(
+                          colors: [
+                            scheme.surfaceContainerHighest,
+                            scheme.primaryContainer,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 2),
+                  border: Border.all(color: scheme.outline.withValues(alpha: .7), width: 1.5),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -439,27 +455,27 @@ class _ReviewTabState extends State<_ReviewTab> {
                     Text(item.english, textDirection: TextDirection.ltr,
                       style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 38,
                         fontWeight: FontWeight.w800,
-                        color: _revealed ? Colors.white : AppColors.primary)),
+                        color: _revealed ? scheme.onPrimary : scheme.primary)),
                     const SizedBox(height: 8),
                     Text(item.pronunciation, textDirection: TextDirection.ltr,
                       style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15,
-                        color: _revealed ? Colors.white70 : Theme.of(context).colorScheme.onSurfaceVariant)),
+                        color: _revealed ? scheme.onPrimary.withValues(alpha: .78) : scheme.onSurfaceVariant)),
                     if (_revealed) ...[
                       const SizedBox(height: 24),
-                      const Divider(color: Colors.white30),
+                      Divider(color: scheme.onPrimary.withValues(alpha: .3)),
                       const SizedBox(height: 16),
                       Text(item.farsi, textAlign: TextAlign.center,
-                        style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 30,
-                          fontWeight: FontWeight.w700, color: Colors.white)),
+                        style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 30,
+                          fontWeight: FontWeight.w700, color: scheme.onPrimary)),
                       const SizedBox(height: 12),
                       Text(item.exampleEn, textDirection: TextDirection.ltr,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 14,
-                          color: Colors.white)),
+                        style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 14,
+                          color: scheme.onPrimary)),
                       const SizedBox(height: 8),
                       Text(item.exampleFa, textAlign: TextAlign.center,
-                        style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
-                          color: Colors.white70)),
+                        style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
+                          color: scheme.onPrimary.withValues(alpha: .78))),
                     ] else ...[
                       const SizedBox(height: 24),
                       Text('معنی را در ذهنت حدس بزن؛ سپس کارت را لمس کن.',
