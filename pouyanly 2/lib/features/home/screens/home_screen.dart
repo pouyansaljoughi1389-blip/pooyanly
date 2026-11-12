@@ -187,7 +187,7 @@ class _HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         CircleAvatar(
                           backgroundColor: AppColors.primary,
@@ -231,7 +231,7 @@ class _HomePage extends StatelessWidget {
                           child: Icon(Icons.auto_awesome_rounded, color: Colors.white),
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -260,7 +260,7 @@ class _HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Theme.of(context).dividerColor),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         CircleAvatar(
                           backgroundColor: AppColors.primary,
@@ -398,7 +398,7 @@ class _LessonCard extends StatelessWidget {
                   ),
                   Text(
                     '${toPersianDigits(lesson.vocabulary.length)} لغت • ${toPersianDigits(lesson.exercises.length)} تمرین',
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                 ],
@@ -506,7 +506,7 @@ class _MiniStat extends StatelessWidget {
             Text(value, style: const TextStyle(
               fontFamily: 'Vazirmatn', fontSize: 16,
               fontWeight: FontWeight.w700, color: AppColors.primary)),
-            Text(label, style: const TextStyle(
+            Text(label, style: TextStyle(
               fontFamily: 'Vazirmatn', fontSize: 11,
               color: Theme.of(context).colorScheme.onSurfaceVariant)),
           ],
