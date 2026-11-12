@@ -15,12 +15,18 @@ void main() {
     });
 
     test('does not mutate lesson vocabulary used by the learning path', () {
-      final rawCount = CourseData.getAllUnits()
+      final rawCountBefore = CourseData.getAllUnits()
+          .expand((unit) => unit.lessons)
+          .fold<int>(0, (count, lesson) => count + lesson.vocabulary.length);
+      final dictionaryCount = CourseData.getAllVocabulary().length;
+      final rawCountAfter = CourseData.getAllUnits()
           .expand((unit) => unit.lessons)
           .fold<int>(0, (count, lesson) => count + lesson.vocabulary.length);
 
-      expect(CourseData.getAllVocabulary().length, lessThanOrEqualTo(rawCount));
-      expect(rawCount, greaterThan(CourseData.getAllVocabulary().length));
+      expect(dictionaryCount, rawCountBefore,
+          reason: 'All published lesson headwords are unique in the current curriculum');
+      expect(rawCountAfter, rawCountBefore,
+          reason: 'Reading the dictionary must not mutate lesson vocabulary');
     });
   });
 }
