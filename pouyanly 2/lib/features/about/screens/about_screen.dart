@@ -33,7 +33,7 @@ class AboutScreen extends StatelessWidget {
                 const BoxShadow(color: Colors.white24, blurRadius: 2, offset: Offset(-2, -2)),
               ],
             ),
-            child: const Column(
+            child: Column(
               children: [
                 ClipOval(
                   child: Image.asset(
