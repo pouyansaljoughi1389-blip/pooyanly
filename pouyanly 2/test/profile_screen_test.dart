@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../lib/core/theme/app_theme.dart';
 import '../lib/data/local/storage_service.dart';
+import '../lib/data/models/user_model.dart';
 import '../lib/features/profile/screens/profile_screen.dart';
 import '../lib/shared/providers/user_provider.dart';
 
