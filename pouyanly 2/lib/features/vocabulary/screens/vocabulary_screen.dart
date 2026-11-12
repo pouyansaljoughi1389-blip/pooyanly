@@ -42,7 +42,6 @@ class _VocabularyScreenState extends State<VocabularyScreen>
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -340,6 +339,7 @@ class _ReviewTabState extends State<_ReviewTab> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     context.watch<UserProvider>();
     final items = _sessionItems;
 
