@@ -14,6 +14,8 @@ void main() {
         expect(levelUnits.expand((unit) => unit.lessons).length, greaterThanOrEqualTo(3));
       }
       expect(lessons.length, 233, reason: 'The learning map must contain exactly 233 lessons');
+      expect(ExpandedCourseData.units.expand((unit) => unit.lessons).length, 226,
+          reason: 'The expanded curriculum must provide exactly 226 lessons');
       final levels = units.map((unit) => unit.cefrLevel).toList();
       expect(levels, orderedEquals([...levels]..sort((a, b) {
         const order = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
@@ -47,7 +49,7 @@ void main() {
           .expand((lesson) => lesson.vocabulary)
           .toList();
       final normalized = vocabulary
-          .map((item) => item.english.trim().toLowerCase().replaceAll(RegExp(r'\\s+'), ' '))
+          .map((item) => item.english.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' '))
           .toList();
       expect(normalized.toSet().length, normalized.length,
           reason: 'An English headword must not be repeated across expanded topics');
