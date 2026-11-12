@@ -21,11 +21,11 @@ class XPBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final safeProgress = progress.clamp(0.0, 1.0);
+    final safeProgress = progress.clamp(0.0, 1.0).toDouble();
 
     return Semantics(
       label: 'پیشرفت سطح ${toPersianDigits(level)}',
-      value: '${(safeProgress * 100).round()} درصد',
+      value: '${toPersianDigits((safeProgress * 100).round())} درصد',
       child: Row(
         children: [
           Container(
