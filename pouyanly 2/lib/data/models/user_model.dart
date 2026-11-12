@@ -133,6 +133,7 @@ class UserModel {
   final String avatarEmoji;
   final List<String> unlockedAvatarEmojis;
   final bool avatarShopPromptShown;
+  final int curriculumVersion;
   final bool notificationsEnabled;
   final bool isDarkMode;
   final DateTime createdAt;
@@ -165,6 +166,7 @@ class UserModel {
     this.avatarEmoji = '🦊',
     this.unlockedAvatarEmojis = const ['🦊'],
     this.avatarShopPromptShown = false,
+    this.curriculumVersion = 2,
     this.notificationsEnabled = true,
     this.isDarkMode = false,
     required this.createdAt,
@@ -204,6 +206,7 @@ class UserModel {
     String? avatarEmoji,
     List<String>? unlockedAvatarEmojis,
     bool? avatarShopPromptShown,
+    int? curriculumVersion,
     bool? notificationsEnabled,
     bool? isDarkMode,
     DateTime? createdAt,
@@ -236,6 +239,7 @@ class UserModel {
       avatarEmoji: avatarEmoji ?? this.avatarEmoji,
       unlockedAvatarEmojis: unlockedAvatarEmojis ?? this.unlockedAvatarEmojis,
       avatarShopPromptShown: avatarShopPromptShown ?? this.avatarShopPromptShown,
+      curriculumVersion: curriculumVersion ?? this.curriculumVersion,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       isDarkMode: isDarkMode ?? this.isDarkMode,
       createdAt: createdAt ?? this.createdAt,
@@ -271,6 +275,7 @@ class UserModel {
     'avatarEmoji': avatarEmoji,
     'unlockedAvatarEmojis': unlockedAvatarEmojis,
     'avatarShopPromptShown': avatarShopPromptShown,
+    'curriculumVersion': curriculumVersion,
     'notificationsEnabled': notificationsEnabled,
     'isDarkMode': isDarkMode,
     'createdAt': createdAt.toIso8601String(),
@@ -318,6 +323,7 @@ class UserModel {
     avatarEmoji: j['avatarEmoji'] ?? '🦊',
     unlockedAvatarEmojis: List<String>.from(j['unlockedAvatarEmojis'] ?? ['🦊']),
     avatarShopPromptShown: j['avatarShopPromptShown'] ?? false,
+    curriculumVersion: j['curriculumVersion'] is int ? j['curriculumVersion'] as int : 0,
     notificationsEnabled: j['notificationsEnabled'] ?? true,
     isDarkMode: j['isDarkMode'] ?? false,
     createdAt: DateTime.tryParse(j['createdAt'] ?? '') ?? DateTime.now(),
