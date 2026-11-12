@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/xp_bar.dart';
+import '../../../core/widgets/animated_game_icons.dart';
 import '../../../data/models/user_model.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../learning_path/screens/learning_path_screen.dart';
@@ -85,9 +86,9 @@ class _HomePage extends StatelessWidget {
                     style: TextStyle(
                         fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w800)),
                 const Spacer(),
-                _StatChip(emoji: '🔥', value: '${user.streak}'),
+                _StatChip(icon: const AnimatedFlameIcon(size: 19), value: '${user.streak}'),
                 const SizedBox(width: 8),
-                _StatChip(emoji: '🪙', value: '${user.coins}'),
+                _StatChip(icon: const AnimatedCoinIcon(size: 19), value: '${user.coins}'),
               ],
             ),
           ),
@@ -285,11 +286,11 @@ class _HomePage extends StatelessWidget {
                 // ── Stats Row ──
                 Row(
                   children: [
-                    _MiniStat('${user.streak}', 'Streak', '🔥'),
+                    _MiniStat('${user.streak}', 'Streak', const AnimatedFlameIcon(size: 22)),
                     const SizedBox(width: 12),
-                    _MiniStat('${user.completedLessonIds.length}', 'درس', '✅'),
+                    _MiniStat('${user.completedLessonIds.length}', 'درس', const AnimatedSymbolIcon(symbol: '✅', size: 22)),
                     const SizedBox(width: 12),
-                    _MiniStat('${user.xp}', 'XP', '⭐'),
+                    _MiniStat('${user.xp}', 'XP', const AnimatedSymbolIcon(symbol: '⭐', size: 22)),
                   ],
                 ),
                 const SizedBox(height: 30),
@@ -319,26 +320,30 @@ class _HomePage extends StatelessWidget {
 }
 
 class _StatChip extends StatelessWidget {
-  final String emoji;
+  final Widget icon;
   final String value;
-  const _StatChip({required this.emoji, required this.value});
+  const _StatChip({required this.icon, required this.value});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.dividerLight),
       ),
-      child: Text(
-        '$emoji $value',
-        style: const TextStyle(
-          fontFamily: 'Vazirmatn',
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          icon,
+          const SizedBox(width: 6),
+          Text(value, style: const TextStyle(
+            fontFamily: 'Vazirmatn',
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          )),
+        ],
       ),
     );
   }
@@ -368,8 +373,8 @@ class _LessonCard extends StatelessWidget {
                 gradient: AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Center(
-                child: Text(lesson.emoji, style: const TextStyle(fontSize: 28)),
+              child: const Center(
+                child: AnimatedSymbolIcon(symbol: '📚', size: 30, color: Colors.white),
               ),
             ),
             const SizedBox(width: 14),
@@ -428,7 +433,7 @@ class _QuickReviewCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Text('🔁', style: TextStyle(fontSize: 28)),
+          const AnimatedSymbolIcon(symbol: '🔁', size: 30, color: Colors.white),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -472,8 +477,8 @@ class _QuickReviewCard extends StatelessWidget {
 class _MiniStat extends StatelessWidget {
   final String value;
   final String label;
-  final String emoji;
-  const _MiniStat(this.value, this.label, this.emoji);
+  final Widget icon;
+  const _MiniStat(this.value, this.label, this.icon);
 
   @override
   Widget build(BuildContext context) {
@@ -487,14 +492,14 @@ class _MiniStat extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 20)),
+            icon,
             const SizedBox(height: 4),
-            Text(value,
-                style: const TextStyle(
-                    fontFamily: 'Vazirmatn', fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.primary)),
-            Text(label,
-                style: const TextStyle(
-                    fontFamily: 'Vazirmatn', fontSize: 11, color: AppColors.textSecondaryLight)),
+            Text(value, style: const TextStyle(
+              fontFamily: 'Vazirmatn', fontSize: 16,
+              fontWeight: FontWeight.w700, color: AppColors.primary)),
+            Text(label, style: const TextStyle(
+              fontFamily: 'Vazirmatn', fontSize: 11,
+              color: AppColors.textSecondaryLight)),
           ],
         ),
       ),
