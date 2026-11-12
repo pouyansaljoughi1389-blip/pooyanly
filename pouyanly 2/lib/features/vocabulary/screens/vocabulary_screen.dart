@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/persian_digits.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../lessons/models/lesson_data.dart';
 import '../services/vocabulary_audio_service.dart';
@@ -115,7 +116,7 @@ class _AllVocabTab extends StatelessWidget {
           child: Row(
             children: [
               Text(
-                '${vocab.length} کلمه',
+                '${toPersianDigits(vocab.length)} کلمه',
                 style: const TextStyle(
                   fontFamily: 'Vazirmatn',
                   fontSize: 13,
@@ -372,7 +373,7 @@ class _ReviewTabState extends State<_ReviewTab> {
             const Text('مرور امروز تمام شد!',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
-            Text('${items.length} لغت را مرور کردی.',
+            Text('${toPersianDigits(items.length)} لغت را مرور کردی.',
               style: const TextStyle(fontFamily: 'Vazirmatn')),
             const SizedBox(height: 24),
             ElevatedButton(
@@ -403,19 +404,19 @@ class _ReviewTabState extends State<_ReviewTab> {
             children: [
               Expanded(child: _ReviewStat(
                 title: 'تسلط واژه‌های مرورشده',
-                value: '${reviewProvider.vocabularyMasteryPercent.toStringAsFixed(0)}٪',
+                value: '${toPersianDigits(reviewProvider.vocabularyMasteryPercent.toStringAsFixed(0))}٪',
                 icon: Icons.auto_graph_rounded,
               )),
               const SizedBox(width: 10),
               Expanded(child: _ReviewStat(
                 title: 'خطاهای ثبت‌شده',
-                value: '${reviewProvider.vocabularyMistakeCount}',
+                value: '${toPersianDigits(reviewProvider.vocabularyMistakeCount)}',
                 icon: Icons.refresh_rounded,
               )),
             ],
           ),
           const SizedBox(height: 14),
-          Text('${_reviewIndex + 1} از ${items.length} لغتِ موعددار',
+          Text('${toPersianDigits(_reviewIndex + 1)} از ${toPersianDigits(items.length)} لغتِ موعددار',
             style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
               color: AppColors.textSecondaryLight)),
           const SizedBox(height: 16),
