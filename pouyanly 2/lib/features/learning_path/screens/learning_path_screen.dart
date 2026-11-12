@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/persian_digits.dart';
 import '../../../core/widgets/animated_game_icons.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../lessons/models/lesson_data.dart';
@@ -52,7 +53,7 @@ class LearningPathScreen extends StatelessWidget {
               child: Center(
                 child: _HeaderCounter(
                   icon: Icons.local_fire_department_rounded,
-                  value: (user?.streak ?? 0).toString(),
+                  value: toPersianDigits(user?.streak ?? 0),
                   color: const Color(0xFFFFB45B),
                 ),
               ),
@@ -82,7 +83,7 @@ class LearningPathScreen extends StatelessWidget {
               const SizedBox(height: 16),
               ClipRRect(borderRadius: BorderRadius.circular(20), child: LinearProgressIndicator(value: totalLessons == 0 ? 0 : completedLessons / totalLessons, minHeight: 10, backgroundColor: Colors.white30, valueColor: const AlwaysStoppedAnimation(Colors.white))),
               const SizedBox(height: 8),
-              Text((totalLessons == 0 ? 0 : (completedLessons / totalLessons * 100).round()).toString() + '٪ از مسیر تکمیل شده', style: const TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontSize: 11)),
+              Text(toPersianDigits(totalLessons == 0 ? 0 : (completedLessons / totalLessons * 100).round()) + '٪ از مسیر تکمیل شده', style: const TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontSize: 11)),
             ]),
           ),
         )),
@@ -170,7 +171,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
               const SizedBox(height: 5),
               Text(widget.unit.titleFarsi, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 3),
-              Text(widget.completed.toString() + '/' + widget.unit.lessons.length.toString() + ' مرحله', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: statusColor)),
+              Text(toPersianDigits(widget.completed) + '/' + toPersianDigits(widget.unit.lessons.length) + ' مرحله', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: statusColor)),
             ])),
             Icon(widget.isUnlocked ? (expanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded) : Icons.lock_outline_rounded, color: statusColor),
           ]),
@@ -207,7 +208,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
                     ),
                     title: Text(lesson.titleFarsi, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, fontWeight: FontWeight.w700)),
                     subtitle: Text(
-                      '${lesson.vocabulary.length} واژه • ${lesson.exercises.length} تمرین • ${lesson.estimatedMinutes} دقیقه',
+                      '${toPersianDigits(lesson.vocabulary.length)} واژه • ${toPersianDigits(lesson.exercises.length)} تمرین • ${toPersianDigits(lesson.estimatedMinutes)} دقیقه',
                       style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10),
                     ),
                     trailing: lessonDone
@@ -488,7 +489,7 @@ class _LearningPathHeaderState extends State<_LearningPathHeader>
                       ),
                       _GlassChip(
                         icon: Icons.local_fire_department_rounded,
-                        label: '${widget.streak} روز',
+                        label: '${toPersianDigits(widget.streak)} روز',
                         tint: const Color(0xFFFFC16E),
                       ),
                     ],
@@ -525,7 +526,7 @@ class _LearningPathHeaderState extends State<_LearningPathHeader>
                           child: _HeaderMetric(
                             icon: Icons.bolt_rounded,
                             label: 'XP',
-                            value: widget.xp.toString(),
+                            value: toPersianDigits(widget.xp),
                             tint: const Color(0xFFFFE082),
                           ),
                         ),
@@ -534,7 +535,7 @@ class _LearningPathHeaderState extends State<_LearningPathHeader>
                           child: _HeaderMetric(
                             icon: Icons.diamond_rounded,
                             label: 'سکه',
-                            value: widget.coins.toString(),
+                            value: toPersianDigits(widget.coins),
                             tint: const Color(0xFFFFD180),
                           ),
                         ),
@@ -543,7 +544,7 @@ class _LearningPathHeaderState extends State<_LearningPathHeader>
                           child: _HeaderMetric(
                             icon: Icons.flag_rounded,
                             label: 'درس‌ها',
-                            value: '${widget.completed}/${widget.total}',
+                            value: '${toPersianDigits(widget.completed)}/${toPersianDigits(widget.total)}',
                             tint: const Color(0xFFB9F6CA),
                           ),
                         ),
@@ -590,7 +591,7 @@ class _LearningPathHeaderState extends State<_LearningPathHeader>
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        '${(progress * 100).round()}٪',
+                        '${toPersianDigits((progress * 100).round())}٪',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
