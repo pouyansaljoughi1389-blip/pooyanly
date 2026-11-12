@@ -96,10 +96,10 @@ class AboutScreen extends StatelessWidget {
           const SizedBox(height: 10),
           const Text(
             'این صفحه‌ها مرجع الهام بصری هستند؛ فایل‌های Lottie آن‌ها داخل برنامه کپی نشده‌اند. آیکون‌های فعلی با نقاشی و انیمیشن بومی Flutter ساخته شده‌اند. برای فایل‌های عمومی LottieFiles، مجوز Lottie Simple License استفادهٔ تجاری و تغییر را مجاز می‌داند و ذکر نام سازنده را توصیه می‌کند.',
-            style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, height: 1.8, color: AppColors.textSecondaryLight),
+            style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, height: 1.8, color: Theme.of(context).colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 20),
-          const Center(child: Text('نسخهٔ آموزشی • ساخته‌شده با Flutter', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: AppColors.textSecondaryLight))),
+          const Center(child: Text('نسخهٔ آموزشی • ساخته‌شده با Flutter', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant))),
         ],
       ),
     );
@@ -130,7 +130,7 @@ class _ContactTile extends StatelessWidget {
           CircleAvatar(backgroundColor: AppColors.primary.withValues(alpha: .12), child: Icon(icon, color: AppColors.primary)),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: AppColors.textSecondaryLight)),
+            Text(title, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
             const SizedBox(height: 3),
             SelectableText(value, style: const TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700, fontSize: 13)),
           ])),
@@ -155,14 +155,14 @@ class _SourceTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.dividerLight),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, fontWeight: FontWeight.w800)),
           const SizedBox(height: 3),
-          Text(creator, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: AppColors.textSecondaryLight)),
+          Text(creator, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 5),
           SelectableText(url, style: const TextStyle(fontSize: 10, color: AppColors.primary)),
         ],
