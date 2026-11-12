@@ -23,9 +23,14 @@ import 'features/about/screens/about_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StorageService.instance.init();
+  final userProvider = UserProvider();
+  // Hydrate the persisted account before the router can build any screen.
+  // Otherwise an existing session appears as a null user and profile/dashboard
+  // tabs can render as empty widgets on a cold launch.
+  await userProvider.init();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => UserProvider(),
+    ChangeNotifierProvider.value(
+      value: userProvider,
       child: const PouyanlyApp(),
     ),
   );
