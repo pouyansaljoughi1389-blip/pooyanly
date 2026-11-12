@@ -268,6 +268,7 @@ class _LessonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () => context.go('/lesson/${lesson.id}'),
       child: Container(
@@ -283,7 +284,7 @@ class _LessonCard extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                gradient: LinearGradient(colors: [scheme.primary, scheme.secondary]),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Center(
@@ -311,7 +312,7 @@ class _LessonCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: AppColors.xpColor.withValues(alpha: 0.15),
+                color: scheme.primaryContainer,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -320,7 +321,7 @@ class _LessonCard extends StatelessWidget {
                   fontFamily: 'Vazirmatn',
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.warning,
+                  color: scheme.onPrimaryContainer,
                 ),
               ),
             ),
@@ -341,12 +342,12 @@ class _QuickReviewCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: AppColors.successGradient,
+        color: Theme.of(context).colorScheme.tertiaryContainer,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          const AnimatedSymbolIcon(symbol: '🔁', size: 30, color: Colors.white),
+          PouyanlyIcon(type: PouyanlyIconType.review, size: 30, color: Theme.of(context).colorScheme.onTertiaryContainer),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -355,12 +356,12 @@ class _QuickReviewCard extends StatelessWidget {
                 const Text(
                   'مرور سریع',
                   style: TextStyle(
-                      fontFamily: 'Vazirmatn', fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+                      fontFamily: 'Vazirmatn', fontSize: 15, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onTertiaryContainer),
                 ),
                 Text(
                   completedCount > 0 ? 'کلمات قدیمی را مرور کنید' : 'پس از یادگیری اول فعال می‌شود',
                   style: const TextStyle(
-                      fontFamily: 'Vazirmatn', fontSize: 12, color: Colors.white70),
+                      fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onTertiaryContainer.withValues(alpha: .78)),
                 ),
               ],
             ),
@@ -371,13 +372,13 @@ class _QuickReviewCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
                   'شروع',
                   style: TextStyle(
-                      fontFamily: 'Vazirmatn', fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.secondary),
+                      fontFamily: 'Vazirmatn', fontSize: 12, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface),
                 ),
               ),
             ),
