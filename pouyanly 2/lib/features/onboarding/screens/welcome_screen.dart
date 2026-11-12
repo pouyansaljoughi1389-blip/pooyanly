@@ -24,7 +24,7 @@ class WelcomeScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.24),
+                      color: AppColors.primary.withValues(alpha: 0.24),
                       blurRadius: 28,
                       offset: const Offset(0, 14),
                     ),
@@ -54,7 +54,7 @@ class WelcomeScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(28),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.16),
+                                  color: Colors.black.withValues(alpha: 0.16),
                                   blurRadius: 24,
                                   offset: const Offset(0, 10),
                                 ),
@@ -97,10 +97,10 @@ class WelcomeScreen extends StatelessWidget {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.16),
+                              color: Colors.white.withValues(alpha: 0.16),
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.24),
+                                color: Colors.white.withValues(alpha: 0.24),
                               ),
                             ),
                             child: const Text(
@@ -204,7 +204,7 @@ class _GlowCircle extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withOpacity(opacity),
+        color: Colors.white.withValues(alpha: opacity),
       ),
     );
   }
@@ -231,7 +231,7 @@ class _FeatureTile extends StatelessWidget {
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.55),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.55),
         ),
       ),
       child: Row(
@@ -240,7 +240,7 @@ class _FeatureTile extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.11),
+              color: color.withValues(alpha: 0.11),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(icon, color: color, size: 24),
