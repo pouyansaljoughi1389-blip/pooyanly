@@ -1,192 +1,333 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
 
+import 'app_colors.dart';
+import 'app_design_tokens.dart';
+
+/// Application-wide Material 3 themes. Content surfaces stay calm and solid;
+/// translucent glass is reserved for navigation and transient controls.
 class AppTheme {
   AppTheme._();
 
   static ThemeData get light => _buildTheme(Brightness.light);
-  static ThemeData get dark  => _buildTheme(Brightness.dark);
+  static ThemeData get dark => _buildTheme(Brightness.dark);
 
   static ThemeData _buildTheme(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
+    final background = isDark
+        ? const Color(0xFF10111B)
+        : const Color(0xFFF6F5FA);
+    final surface = isDark
+        ? const Color(0xFF191A27)
+        : const Color(0xFFFFFFFF);
+    final card = isDark
+        ? const Color(0xFF202131)
+        : const Color(0xFFFFFFFF);
+    final foreground = isDark
+        ? const Color(0xFFF4F2FC)
+        : const Color(0xFF211D32);
+    final secondaryText = isDark
+        ? const Color(0xFFB5B1C5)
+        : const Color(0xFF6D687C);
+    final outline = isDark
+        ? const Color(0xFF39374B)
+        : const Color(0xFFE7E3EF);
 
-    final colorScheme = ColorScheme(
+    final seeded = ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
       brightness: brightness,
-      primary:          AppColors.primary,
-      onPrimary:        Colors.white,
-      primaryContainer: isDark ? AppColors.primaryDark : AppColors.primaryLight,
-      onPrimaryContainer: isDark ? Colors.white : AppColors.primaryDark,
-      secondary:        AppColors.secondary,
-      onSecondary:      Colors.white,
-      secondaryContainer: AppColors.secondaryLight,
-      onSecondaryContainer: AppColors.secondaryDark,
-      error:            AppColors.error,
-      onError:          Colors.white,
-      surface:          isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-      onSurface:        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-      surfaceContainerHighest: isDark ? AppColors.cardDark : AppColors.cardLight,
-      onSurfaceVariant: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-      outline:          isDark ? AppColors.dividerDark : AppColors.dividerLight,
+    );
+    final scheme = seeded.copyWith(
+      primary: isDark ? const Color(0xFFAAA6FF) : AppColors.primary,
+      onPrimary: isDark ? const Color(0xFF17152A) : Colors.white,
+      primaryContainer: isDark
+          ? const Color(0xFF343052)
+          : const Color(0xFFEAE8FF),
+      onPrimaryContainer: isDark
+          ? const Color(0xFFEAE8FF)
+          : const Color(0xFF29234E),
+      secondary: isDark ? const Color(0xFF72D9C6) : AppColors.secondary,
+      onSecondary: isDark ? const Color(0xFF092B25) : Colors.white,
+      error: AppColors.error,
+      surface: surface,
+      onSurface: foreground,
+      surfaceContainerHighest: card,
+      onSurfaceVariant: secondaryText,
+      outline: outline,
+      outlineVariant: outline.withOpacity(.72),
+    );
+
+    final baseText = ThemeData(
+      brightness: brightness,
+      colorScheme: scheme,
+      fontFamily: 'Vazirmatn',
+    ).textTheme;
+
+    final textTheme = baseText.copyWith(
+      displayLarge: baseText.displayLarge?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontWeight: FontWeight.w800,
+        color: foreground,
+        height: 1.18,
+      ),
+      displayMedium: baseText.displayMedium?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontWeight: FontWeight.w800,
+        color: foreground,
+        height: 1.2,
+      ),
+      headlineSmall: baseText.headlineSmall?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontWeight: FontWeight.w800,
+        color: foreground,
+      ),
+      titleLarge: baseText.titleLarge?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        color: foreground,
+      ),
+      titleMedium: baseText.titleMedium?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        color: foreground,
+      ),
+      bodyLarge: baseText.bodyLarge?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontSize: 16,
+        height: 1.65,
+        color: foreground,
+      ),
+      bodyMedium: baseText.bodyMedium?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontSize: 14,
+        height: 1.6,
+        color: foreground,
+      ),
+      bodySmall: baseText.bodySmall?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontSize: 12,
+        height: 1.5,
+        color: secondaryText,
+      ),
+      labelLarge: baseText.labelLarge?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontWeight: FontWeight.w700,
+      ),
+    );
+
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
     );
 
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
-      colorScheme: colorScheme,
-      scaffoldBackgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: background,
       fontFamily: 'Vazirmatn',
-
-      // ── AppBar ──
+      textTheme: textTheme,
+      visualDensity: VisualDensity.standard,
+      splashFactory: InkSparkle.splashFactory,
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: isDark ? const Color(0xD92A1D48) : const Color(0xB86E4AB6),
-        foregroundColor: Colors.white,
-        titleTextStyle: TextStyle(
-          fontFamily: 'Vazirmatn',
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
-        ),
-      ),
-
-      drawerTheme: DrawerThemeData(
-        backgroundColor: isDark ? const Color(0xF0211738) : const Color(0xF2EEE6FF),
+        backgroundColor: background,
+        foregroundColor: foreground,
         surfaceTintColor: Colors.transparent,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.horizontal(left: Radius.circular(28)),
-        ),
+        centerTitle: false,
+        titleTextStyle: textTheme.titleLarge,
+        iconTheme: IconThemeData(color: foreground, size: 23),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.transparent),
-      popupMenuTheme: PopupMenuThemeData(
-        color: isDark ? const Color(0xF0211738) : const Color(0xF2F2EBFF),
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      ),
-
-      // ── Card ──
       cardTheme: CardThemeData(
-        elevation: 3,
-        shadowColor: isDark ? Colors.black54 : AppColors.primary.withOpacity(0.10),
+        color: card,
+        elevation: 0,
+        margin: EdgeInsets.zero,
         surfaceTintColor: Colors.transparent,
-        color: isDark ? AppColors.cardDark.withOpacity(0.78) : AppColors.cardLight.withOpacity(0.78),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
-            color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
-          ),
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusLarge),
+          side: BorderSide(color: outline.withOpacity(.78)),
         ),
       ),
-
-      // ── ElevatedButton ──
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          elevation: 3,
-          shadowColor: AppColors.primary.withOpacity(0.22),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-          textStyle: const TextStyle(
-            fontFamily: 'Vazirmatn',
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          elevation: 0,
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
           ),
-        ),
-      ),
-
-      // ── OutlinedButton ──
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary, width: 1.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-          textStyle: const TextStyle(
-            fontFamily: 'Vazirmatn',
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-
-      // ── TextButton ──
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
           textStyle: const TextStyle(
             fontFamily: 'Vazirmatn',
             fontSize: 14,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
-
-      // ── InputDecoration ──
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          shape: shape,
+          textStyle: const TextStyle(
+            fontFamily: 'Vazirmatn',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: scheme.primary,
+          minimumSize: const Size(48, 48),
+          side: BorderSide(color: scheme.primary.withOpacity(.55)),
+          shape: shape,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+          textStyle: const TextStyle(
+            fontFamily: 'Vazirmatn',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: scheme.primary,
+          minimumSize: const Size(44, 44),
+          textStyle: const TextStyle(
+            fontFamily: 'Vazirmatn',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isDark ? AppColors.cardDark : AppColors.cardLight,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: isDark ? AppColors.dividerDark : AppColors.dividerLight),
+        fillColor: card,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppDesignTokens.space4,
+          vertical: AppDesignTokens.space3,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: isDark ? AppColors.dividerDark : AppColors.dividerLight),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         hintStyle: TextStyle(
           fontFamily: 'Vazirmatn',
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+          color: secondaryText,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
+          borderSide: BorderSide(color: outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
+          borderSide: BorderSide(color: outline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
+          borderSide: BorderSide(color: scheme.primary, width: 1.6),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
+          borderSide: BorderSide(color: scheme.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
+          borderSide: BorderSide(color: scheme.error, width: 1.6),
         ),
       ),
-
-      // ── BottomNavigationBar ──
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: Colors.transparent,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10, fontWeight: FontWeight.w700),
-        unselectedLabelStyle: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10),
-        elevation: 8,
-      ),
-
-      // ── Chip ──
       chipTheme: ChipThemeData(
-        backgroundColor: isDark ? AppColors.cardDark : AppColors.backgroundLight,
+        backgroundColor: card,
+        selectedColor: scheme.primaryContainer,
         labelStyle: TextStyle(
           fontFamily: 'Vazirmatn',
           fontSize: 12,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+          color: foreground,
         ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        side: BorderSide(color: outline),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusSmall),
+        ),
       ),
-
-      // ── Text ──
-      textTheme: TextTheme(
-        displayLarge: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w800, color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
-        displayMedium: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700, color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
-        titleLarge: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700, fontSize: 20, color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
-        titleMedium: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w600, fontSize: 16, color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
-        bodyLarge: TextStyle(fontFamily: 'Vazirmatn', fontSize: 16, color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
-        bodyMedium: TextStyle(fontFamily: 'Vazirmatn', fontSize: 14, color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
-        bodySmall: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
-        labelLarge: const TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700, fontSize: 14),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Colors.transparent,
+        selectedItemColor: scheme.primary,
+        unselectedItemColor: secondaryText,
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+        selectedLabelStyle: const TextStyle(
+          fontFamily: 'Vazirmatn',
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontFamily: 'Vazirmatn',
+          fontSize: 10,
+        ),
       ),
-
-      dialogTheme: DialogThemeData(backgroundColor: isDark ? AppColors.cardDark.withOpacity(0.96) : AppColors.cardLight.withOpacity(0.96), surfaceTintColor: Colors.transparent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24))),
-
+      drawerTheme: DrawerThemeData(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.horizontal(
+            left: Radius.circular(AppDesignTokens.radiusLarge),
+          ),
+        ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        modalBackgroundColor: surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppDesignTokens.radiusLarge),
+          ),
+        ),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
+        ),
+        textStyle: textTheme.bodyMedium,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusLarge),
+        ),
+        titleTextStyle: textTheme.titleLarge,
+        contentTextStyle: textTheme.bodyMedium,
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
+        ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: isDark
+            ? const Color(0xFF302D40)
+            : const Color(0xFF292538),
+        contentTextStyle: const TextStyle(
+          fontFamily: 'Vazirmatn',
+          color: Colors.white,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
+        ),
+      ),
       dividerTheme: DividerThemeData(
-        color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
+        color: outline,
         thickness: 1,
+        space: 1,
       ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: scheme.primary,
+        linearTrackColor: scheme.primary.withOpacity(.12),
+        circularTrackColor: scheme.primary.withOpacity(.12),
+      ),
+      iconTheme: IconThemeData(color: foreground),
     );
   }
 }
