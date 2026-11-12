@@ -20,6 +20,7 @@ void main() {
       (tester) async {
     final provider = UserProvider();
     await provider.init();
+    expect(provider.isInitialized, isTrue);
 
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
@@ -30,7 +31,7 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
 
     expect(find.text('هنوز حسابی برای نمایش وجود ندارد'), findsOneWidget);
     expect(find.text('رفتن به صفحهٔ شروع'), findsOneWidget);
