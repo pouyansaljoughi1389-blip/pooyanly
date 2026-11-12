@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -12,8 +13,16 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
+    // The profile tests exercise Flutter UI, not the Android launcher widget
+    // channel. Using a non-Android test platform keeps plugin calls out of the
+    // widget-test isolate and makes provider hydration deterministic.
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     SharedPreferences.setMockInitialValues({});
     await StorageService.instance.init();
+  });
+
+  tearDown(() {
+    debugDefaultTargetPlatformOverride = null;
   });
 
   testWidgets('profile never renders a blank screen without a user',
@@ -31,7 +40,6 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
 
     expect(find.text('هنوز حسابی برای نمایش وجود ندارد'), findsOneWidget);
     expect(find.text('رفتن به صفحهٔ شروع'), findsOneWidget);
