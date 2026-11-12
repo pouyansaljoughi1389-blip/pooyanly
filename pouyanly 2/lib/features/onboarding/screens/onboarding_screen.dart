@@ -76,7 +76,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(100),
-                      color: i <= _page ? AppColors.primary : AppColors.dividerLight,
+                      color: i <= _page ? AppColors.primary : Theme.of(context).dividerColor,
                     ),
                   ),
                 )),
@@ -90,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 style: const TextStyle(
                   fontFamily: 'Vazirmatn',
                   fontSize: 12,
-                  color: AppColors.textSecondaryLight,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -143,7 +143,7 @@ class _GoalPage extends StatelessWidget {
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
           const Text('بهترین مسیر یادگیری را برای شما تنظیم می‌کنیم',
-              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 14),
           Expanded(
             child: ListView(
@@ -191,7 +191,7 @@ class _LevelPage extends StatelessWidget {
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
           const Text('نگران نباشید — آزمون تعیین سطح دقیق‌تر می‌کند',
-              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 20),
           Expanded(
             child: ListView(
@@ -237,7 +237,7 @@ class _TimePage extends StatelessWidget {
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
           const Text('تداوم از مقدار مهم‌تر است',
-              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 20),
           Expanded(
             child: GridView.count(
@@ -276,7 +276,7 @@ class _PeriodPage extends StatelessWidget {
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
           const Text('یادآوری هوشمند در بهترین زمان',
-              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 20),
           Expanded(
             child: ListView(
@@ -327,7 +327,7 @@ class _ChoiceCard extends StatelessWidget {
               : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.dividerLight,
+            color: selected ? AppColors.primary : Theme.of(context).dividerColor,
             width: selected ? 2 : 1,
           ),
         ),
@@ -375,7 +375,7 @@ class _GridChoiceCard extends StatelessWidget {
               : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.dividerLight,
+            color: selected ? AppColors.primary : Theme.of(context).dividerColor,
             width: selected ? 2 : 1,
           ),
         ),
