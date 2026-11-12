@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/persian_digits.dart';
 import '../../../core/widgets/xp_bar.dart';
 import '../../../core/widgets/animated_game_icons.dart';
 import '../../../data/models/user_model.dart';
@@ -86,9 +87,9 @@ class _HomePage extends StatelessWidget {
                     style: TextStyle(
                         fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w800)),
                 const Spacer(),
-                _StatChip(icon: const AnimatedFlameIcon(size: 19), value: '${user.streak}'),
+                _StatChip(icon: const AnimatedFlameIcon(size: 19), value: toPersianDigits(user.streak)),
                 const SizedBox(width: 8),
-                _StatChip(icon: const AnimatedCoinIcon(size: 19), value: '${user.coins}'),
+                _StatChip(icon: const AnimatedCoinIcon(size: 19), value: toPersianDigits(user.coins)),
               ],
             ),
           ),
@@ -132,7 +133,7 @@ class _HomePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${user.dailyStudyTime?.farsiLabel ?? '۱۰ دقیقه در روز'} • ${userProvider.dailyXpEarned}/۵۰ XP',
+                        '${user.dailyStudyTime?.farsiLabel ?? '۱۰ دقیقه در روز'} • ${toPersianDigits(userProvider.dailyXpEarned)}/۵۰ XP',
                         style: const TextStyle(
                           fontFamily: 'Vazirmatn',
                           fontSize: 18,
@@ -286,11 +287,11 @@ class _HomePage extends StatelessWidget {
                 // ── Stats Row ──
                 Row(
                   children: [
-                    _MiniStat('${user.streak}', 'Streak', const AnimatedFlameIcon(size: 22)),
+                    _MiniStat(toPersianDigits(user.streak), 'Streak', const AnimatedFlameIcon(size: 22)),
                     const SizedBox(width: 12),
-                    _MiniStat('${user.completedLessonIds.length}', 'درس', const AnimatedSymbolIcon(symbol: '✅', size: 22)),
+                    _MiniStat(toPersianDigits(user.completedLessonIds.length), 'درس', const AnimatedSymbolIcon(symbol: '✅', size: 22)),
                     const SizedBox(width: 12),
-                    _MiniStat('${user.xp}', 'XP', const AnimatedSymbolIcon(symbol: '⭐', size: 22)),
+                    _MiniStat(toPersianDigits(user.xp), 'XP', const AnimatedSymbolIcon(symbol: '⭐', size: 22)),
                   ],
                 ),
                 const SizedBox(height: 30),
@@ -388,7 +389,7 @@ class _LessonCard extends StatelessWidget {
                         fontFamily: 'Vazirmatn', fontSize: 15, fontWeight: FontWeight.w700),
                   ),
                   Text(
-                    '${lesson.vocabulary.length} لغت • ${lesson.exercises.length} تمرین',
+                    '${toPersianDigits(lesson.vocabulary.length)} لغت • ${toPersianDigits(lesson.exercises.length)} تمرین',
                     style: const TextStyle(
                         fontFamily: 'Vazirmatn', fontSize: 12, color: AppColors.textSecondaryLight),
                   ),
@@ -402,7 +403,7 @@ class _LessonCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                '+${lesson.xpReward} XP',
+                '+${toPersianDigits(lesson.xpReward)} XP',
                 style: const TextStyle(
                   fontFamily: 'Vazirmatn',
                   fontSize: 12,
