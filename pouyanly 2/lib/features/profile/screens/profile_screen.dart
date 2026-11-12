@@ -107,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Container(width: 76, height: 82, decoration: BoxDecoration(
                       color: selected ? AppColors.primary.withValues(alpha: .12) : Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: selected ? AppColors.primary : AppColors.dividerLight, width: selected ? 2 : 1),
+                      border: Border.all(color: selected ? AppColors.primary : Theme.of(context).colorScheme.outlineVariant, width: selected ? 2 : 1),
                     ), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Text(emoji, style: const TextStyle(fontSize: 30)),
                       const SizedBox(height: 3),
@@ -428,7 +428,7 @@ class _StatBox extends StatelessWidget {
               style: const TextStyle(
                 fontFamily: 'Vazirmatn',
                 fontSize: 11,
-                color: AppColors.textSecondaryLight,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -454,7 +454,7 @@ class _InfoSection extends StatelessWidget {
             fontFamily: 'Vazirmatn',
             fontSize: 15,
             fontWeight: FontWeight.w700,
-            color: AppColors.textSecondaryLight,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 8),
@@ -533,7 +533,7 @@ class _ScoreRow extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: score / 100,
                 minHeight: 8,
-                backgroundColor: AppColors.dividerLight,
+                backgroundColor: Theme.of(context).colorScheme.outlineVariant,
                 valueColor: AlwaysStoppedAnimation(color),
               ),
             ),
