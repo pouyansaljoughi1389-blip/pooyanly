@@ -87,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 'مرحله ${_page + 1} از ۴',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Vazirmatn',
                   fontSize: 12,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -142,7 +142,7 @@ class _GoalPage extends StatelessWidget {
           const Text('هدف شما از یادگیری چیست؟',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          const Text('بهترین مسیر یادگیری را برای شما تنظیم می‌کنیم',
+          Text('بهترین مسیر یادگیری را برای شما تنظیم می‌کنیم',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 14),
           Expanded(
@@ -190,7 +190,7 @@ class _LevelPage extends StatelessWidget {
           const Text('سطح فعلی انگلیسی شما چیست؟',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          const Text('نگران نباشید — آزمون تعیین سطح دقیق‌تر می‌کند',
+          Text('نگران نباشید — آزمون تعیین سطح دقیق‌تر می‌کند',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 20),
           Expanded(
@@ -236,7 +236,7 @@ class _TimePage extends StatelessWidget {
           const Text('چقدر در روز مطالعه می‌کنید؟',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          const Text('تداوم از مقدار مهم‌تر است',
+          Text('تداوم از مقدار مهم‌تر است',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 20),
           Expanded(
@@ -275,7 +275,7 @@ class _PeriodPage extends StatelessWidget {
           const Text('چه وقتی مطالعه می‌کنید؟',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          const Text('یادآوری هوشمند در بهترین زمان',
+          Text('یادآوری هوشمند در بهترین زمان',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 20),
           Expanded(
