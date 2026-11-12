@@ -1,94 +1,101 @@
-import 'dart:ui';
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
-/// Shared translucent surface used by POUYANLY's glass design system.
-class LiquidGlass extends StatefulWidget {
+import '../theme/app_colors.dart';
+import '../theme/app_design_tokens.dart';
+
+/// A restrained translucent surface for controls and navigation only.
+/// Keep lesson copy, vocabulary definitions and long-form content unwrapped.
+class LiquidGlass extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final BorderRadius borderRadius;
   final VoidCallback? onTap;
+  final bool enableBlur;
+  final double blurSigma;
+  final Color? tint;
+  final bool showHighlight;
 
   const LiquidGlass({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(12),
-    this.borderRadius = const BorderRadius.all(Radius.circular(24)),
+    this.padding = const EdgeInsets.all(AppDesignTokens.space3),
+    this.borderRadius = const BorderRadius.all(
+      Radius.circular(AppDesignTokens.radiusLarge),
+    ),
     this.onTap,
-  });
-
-  @override
-  State<LiquidGlass> createState() => _LiquidGlassState();
-}
-
-class _LiquidGlassState extends State<LiquidGlass> {
-  bool _pressed = false;
-  Offset _drag = Offset.zero;
+    this.enableBlur = false,
+    this.blurSigma = AppDesignTokens.blurPopover,
+    this.tint,
+    this.showHighlight = true,
+  }) : assert(blurSigma >= 0 && blurSigma <= 20);
 
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final surface = AnimatedScale(
-      scale: _pressed ? .975 : 1,
-      duration: const Duration(milliseconds: 260),
-      curve: Curves.elasticOut,
-      child: Transform.translate(
-        offset: _drag,
-        child: ClipRRect(
-          borderRadius: widget.borderRadius,
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 260),
-              padding: widget.padding,
-              decoration: BoxDecoration(
-                borderRadius: widget.borderRadius,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: dark
-                      ? [const Color(0xB83A2A68), const Color(0x8820183D), const Color(0x663B2A66)]
-                      : [const Color(0xDFFFFFFF), const Color(0xA6E8E5FF), const Color(0x80FFFFFF)],
-                ),
-                border: Border.all(
-                  color: dark ? Colors.white.withOpacity(.24) : Colors.white.withOpacity(.78),
-                  width: 1.2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF7656D6).withOpacity(dark ? .22 : .14),
-                    blurRadius: _pressed ? 12 : 26,
-                    offset: Offset(0, _pressed ? 3 : 10),
-                  ),
-                  BoxShadow(
-                    color: Colors.white.withOpacity(dark ? .07 : .55),
-                    blurRadius: 2,
-                    offset: const Offset(-1, -1),
-                  ),
-                ],
-              ),
-              child: widget.child,
-            ),
-          ),
+    final reduceTransparency = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    final useBlur = enableBlur && !reduceTransparency && blurSigma > 0;
+    final baseTint = tint ?? (dark ? const Color(0xFF25203D) : Colors.white);
+    final border = dark
+        ? Colors.white.withOpacity(.16)
+        : AppColors.primary.withOpacity(.12);
+
+    Widget surface = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            baseTint.withOpacity(dark ? .84 : .78),
+            baseTint.withOpacity(dark ? .70 : .66),
+          ],
         ),
+        border: Border.all(color: border, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(dark ? .20 : .055),
+            blurRadius: 18,
+            offset: const Offset(0, 7),
+          ),
+          if (showHighlight)
+            BoxShadow(
+              color: Colors.white.withOpacity(dark ? .07 : .72),
+              blurRadius: 1,
+              offset: const Offset(0, -1),
+            ),
+        ],
       ),
+      child: Padding(padding: padding, child: child),
     );
 
-    if (widget.onTap == null) return surface;
-    return GestureDetector(
-      onTap: widget.onTap,
-      onPanStart: (_) => setState(() => _pressed = true),
-      onPanUpdate: (details) => setState(() {
-        _drag = Offset(
-          (_drag.dx + details.delta.dx * .22).clamp(-8.0, 8.0).toDouble(),
-          (_drag.dy + details.delta.dy * .22).clamp(-8.0, 8.0).toDouble(),
-        );
-      }),
-      onPanEnd: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
-      onPanCancel: () => setState(() { _pressed = false; _drag = Offset.zero; }),
-      child: surface,
+    if (useBlur) {
+      surface = ClipRRect(
+        borderRadius: borderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+          child: surface,
+        ),
+      );
+    } else {
+      surface = ClipRRect(borderRadius: borderRadius, child: surface);
+    }
+
+    if (onTap == null) return surface;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: borderRadius,
+        child: surface,
+      ),
     );
   }
 }
+
+/// Floating, accessible navigation with a single restrained glass layer.
 class LiquidGlassNavigationBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTap;
@@ -109,125 +116,86 @@ class LiquidGlassNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.primary;
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.primary;
+    final safeIndex = selectedIndex.clamp(0, _items.length - 1);
+
     return SafeArea(
       top: false,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
         child: LiquidGlass(
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 7),
+          enableBlur: true,
+          blurSigma: AppDesignTokens.blurNavigation,
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
           borderRadius: BorderRadius.circular(28),
           child: SizedBox(
-            height: 58,
-            child: Stack(
-              children: [
-                AnimatedAlign(
-                  alignment: Alignment(
-                    1 - (2 * selectedIndex / (_items.length - 1)),
-                    0,
-                  ),
-                  duration: const Duration(milliseconds: 620),
-                  curve: Curves.elasticOut,
-                  child: FractionallySizedBox(
-                    widthFactor: 1 / _items.length,
-                    heightFactor: .92,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      decoration: BoxDecoration(
-                        color: color.withOpacity(.16),
+            height: 60,
+            child: Row(
+              children: List.generate(_items.length, (index) {
+                final item = _items[index];
+                final active = safeIndex == index;
+                return Expanded(
+                  child: Semantics(
+                    button: true,
+                    selected: active,
+                    label: item.label,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
                         borderRadius: BorderRadius.circular(22),
-                        border: Border.all(color: color.withOpacity(.20)),
+                        onTap: () => onTap(index),
+                        child: AnimatedContainer(
+                          duration: AppDesignTokens.motionStandard,
+                          curve: AppDesignTokens.motionCurve,
+                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                          decoration: BoxDecoration(
+                            color: active
+                                ? color.withOpacity(.13)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(
+                              color: active
+                                  ? color.withOpacity(.18)
+                                  : Colors.transparent,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                item.icon,
+                                size: 22,
+                                color: active
+                                    ? color
+                                    : theme.colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                item.label,
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontFamily: 'Vazirmatn',
+                                  fontSize: 10,
+                                  height: 1.2,
+                                  fontWeight: active
+                                      ? FontWeight.w800
+                                      : FontWeight.w500,
+                                  color: active
+                                      ? color
+                                      : theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Row(
-                  children: List.generate(_items.length, (index) {
-                    final item = _items[index];
-                    final active = selectedIndex == index;
-                    return Expanded(
-                      child: _JellyNavItem(
-                        icon: item.icon,
-                        label: item.label,
-                        active: active,
-                        color: color,
-                        onTap: () => onTap(index),
-                      ),
-                    );
-                  }),
-                ),
-              ],
+                );
+              }),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _JellyNavItem extends StatefulWidget {
-  final IconData icon;
-  final String label;
-  final bool active;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _JellyNavItem({
-    required this.icon,
-    required this.label,
-    required this.active,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  State<_JellyNavItem> createState() => _JellyNavItemState();
-}
-
-class _JellyNavItemState extends State<_JellyNavItem> {
-  bool _pressed = false;
-  Offset _drag = Offset.zero;
-
-  @override
-  Widget build(BuildContext context) {
-    final inactive = Theme.of(context).colorScheme.onSurfaceVariant;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: widget.onTap,
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapCancel: () => setState(() { _pressed = false; _drag = Offset.zero; }),
-      onTapUp: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
-      onPanStart: (_) => setState(() => _pressed = true),
-      onPanUpdate: (details) => setState(() {
-        _drag = Offset(
-          (_drag.dx + details.delta.dx * .22).clamp(-8.0, 8.0),
-          (_drag.dy + details.delta.dy * .22).clamp(-8.0, 8.0),
-        );
-      }),
-      onPanEnd: (_) => setState(() { _pressed = false; _drag = Offset.zero; }),
-      onPanCancel: () => setState(() { _pressed = false; _drag = Offset.zero; }),
-      child: AnimatedScale(
-        scale: _pressed ? .82 : (widget.active ? 1.04 : 1),
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.elasticOut,
-        child: Transform.translate(
-          offset: _drag,
-          child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(widget.icon, size: 22, color: widget.active ? widget.color : inactive),
-            const SizedBox(height: 2),
-            Text(
-              widget.label,
-              style: TextStyle(
-                fontFamily: 'Vazirmatn',
-                fontSize: 10,
-                fontWeight: widget.active ? FontWeight.w900 : FontWeight.w500,
-                color: widget.active ? widget.color : inactive,
-              ),
-            ),
-          ],
-        ),
         ),
       ),
     );
