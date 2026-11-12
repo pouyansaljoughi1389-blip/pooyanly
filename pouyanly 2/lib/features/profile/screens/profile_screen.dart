@@ -79,8 +79,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         return;
                       }
                       final success = await provider.unlockAvatarEmoji(emoji);
+                      if (success) await provider.setAvatarEmoji(emoji);
                       if (!sheetContext.mounted) return;
-                      ScaffoldMessenger.of(sheetContext).showSnackBar(SnackBar(content: Text(success ? 'آواتار باز شد؛ دوباره لمسش کن تا انتخاب شود.' : 'سکهٔ کافی نداری.')));
+                      if (success) {
+                        Navigator.pop(sheetContext);
+                      } else {
+                        ScaffoldMessenger.of(sheetContext).showSnackBar(const SnackBar(content: Text('سکهٔ کافی نداری.')));
+                      }
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Container(width: 76, height: 82, decoration: BoxDecoration(
