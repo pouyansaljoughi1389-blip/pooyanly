@@ -8,6 +8,9 @@ import '../../core/services/learning_reminder_service.dart';
 class UserProvider extends ChangeNotifier {
   UserModel? _user;
   UserModel? get user => _user;
+  bool _isInitialized = false;
+  bool get isInitialized => _isInitialized;
+  Future<void>? _initFuture;
   List<Map<String, dynamic>> _assessmentHistory = [];
   Map<String, dynamic> _dailyMissionState = {};
   Map<String, dynamic> _weeklyMissionState = {};
@@ -76,13 +79,16 @@ class UserProvider extends ChangeNotifier {
   List<Map<String, dynamic>> get assessmentHistory => List.unmodifiable(_assessmentHistory);
 
   // ── Init ──────────────────────────────────────────────────────────
-  Future<void> init() async {
+  Future<void> init() => _initFuture ??= _initialize();
+
+  Future<void> _initialize() async {
     _user = StorageService.instance.loadUser();
     _assessmentHistory = StorageService.instance.loadAssessmentHistory();
     _dailyMissionState = StorageService.instance.loadDailyMissionState();
     _weeklyMissionState = StorageService.instance.loadWeeklyMissionState();
     _ensureDailyMissionDay();
     _ensureWeeklyMissionWeek();
+    _isInitialized = true;
     notifyListeners();
     try {
       await DailyProgressWidgetService.sync(
