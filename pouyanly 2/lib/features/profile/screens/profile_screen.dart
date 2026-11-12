@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -22,8 +24,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Keep this screen safe when reached directly, outside the splash route.
-    context.read<UserProvider>().init();
+    // Initialize after the first frame so Provider is never notified while
+    // the widget tree is still being built when this screen is opened directly.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(context.read<UserProvider>().init());
+    });
   }
 
   @override
