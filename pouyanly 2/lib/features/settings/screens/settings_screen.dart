@@ -356,7 +356,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 11,
-                            color: Colors.white70,
+                            color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.78),
                           ),
                         ),
                       ],
