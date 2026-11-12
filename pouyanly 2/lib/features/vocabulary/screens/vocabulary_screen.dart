@@ -100,7 +100,7 @@ class _AllVocabTab extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'جستجوی کلمه...',
               hintStyle: const TextStyle(fontFamily: 'Vazirmatn'),
-              prefixIcon: const Icon(Icons.search_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
+              prefixIcon: Icon(Icons.search_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
               suffixIcon: search.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded),
