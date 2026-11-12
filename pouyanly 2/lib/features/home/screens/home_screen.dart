@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../core/widgets/pouyanly_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/persian_digits.dart';
 import '../../../core/widgets/xp_bar.dart';
 import '../../../core/widgets/animated_game_icons.dart';
@@ -409,7 +408,7 @@ class _MiniStat extends StatelessWidget {
           children: [
             icon,
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(
+            Text(value, style: TextStyle(
               fontFamily: 'Vazirmatn', fontSize: 16,
               fontWeight: FontWeight.w700, color: scheme.primary)),
             Text(label, style: TextStyle(
