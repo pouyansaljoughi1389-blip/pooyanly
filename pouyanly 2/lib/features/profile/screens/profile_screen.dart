@@ -90,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Container(width: 76, height: 82, decoration: BoxDecoration(
-                      color: selected ? AppColors.primary.withOpacity(.12) : Theme.of(context).cardColor,
+                      color: selected ? AppColors.primary.withValues(alpha: .12) : Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: selected ? AppColors.primary : AppColors.dividerLight, width: selected ? 2 : 1),
                     ), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -143,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           border: Border.all(color: user.xp >= _avatarShopXpThreshold ? AppColors.error : Colors.white, width: user.xp >= _avatarShopXpThreshold ? 5 : 3),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
+                              color: Colors.black.withValues(alpha: 0.15),
                               blurRadius: 15,
                             ),
                           ],
@@ -244,7 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         value: user.isDarkMode,
                         onChanged: (v) =>
                             context.read<UserProvider>().toggleDarkMode(),
-                        activeColor: AppColors.primary,
+                        activeThumbColor: AppColors.primary,
                       ),
                     ),
                     _SettingRow(
