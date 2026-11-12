@@ -87,7 +87,7 @@ class _TutorScreenState extends State<TutorScreen> {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Text('سطح فعلی: ${user.cefrLevel.label}',
-                      style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12,
+                      style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12,
                           color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 ),
               ),
