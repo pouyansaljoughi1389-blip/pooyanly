@@ -35,8 +35,7 @@ class LiquidGlass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final reduceTransparency = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    final useBlur = enableBlur && !reduceTransparency && blurSigma > 0;
+    final useBlur = enableBlur && blurSigma > 0;
     final baseTint = tint ?? (dark ? const Color(0xFF25203D) : Colors.white);
     final border = dark
         ? Colors.white.withOpacity(.16)
