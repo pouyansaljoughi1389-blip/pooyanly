@@ -34,20 +34,32 @@ class _AccountScreenState extends State<AccountScreen> {
     final isPhone = RegExp(r'^\+?[0-9\s()\-]{7,20}$').hasMatch(contact);
     if (first.isEmpty || last.isEmpty || (!isEmail && !isPhone)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('نام، نام خانوادگی و یک ایمیل یا شمارهٔ معتبر وارد کن.')),
+        const SnackBar(
+          content: Text('نام، نام خانوادگی و یک ایمیل یا شمارهٔ معتبر وارد کن.'),
+        ),
       );
       return;
     }
+
     setState(() => _busy = true);
-    await context.read<UserProvider>().createUser(
-      firstName: first,
-      lastName: last,
-      contact: contact,
-      contactType: isEmail ? 'email' : 'phone',
-    );
-    await LearningReminderService.restore();
-    if (!mounted) return;
-    context.go('/onboarding');
+    try {
+      await context.read<UserProvider>().createUser(
+        firstName: first,
+        lastName: last,
+        contact: contact,
+        contactType: isEmail ? 'email' : 'phone',
+      );
+      await LearningReminderService.restore();
+      if (mounted) context.go('/onboarding');
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('ذخیرهٔ اطلاعات انجام نشد. دوباره تلاش کن.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   @override
@@ -97,7 +109,8 @@ class _AccountScreenState extends State<AccountScreen> {
               TextField(controller: _lastName, textCapitalization: TextCapitalization.words,
                 decoration: const InputDecoration(labelText: 'نام خانوادگی', prefixIcon: Icon(Icons.badge_outlined))),
               const SizedBox(height: 12),
-              TextField(controller: _contact, keyboardType: TextInputType.emailAddress,
+              TextField(controller: _contact, keyboardType: TextInputType.text,
+                autofillHints: const [AutofillHints.email, AutofillHints.telephoneNumber],
                 decoration: const InputDecoration(labelText: 'ایمیل یا شماره تلفن', hintText: 'name@example.com یا 09…', prefixIcon: Icon(Icons.alternate_email_rounded))),
               const SizedBox(height: 10),
               Text('فعلاً اطلاعات فقط به‌صورت محلی ذخیره می‌شوند؛ کد تأیید و اتصال به سرویس حساب کاربری در مرحلهٔ بعد اضافه خواهد شد.',
