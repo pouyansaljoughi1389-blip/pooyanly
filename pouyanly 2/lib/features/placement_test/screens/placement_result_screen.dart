@@ -144,7 +144,7 @@ class PlacementResultScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           _getSkillRecommendation(user.skillScores),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 12,
                             height: 1.8,
@@ -188,7 +188,7 @@ class PlacementResultScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       Text(
                         _getRecommendation(cefrLevel),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Vazirmatn',
                           fontSize: 13,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
