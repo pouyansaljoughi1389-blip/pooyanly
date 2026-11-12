@@ -2,7 +2,6 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
 import '../theme/app_design_tokens.dart';
 import 'premium_icon.dart';
 
@@ -34,11 +33,11 @@ class LiquidGlass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final baseTint = tint ?? (dark ? const Color(0xFF25203D) : Colors.white);
-    final border = dark
-        ? Colors.white.withValues(alpha: .16)
-        : AppColors.primary.withValues(alpha: .12);
+    final theme = Theme.of(context);
+    final dark = theme.brightness == Brightness.dark;
+    final scheme = theme.colorScheme;
+    final baseTint = tint ?? scheme.surfaceContainerHighest;
+    final border = scheme.outline.withValues(alpha: dark ? .62 : .72);
     final decoration = BoxDecoration(
       borderRadius: borderRadius,
       gradient: LinearGradient(
@@ -52,13 +51,13 @@ class LiquidGlass extends StatelessWidget {
       border: Border.all(color: border, width: 1),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: dark ? .20 : .055),
+          color: scheme.shadow.withValues(alpha: dark ? .28 : .045),
           blurRadius: 18,
           offset: const Offset(0, 7),
         ),
         if (showHighlight)
           BoxShadow(
-            color: Colors.white.withValues(alpha: dark ? .07 : .72),
+            color: scheme.onSurface.withValues(alpha: dark ? .06 : .035),
             blurRadius: 1,
             offset: const Offset(0, -1),
           ),
