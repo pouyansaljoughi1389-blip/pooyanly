@@ -18,9 +18,12 @@ void main() {
 
   testWidgets('profile never renders a blank screen without a user',
       (tester) async {
+    final provider = UserProvider();
+    await provider.init();
+
     await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => UserProvider(),
+      ChangeNotifierProvider.value(
+        value: provider,
         child: MaterialApp(
           theme: AppTheme.light,
           home: const ProfileScreen(),
@@ -29,8 +32,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('هنوز حسابی برای نمایش وجود ندارد'), findsOneWidget);
-    expect(find.text('رفتن به صفحهٔ شروع'), findsOneWidget);
+    expect(find.text('پروفایل هنوز آماده نیست'), findsOneWidget);
+    expect(find.text('رفتن به شروع'), findsOneWidget);
   });
 
   test('user provider initialization is idempotent', () async {
