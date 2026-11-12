@@ -98,7 +98,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.cefrColor(q.cefrLevel).withOpacity(0.15),
+                      color: AppColors.cefrColor(q.cefrLevel).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -226,15 +226,15 @@ class _OptionTile extends StatelessWidget {
     Color? textColor;
 
     if (correct) {
-      bgColor = AppColors.success.withOpacity(0.12);
+      bgColor = AppColors.success.withValues(alpha: 0.12);
       borderColor = AppColors.success;
       textColor = AppColors.success;
     } else if (wrong) {
-      bgColor = AppColors.error.withOpacity(0.12);
+      bgColor = AppColors.error.withValues(alpha: 0.12);
       borderColor = AppColors.error;
       textColor = AppColors.error;
     } else if (selected) {
-      bgColor = AppColors.primary.withOpacity(0.08);
+      bgColor = AppColors.primary.withValues(alpha: 0.08);
       borderColor = AppColors.primary;
       textColor = AppColors.primary;
     }
@@ -283,9 +283,9 @@ class _FeedbackPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
