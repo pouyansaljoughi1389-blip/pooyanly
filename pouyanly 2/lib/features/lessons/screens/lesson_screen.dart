@@ -157,7 +157,7 @@ class _VocabPhase extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   '${index + 1}/${lesson.vocabulary.length}',
-                  style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -501,7 +501,7 @@ class _ExercisePhase extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   '${index + 1}/${lesson.exercises.length}',
-                  style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -578,7 +578,7 @@ class _ExercisePhase extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(exercise.explanationFarsi,
-                              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
                           if (exercise.exampleEn != null) ...[
                             const SizedBox(height: 8),
                             Text(exercise.exampleEn!,
@@ -689,7 +689,7 @@ class _ResultPhase extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               passed ? 'درس «${lesson.titleFarsi}» با موفقیت ثبت شد.' : 'برای باز شدن مرحلهٔ بعد باید حداقل ۷۰٪ پاسخ درست داشته باشی.',
-              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 15, color: Theme.of(context).colorScheme.onSurfaceVariant),
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15, color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 32),
             Row(
@@ -741,7 +741,7 @@ class _StatBadge extends StatelessWidget {
           Text(value,
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 20, fontWeight: FontWeight.w800, color: color)),
           Text(label,
-              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
         ],
       ),
     );
