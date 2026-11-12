@@ -72,7 +72,15 @@ class _HomePage extends StatelessWidget {
             pinned: false,
             title: Row(
               children: [
-                const Text('🦁 ', style: TextStyle(fontSize: 22)),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.asset(
+                    'assets/images/app_icon.jpg',
+                    width: 26,
+                    height: 26,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 const Text('POUYANLY',
                     style: TextStyle(
                         fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w800)),
