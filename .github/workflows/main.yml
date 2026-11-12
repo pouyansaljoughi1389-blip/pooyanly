@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - 'feature/**'
   pull_request:
     branches:
       - main
@@ -13,11 +12,11 @@ on:
 permissions:
   contents: read
 
-# Queue validations for the same branch instead of cancelling a run while
-# flutter test, APK packaging or emulator evidence capture is in progress.
+# Validate feature work through its pull request, avoiding duplicate push and
+# pull_request runs. A newer commit supersedes an older validation attempt.
 concurrency:
   group: pouyanly-apk-${{ github.event.pull_request.head.ref || github.ref_name }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
