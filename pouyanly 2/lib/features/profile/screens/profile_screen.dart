@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -20,17 +18,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   static const int _avatarShopXpThreshold = 1000;
   bool _promptScheduled = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize after the first frame so Provider is never notified while
-    // the widget tree is still being built when this screen is opened directly.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      unawaited(context.read<UserProvider>().init());
-    });
-  }
 
   @override
   void didChangeDependencies() {
@@ -73,14 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         textDirection: TextDirection.rtl,
         child: Consumer<UserProvider>(builder: (context, currentProvider, _) {
           final user = currentProvider.user;
-          if (user == null) {
-      return UserRequiredState(
-        title: 'پروفایل هنوز آماده نیست',
-        message: 'اطلاعات حساب بارگذاری نشده است. برای ورود دوباره به مسیر شروع برنامه برو.',
-        actionLabel: 'رفتن به شروع',
-        onPressed: () => context.go('/welcome'),
-      );
-    }
+          if (user == null) return const SizedBox.shrink();
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
