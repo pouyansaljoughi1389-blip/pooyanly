@@ -465,7 +465,7 @@ class _StreakCalendar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: List.generate(7, (index) {
           final date = today.subtract(Duration(days: 6 - index));
-          final key = '\${date.year.toString().padLeft(4, '0')}-\${date.month.toString().padLeft(2, '0')}-\${date.day.toString().padLeft(2, '0')}';
+          final key = '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
           final isToday = index == 6;
           final studied = activeDates.contains(key);
           return Expanded(child: Column(children: [

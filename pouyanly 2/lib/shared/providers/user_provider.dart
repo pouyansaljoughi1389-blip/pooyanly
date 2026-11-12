@@ -296,37 +296,35 @@ class UserProvider extends ChangeNotifier {
   // Skip only the next sequential lesson; skipping costs XP and grants no lesson reward.
   Future<bool> skipLesson(String lessonId, {int xpCost = 100, required List<String> previousLessonIds}) async {
     final current = _user;
-    if (current == null || current.xp < xpCost || current.completedLessonIds.contains(lessonId)) return false;
-    if (!CourseData.getAllUnits().expand((unit) => unit.lessons).any((lesson) => lesson.id == lessonId)) return false;
-    if (previousLessonIds.any((id) => !current.completedLessonIds.contains(id))) return false;
+    if (current == null || xpCost <= 0 || current.xp < xpCost || current.completedLessonIds.contains(lessonId)) return false;
+    final units = CourseData.getAllUnits();
+    final completedIds = current.completedLessonIds.toSet();
+    final nextLessonId = LearningPathPolicy.nextLessonId(units: units, completedIds: completedIds);
+    final unitIndex = units.indexWhere((unit) => unit.lessons.any((lesson) => lesson.id == lessonId));
+    if (unitIndex < 0 || nextLessonId != lessonId) return false;
+    if (!LearningPathPolicy.isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIds)) return false;
+    if (previousLessonIds.any((id) => !completedIds.contains(id))) return false;
     final completed = List<String>.from(current.completedLessonIds)..add(lessonId);
     _user = current.copyWith(xp: current.xp - xpCost, completedLessonIds: completed);
     await _save();
     return true;
   }
 
-  Future<void> completeCheckpoint(String unitId) async {
+  Future<bool> completeCheckpoint(String unitId) async {
     final current = _user;
-    if (current == null || unitId.trim().isEmpty) return;
-    Unit? targetUnit;
-    for (final unit in CourseData.getAllUnits()) {
-      if (unit.id == unitId) {
-        targetUnit = unit;
-        break;
-      }
-    }
-    if (targetUnit == null ||
-        !targetUnit.lessons.every((lesson) => current.completedLessonIds.contains(lesson.id))) {
-      return;
-    }
+    if (current == null || unitId.trim().isEmpty) return false;
+    final units = CourseData.getAllUnits();
+    final unitIndex = units.indexWhere((unit) => unit.id == unitId);
+    if (unitIndex < 0) return false;
     final checkpointId = 'checkpoint_$unitId';
-    if (current.completedLessonIds.contains(checkpointId)) return;
-    _user = current.copyWith(
-      completedLessonIds: [...current.completedLessonIds, checkpointId],
-      xp: current.xp + 50,
-      coins: current.coins + 10,
-    );
+    if (current.completedLessonIds.contains(checkpointId)) return true;
+    final completedIds = current.completedLessonIds.toSet();
+    if (!LearningPathPolicy.isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIds)) return false;
+    final targetUnit = units[unitIndex];
+    if (!targetUnit.lessons.every((lesson) => completedIds.contains(lesson.id))) return false;
+    _user = current.copyWith(completedLessonIds: [...current.completedLessonIds, checkpointId], xp: current.xp + 50, coins: current.coins + 10);
     await _save();
+    return true;
   }
 
   // ── Lesson Completion ─────────────────────────────────────────────
@@ -334,8 +332,13 @@ class UserProvider extends ChangeNotifier {
     final currentUser = _user;
     if (currentUser == null || lessonId.trim().isEmpty) return;
 
-    // A completed lesson must never grant XP or coins more than once.
+    // Completion is idempotent and must respect the canonical sequential path.
     if (currentUser.completedLessonIds.contains(lessonId)) return;
+    final units = CourseData.getAllUnits();
+    final completedIds = currentUser.completedLessonIds.toSet();
+    final unitIndex = units.indexWhere((unit) => unit.lessons.any((lesson) => lesson.id == lessonId));
+    if (unitIndex < 0 || LearningPathPolicy.nextLessonId(units: units, completedIds: completedIds) != lessonId ||
+        !LearningPathPolicy.isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIds)) return;
 
     final ids = List<String>.from(currentUser.completedLessonIds)..add(lessonId);
     final now = DateTime.now();

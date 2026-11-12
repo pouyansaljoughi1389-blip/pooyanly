@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pouyanly/data/local/storage_service.dart';
+import 'package:pouyanly/features/lessons/models/lesson_data.dart';
 import 'package:pouyanly/shared/providers/user_provider.dart';
 
 void main() {
@@ -28,9 +29,12 @@ void main() {
       await provider.createUser();
 
       expect(await provider.claimWeeklyMission('lessons'), isFalse);
-      await provider.completeLesson('weekly-1');
-      await provider.completeLesson('weekly-2');
-      await provider.completeLesson('weekly-3');
+      final units = CourseData.getAllUnits();
+      final firstUnit = units.first;
+      await provider.completeLesson(firstUnit.lessons[0].id);
+      await provider.completeLesson(firstUnit.lessons[1].id);
+      expect(await provider.completeCheckpoint(firstUnit.id), isTrue);
+      await provider.completeLesson(units[1].lessons.first.id);
 
       expect(provider.weeklyMissionProgress['lessons'], 3);
       expect(await provider.claimWeeklyMission('lessons'), isTrue);

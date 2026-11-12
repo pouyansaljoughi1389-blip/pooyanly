@@ -122,6 +122,36 @@ class LessonPassPolicy {
   }
 }
 
+/// Authoritative ordering and unlock rules for the CEFR learning path.
+/// Shared by the map UI and persistence provider so deep links cannot bypass locks.
+class LearningPathPolicy {
+  LearningPathPolicy._();
+  static String? nextLessonId({required List<Unit> units, required Set<String> completedIds}) {
+    for (final unit in units) { for (final lesson in unit.lessons) { if (!completedIds.contains(lesson.id)) return lesson.id; } }
+    return null;
+  }
+  static bool isUnitUnlocked({required List<Unit> units, required int unitIndex, required Set<String> completedIds}) {
+    if (unitIndex < 0 || unitIndex >= units.length) return false;
+    if (unitIndex == 0) return true;
+    for (final previous in units.take(unitIndex)) {
+      if (!previous.lessons.every((lesson) => completedIds.contains(lesson.id))) return false;
+      if (!completedIds.contains('checkpoint_${previous.id}')) return false;
+    }
+    return true;
+  }
+  static bool isLessonUnlocked({required List<Unit> units, required String lessonId, required Set<String> completedIds}) {
+    for (var unitIndex = 0; unitIndex < units.length; unitIndex++) {
+      final unit = units[unitIndex];
+      final lessonIndex = unit.lessons.indexWhere((lesson) => lesson.id == lessonId);
+      if (lessonIndex < 0) continue;
+      if (!isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIds)) return false;
+      for (final previousLesson in unit.lessons.take(lessonIndex)) { if (!completedIds.contains(previousLesson.id)) return false; }
+      return true;
+    }
+    return false;
+  }
+}
+
 // ─── Course Data ────────────────────────────────────────────────────────────
 
 class CourseData {

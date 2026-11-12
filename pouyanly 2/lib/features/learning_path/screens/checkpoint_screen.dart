@@ -35,10 +35,9 @@ class _CheckpointScreenState extends State<CheckpointScreen> {
         .where((entry) => _answers[entry.key] == entry.value.correctAnswer)
         .length;
     final percent = (correct / _questions.length * 100).round();
-    final passed = percent >= 70;
-    if (passed) {
-      await context.read<UserProvider>().completeCheckpoint(widget.unitId);
-    }
+    final scorePassed = percent >= 70;
+    final checkpointRecorded = scorePassed ? await context.read<UserProvider>().completeCheckpoint(widget.unitId) : false;
+    final passed = scorePassed && checkpointRecorded;
     if (!mounted) return;
     await showDialog<void>(
       context: context,
@@ -69,7 +68,16 @@ class _CheckpointScreenState extends State<CheckpointScreen> {
       return Scaffold(appBar: AppBar(title: const Text('آزمون جزیره')), body: const Center(child: Text('آزمون این بخش پیدا نشد.')));
     }
     final completedIds = context.watch<UserProvider>().user?.completedLessonIds ?? const <String>[];
-    final unitLessonsPassed = unit.lessons.every((lesson) => completedIds.contains(lesson.id));
+    final units = CourseData.getAllUnits();
+    final unitIndex = units.indexWhere((item) => item.id == widget.unitId);
+    final completedIdSet = completedIds.toSet();
+    final unitUnlocked = LearningPathPolicy.isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIdSet);
+    if (!unitUnlocked) {
+      return Scaffold(appBar: AppBar(title: const Text('آزمون جامع بخش')), body: const Center(child: Padding(
+        padding: EdgeInsets.all(28), child: Text('این آزمون هنوز قفل است. ابتدا بخش قبلی و آزمون پایانی آن را با موفقیت کامل کن.', textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15, height: 1.8)),
+      )));
+    }
+    final unitLessonsPassed = unit.lessons.every((lesson) => completedIdSet.contains(lesson.id));
     if (!unitLessonsPassed) {
       return Scaffold(
         appBar: AppBar(title: const Text('آزمون جامع بخش')),

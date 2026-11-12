@@ -17,20 +17,35 @@ class LearningPathScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
+    // CourseData owns the canonical A1→A2→B1→B2→C1→C2 order. Goals may
+    // highlight relevant topics, but must never reorder prerequisites.
     final units = CourseData.getAllUnits();
-    units.sort((a, b) {
-      final byGoal = _goalPriority(a, user?.goal?.name).compareTo(_goalPriority(b, user?.goal?.name));
-      return byGoal != 0 ? byGoal : a.id.compareTo(b.id);
-    });
     final completedIds = user?.completedLessonIds ?? const <String>[];
-    
-    final allLessons = units.expand((u) => u.lessons).toList();
-    final completedLessons = allLessons.where((l) => completedIds.contains(l.id)).length;
-    String? nextLessonId;
-    for (final lesson in allLessons) {
-      if (!completedIds.contains(lesson.id)) { nextLessonId = lesson.id; break; }
-    }
+    final completedIdSet = completedIds.toSet();
+    final allLessons = units.expand((unit) => unit.lessons).toList();
+    final completedLessons = allLessons.where((lesson) => completedIdSet.contains(lesson.id)).length;
+    final nextLessonId = LearningPathPolicy.nextLessonId(units: units, completedIds: completedIdSet);
     final totalLessons = units.fold<int>(0, (sum, unit) => sum + unit.lessons.length);
+    final pathItems = <Widget>[];
+    String? previousLevel;
+    for (var index = 0; index < units.length; index++) {
+      final unit = units[index];
+      if (unit.cefrLevel != previousLevel) {
+        previousLevel = unit.cefrLevel;
+        final levelUnits = units.where((item) => item.cefrLevel == unit.cefrLevel).toList();
+        final levelLessons = levelUnits.expand((item) => item.lessons).toList();
+        final levelCompleted = levelLessons.where((lesson) => completedIdSet.contains(lesson.id)).length;
+        pathItems.add(_CefrLevelHeader(level: unit.cefrLevel, completed: levelCompleted, total: levelLessons.length));
+      }
+      final completed = unit.lessons.where((lesson) => completedIdSet.contains(lesson.id)).length;
+      pathItems.add(_MapUnitNode(
+        unit: unit, completed: completed,
+        isUnlocked: LearningPathPolicy.isUnitUnlocked(units: units, unitIndex: index, completedIds: completedIdSet),
+        completedIds: completedIds, alignLeft: index.isOdd, nextLessonId: nextLessonId,
+        allLessonIds: allLessons.map((lesson) => lesson.id).toList(growable: false),
+        goalRecommended: user?.goal != null && _goalPriority(unit, user!.goal!.name) == 0,
+      ));
+    }
     return Directionality(
       textDirection: TextDirection.rtl,
       child: CustomScrollView(slivers: [
@@ -88,13 +103,7 @@ class LearningPathScreen extends StatelessWidget {
             ]),
           ),
         )),
-        SliverPadding(padding: const EdgeInsets.fromLTRB(14, 24, 14, 30), sliver: SliverList(delegate: SliverChildBuilderDelegate((context, index) {
-          final unit = units[index];
-          final completed = unit.lessons.where((l) => completedIds.contains(l.id)).length;
-          final unlocked = index == 0 ||
-              units.take(index).every((previous) => previous.lessons.every((l) => completedIds.contains(l.id)) && completedIds.contains('checkpoint_${previous.id}'));
-          return _MapUnitNode(unit: unit, completed: completed, isUnlocked: unlocked, completedIds: completedIds, alignLeft: index.isOdd, nextLessonId: nextLessonId, allLessonIds: allLessons.map((lesson) => lesson.id).toList());
-        }, childCount: units.length))),
+        SliverPadding(padding: const EdgeInsets.fromLTRB(14, 24, 14, 30), sliver: SliverList(delegate: SliverChildListDelegate(pathItems))),
       ]),
     );
   }
@@ -128,6 +137,32 @@ class _HeaderCounter extends StatelessWidget {
   }
 }
 
+class _CefrLevelHeader extends StatelessWidget {
+  final String level; final int completed; final int total;
+  const _CefrLevelHeader({required this.level, required this.completed, required this.total});
+  String get _title => switch (level) {
+    'A1' => 'شروع از پایه', 'A2' => 'مقدماتی', 'B1' => 'متوسط',
+    'B2' => 'متوسط رو به بالا', 'C1' => 'پیشرفته', 'C2' => 'تسلط پیشرفته', _ => 'مسیر یادگیری',
+  };
+  @override Widget build(BuildContext context) {
+    final color = AppColors.cefrColor(level);
+    final progress = total == 0 ? 0.0 : (completed / total).clamp(0.0, 1.0).toDouble();
+    return Padding(padding: const EdgeInsetsDirectional.fromSTEB(4, 14, 4, 18), child: Row(children: [
+      Container(width: 48, height: 48, alignment: Alignment.center,
+        decoration: BoxDecoration(color: color.withValues(alpha: .12), borderRadius: BorderRadius.circular(15), border: Border.all(color: color.withValues(alpha: .45))),
+        child: Text(level, style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, fontWeight: FontWeight.w900, color: color))),
+      const SizedBox(width: 12),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(_title, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 14, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 3),
+        Text('${toPersianDigits(completed)} از ${toPersianDigits(total)} درس', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 10, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        const SizedBox(height: 7),
+        ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(value: progress, minHeight: 5, backgroundColor: color.withValues(alpha: .12), valueColor: AlwaysStoppedAnimation<Color>(color))),
+      ])),
+    ]));
+  }
+}
+
 class _MapUnitNode extends StatefulWidget {
   final Unit unit;
   final int completed;
@@ -136,7 +171,8 @@ class _MapUnitNode extends StatefulWidget {
   final bool alignLeft;
   final String? nextLessonId;
   final List<String> allLessonIds;
-  const _MapUnitNode({required this.unit, required this.completed, required this.isUnlocked, required this.completedIds, required this.alignLeft, required this.nextLessonId, required this.allLessonIds});
+  final bool goalRecommended;
+  const _MapUnitNode({required this.unit, required this.completed, required this.isUnlocked, required this.completedIds, required this.alignLeft, required this.nextLessonId, required this.allLessonIds, this.goalRecommended = false});
   @override
   State<_MapUnitNode> createState() => _MapUnitNodeState();
 }
@@ -169,6 +205,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
             const SizedBox(width: 13),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               if (done) const Text('تکمیل شد', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 10, color: AppColors.success, fontWeight: FontWeight.w700)),
+              if (widget.goalRecommended) Text('مرتبط با هدف تو', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 10, color: AppColors.cefrColor(widget.unit.cefrLevel), fontWeight: FontWeight.w800)),
               const SizedBox(height: 5),
               Text(widget.unit.titleFarsi, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 3),
@@ -197,7 +234,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
                   final lessonDone = widget.completedIds.contains(lesson.id);
                   return ListTile(
                     dense: true,
-                    onTap: lessonDone || lesson.id == widget.nextLessonId
+                    onTap: lessonDone || (lesson.id == widget.nextLessonId && LearningPathPolicy.isLessonUnlocked(units: CourseData.getAllUnits(), lessonId: lesson.id, completedIds: widget.completedIds.toSet()))
                         ? () => context.push('/lesson/' + lesson.id)
                         : () => ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('برای باز شدن این مرحله، ابتدا مرحلهٔ قبلی را کامل کن.')),
