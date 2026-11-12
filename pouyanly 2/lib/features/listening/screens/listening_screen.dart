@@ -162,7 +162,7 @@ class _ListeningScreenState extends State<ListeningScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: border ?? AppColors.dividerLight),
+                    border: Border.all(color: border ?? Theme.of(context).dividerColor),
                   ),
                   child: Row(
                     children: [
