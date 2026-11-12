@@ -107,6 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
     if (user == null) return const SizedBox.shrink();
+    _maybePromptAvatarShop();
 
     return Directionality(
       textDirection: TextDirection.rtl,
