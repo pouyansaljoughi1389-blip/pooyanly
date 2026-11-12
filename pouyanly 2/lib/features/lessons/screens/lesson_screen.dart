@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/lesson_option_order.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -24,6 +25,8 @@ class _LessonScreenState extends State<LessonScreen> {
   int _correct = 0;
   String? _selectedAnswer;
   bool _showFeedback = false;
+  bool _completionSaved = false;
+  int _xpEarned = 0;
 
   late Lesson? _lesson;
 
@@ -31,6 +34,7 @@ class _LessonScreenState extends State<LessonScreen> {
   void initState() {
     super.initState();
     _lesson = CourseData.getLessonById(widget.lessonId);
+    if (_lesson?.vocabulary.isEmpty == true) _phase = _LessonPhase.exercise;
   }
 
   void _nextVocab() {
@@ -68,16 +72,23 @@ class _LessonScreenState extends State<LessonScreen> {
   Future<void> _finishLesson() async {
     if (_lesson == null) return;
     final total = _lesson!.exercises.length;
-    final passed = LessonPassPolicy.isPassed(correct: _correct, total: total);
-    if (passed) {
-      await context.read<UserProvider>().completeLesson(
-        _lesson!.id,
-        xpGain: _lesson!.xpReward,
-        coinGain: 5,
-      );
-    }
+    final scorePassed = LessonPassPolicy.isPassed(correct: _correct, total: total);
+    final provider = context.read<UserProvider>();
+    final wasAlreadyCompleted =
+        provider.user?.completedLessonIds.contains(_lesson!.id) ?? false;
+    final saved = scorePassed
+        ? await provider.completeLesson(
+            _lesson!.id,
+            xpGain: _lesson!.xpReward,
+            coinGain: 5,
+          )
+        : false;
     if (!mounted) return;
-    setState(() => _phase = _LessonPhase.result);
+    setState(() {
+      _completionSaved = saved;
+      _xpEarned = saved && !wasAlreadyCompleted ? _lesson!.xpReward : 0;
+      _phase = _LessonPhase.result;
+    });
   }
 
   @override
@@ -87,6 +98,25 @@ class _LessonScreenState extends State<LessonScreen> {
         appBar: AppBar(leading: BackButton(onPressed: () => context.go('/home'))),
         body: const Center(child: Text('درس پیدا نشد', style: TextStyle(fontFamily: 'Vazirmatn'))),
       );
+    }
+
+    final user = context.watch<UserProvider>().user;
+    final completedIds = user?.completedLessonIds.toSet() ?? <String>{};
+    final isAlreadyCompleted = completedIds.contains(_lesson!.id);
+    final units = CourseData.getAllUnits();
+    final canStart = user != null &&
+        (isAlreadyCompleted ||
+            LearningPathPolicy.isLessonUnlocked(
+              units: units,
+              lessonId: _lesson!.id,
+              completedIds: completedIds,
+            ));
+    if (!canStart) return const _LockedLessonView();
+    if (_lesson!.exercises.isEmpty ||
+        _lesson!.exercises.any((exercise) =>
+            exercise.options.length < 2 ||
+            !exercise.options.contains(exercise.correctAnswer))) {
+      return const _UnavailableLessonView();
     }
 
     return Scaffold(
@@ -111,9 +141,71 @@ class _LessonScreenState extends State<LessonScreen> {
               lesson: _lesson!,
               correct: _correct,
               total: _lesson!.exercises.length,
-              passed: LessonPassPolicy.isPassed(correct: _correct, total: _lesson!.exercises.length),
+              scorePassed: LessonPassPolicy.isPassed(correct: _correct, total: _lesson!.exercises.length),
+              progressSaved: _completionSaved,
+              xpEarned: _xpEarned,
             ),
         },
+      ),
+    );
+  }
+}
+
+
+class _LockedLessonView extends StatelessWidget {
+  const _LockedLessonView();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.lock_rounded, size: 52, color: scheme.onSurfaceVariant),
+                const SizedBox(height: 18),
+                const Text(
+                  'این درس هنوز باز نشده است',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 20, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'برای دسترسی به این درس، ابتدا درس‌های قبلی و آزمون مرحله را کامل کن.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Vazirmatn', color: scheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 24),
+                PButton(label: 'بازگشت به مسیر یادگیری', onPressed: () => context.go('/home')),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UnavailableLessonView extends StatelessWidget {
+  const _UnavailableLessonView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('محتوای درس')),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'این درس هنوز تمرین قابل ارزیابی ندارد؛ پیشرفتت ثبت نمی‌شود.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontFamily: 'Vazirmatn'),
+          ),
+        ),
       ),
     );
   }
@@ -542,7 +634,10 @@ class _ExercisePhase extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ...exercise.options.map((opt) {
+                  ...LessonOptionOrder.forExercise(
+                    lessonId: lesson.id,
+                    exercise: exercise,
+                  ).map((opt) {
                     bool isCorrect = showFeedback && opt == exercise.correctAnswer;
                     bool isWrong = showFeedback && selected == opt && opt != exercise.correctAnswer;
                     return _OptionTile(
@@ -665,13 +760,25 @@ class _ResultPhase extends StatelessWidget {
   final Lesson lesson;
   final int correct;
   final int total;
-  final bool passed;
+  final bool scorePassed;
+  final bool progressSaved;
+  final int xpEarned;
 
-  const _ResultPhase({required this.lesson, required this.correct, required this.total, required this.passed});
+  const _ResultPhase({
+    required this.lesson,
+    required this.correct,
+    required this.total,
+    required this.scorePassed,
+    required this.progressSaved,
+    required this.xpEarned,
+  });
 
   @override
   Widget build(BuildContext context) {
     final accuracy = total > 0 ? (correct / total * 100).round() : 0;
+    final passed = scorePassed && progressSaved;
+    final saveFailed = scorePassed && !progressSaved;
+    final alreadyCompleted = passed && xpEarned == 0;
     final emoji = passed ? (accuracy >= 90 ? '🏆' : '🎉') : '💪';
 
     return SafeArea(
@@ -683,12 +790,22 @@ class _ResultPhase extends StatelessWidget {
             Text(emoji, style: const TextStyle(fontSize: 72)),
             const SizedBox(height: 20),
             Text(
-              passed ? 'آفرین! حدنصاب را گرفتی' : 'هنوز به حدنصاب نرسیدی',
+              passed
+                  ? (alreadyCompleted ? 'مرور درس با موفقیت انجام شد' : 'آفرین! حدنصاب را گرفتی')
+                  : saveFailed
+                      ? 'پیشرفت ثبت نشد'
+                      : 'هنوز به حدنصاب نرسیدی',
               style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 28, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
             Text(
-              passed ? 'درس «${lesson.titleFarsi}» با موفقیت ثبت شد.' : 'برای باز شدن مرحلهٔ بعد باید حداقل ۷۰٪ پاسخ درست داشته باشی.',
+              passed
+                  ? (alreadyCompleted
+                      ? 'این درس قبلاً تکمیل شده است؛ امتیاز دوباره‌ای ثبت نمی‌شود.'
+                      : 'درس «${lesson.titleFarsi}» با موفقیت ثبت شد.')
+                  : saveFailed
+                      ? 'امتیاز کافی گرفتی، اما ذخیره‌سازی پیشرفت تأیید نشد. دوباره تلاش کن.'
+                      : 'برای باز شدن مرحلهٔ بعد باید حداقل ۷۰٪ پاسخ درست داشته باشی.',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15, color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 32),
@@ -699,12 +816,12 @@ class _ResultPhase extends StatelessWidget {
                 const SizedBox(width: 16),
                 _StatBadge('$accuracy%', 'دقت', AppColors.primary),
                 const SizedBox(width: 16),
-                _StatBadge(passed ? '+${lesson.xpReward}' : '۰', 'XP دریافتی', AppColors.warning),
+                _StatBadge(xpEarned > 0 ? '+$xpEarned' : '۰', 'XP دریافتی', AppColors.warning),
               ],
             ),
             const SizedBox(height: 40),
             PButton(
-              label: passed ? 'ادامهٔ مسیر' : 'تلاش دوباره',
+              label: passed ? 'ادامهٔ مسیر' : (saveFailed ? 'تلاش برای ثبت دوباره' : 'تلاش دوباره'),
               onPressed: () => context.go(passed ? '/home' : '/lesson/${lesson.id}'),
               icon: passed ? Icons.arrow_forward_rounded : Icons.refresh_rounded,
             ),

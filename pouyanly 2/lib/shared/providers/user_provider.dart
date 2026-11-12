@@ -328,17 +328,17 @@ class UserProvider extends ChangeNotifier {
   }
 
   // ── Lesson Completion ─────────────────────────────────────────────
-  Future<void> completeLesson(String lessonId, {int xpGain = 20, int coinGain = 5}) async {
+  Future<bool> completeLesson(String lessonId, {int xpGain = 20, int coinGain = 5}) async {
     final currentUser = _user;
-    if (currentUser == null || lessonId.trim().isEmpty) return;
+    if (currentUser == null || lessonId.trim().isEmpty) return false;
 
     // Completion is idempotent and must respect the canonical sequential path.
-    if (currentUser.completedLessonIds.contains(lessonId)) return;
+    if (currentUser.completedLessonIds.contains(lessonId)) return true;
     final units = CourseData.getAllUnits();
     final completedIds = currentUser.completedLessonIds.toSet();
     final unitIndex = units.indexWhere((unit) => unit.lessons.any((lesson) => lesson.id == lessonId));
     if (unitIndex < 0 || LearningPathPolicy.nextLessonId(units: units, completedIds: completedIds) != lessonId ||
-        !LearningPathPolicy.isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIds)) return;
+        !LearningPathPolicy.isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIds)) return false;
 
     final ids = List<String>.from(currentUser.completedLessonIds)..add(lessonId);
     final now = DateTime.now();
@@ -394,6 +394,7 @@ class UserProvider extends ChangeNotifier {
         percent: dailyProgressPercent,
       );
     } catch (_) {}
+    return true;
   }
 
   // ── Spaced vocabulary review ───────────────────────────────────────
