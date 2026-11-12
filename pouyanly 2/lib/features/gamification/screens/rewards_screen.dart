@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/animated_game_icons.dart';
 import '../../../shared/providers/user_provider.dart';
 
 class RewardsScreen extends StatelessWidget {
@@ -212,7 +213,7 @@ class _TopStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 22)),
+        AnimatedSymbolIcon(symbol: emoji, size: 25, color: Colors.white),
         const SizedBox(height: 4),
         Text(value,
             style: const TextStyle(
@@ -296,7 +297,7 @@ class _MissionCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 26)),
+          AnimatedSymbolIcon(symbol: emoji, size: 31, color: AppColors.primary),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -314,12 +315,19 @@ class _MissionCard extends StatelessWidget {
                         color: AppColors.xpColor.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text('+$reward XP${coinReward > 0 ? ' • +$coinReward 🪙' : ''}',
-                          style: const TextStyle(
-                              fontFamily: 'Vazirmatn',
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.warning)),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text('+$reward XP', style: const TextStyle(
+                          fontFamily: 'Vazirmatn', fontSize: 11,
+                          fontWeight: FontWeight.w700, color: AppColors.warning)),
+                        if (coinReward > 0) ...[
+                          const SizedBox(width: 5),
+                          Text('+$coinReward', style: const TextStyle(
+                            fontFamily: 'Vazirmatn', fontSize: 11,
+                            fontWeight: FontWeight.w700, color: AppColors.warning)),
+                          const SizedBox(width: 3),
+                          const AnimatedCoinIcon(size: 15),
+                        ],
+                      ]),
                     ),
                   ],
                 ),
@@ -395,9 +403,10 @@ class _AchievementBadge extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            unlocked ? emoji : '🔒',
-            style: TextStyle(fontSize: unlocked ? 28 : 22),
+          AnimatedSymbolIcon(
+            symbol: unlocked ? emoji : '🔒',
+            size: unlocked ? 31 : 25,
+            color: unlocked ? AppColors.primary : AppColors.textSecondaryLight,
           ),
           const SizedBox(height: 6),
           Text(title,
@@ -462,8 +471,7 @@ class _StreakCalendar extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    inStreak ? '🔥' : '○',
-                    style: TextStyle(fontSize: inStreak ? 18 : 14),
+                    inStreak ? const AnimatedFlameIcon(size: 22) : const Icon(Icons.circle_outlined, size: 14),
                   ),
                 ),
               ),
@@ -492,7 +500,7 @@ class _OfflineLeagueCard extends StatelessWidget {
       decoration: BoxDecoration(gradient: AppColors.primaryGradient,
         borderRadius: BorderRadius.circular(16)),
       child: Row(children: [
-        const Text('🏅', style: TextStyle(fontSize: 32)),
+        const AnimatedSymbolIcon(symbol: '🏅', size: 36, color: Colors.white),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
           children: [
