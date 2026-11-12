@@ -182,7 +182,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
   @override
   Widget build(BuildContext context) {
     final done = widget.completed == widget.unit.lessons.length;
-    final levelColor = AppColors.primary;
+    final levelColor = AppColors.cefrColor(widget.unit.cefrLevel);
     final statusColor = done ? AppColors.success : widget.isUnlocked ? levelColor : Theme.of(context).colorScheme.onSurfaceVariant;
     final bubble = Material(
       elevation: widget.isUnlocked ? 9 : 1,
