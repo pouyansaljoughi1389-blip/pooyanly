@@ -35,7 +35,7 @@ class PremiumIcon extends StatelessWidget {
               child: Icon(
                 icon,
                 size: size,
-                color: foreground.withOpacity(.20),
+                color: foreground.withValues(alpha: .20),
               ),
             ),
             Icon(icon, size: size, color: foreground),
@@ -64,18 +64,18 @@ class PremiumIcon extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              foreground.withOpacity(.20),
-              foreground.withOpacity(.08),
+              foreground.withValues(alpha: .20),
+              foreground.withValues(alpha: .08),
             ],
           ),
           border: Border.all(
-            color: Colors.white.withOpacity(
+            color: Colors.white.withValues(alpha: 
               Theme.of(context).brightness == Brightness.dark ? .16 : .70,
             ),
           ),
           boxShadow: [
             BoxShadow(
-              color: foreground.withOpacity(.13),
+              color: foreground.withValues(alpha: .13),
               blurRadius: 9,
               offset: const Offset(0, 3),
             ),
