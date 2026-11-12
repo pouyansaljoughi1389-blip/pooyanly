@@ -75,7 +75,7 @@ class LearningPathScreen extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(gradient: AppColors.heroGradient, borderRadius: BorderRadius.circular(30),
-              boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(.24), blurRadius: 24, offset: const Offset(0, 12)), const BoxShadow(color: Colors.white24, blurRadius: 2, offset: Offset(-2, -2))]),
+              boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: .24), blurRadius: 24, offset: const Offset(0, 12)), const BoxShadow(color: Colors.white24, blurRadius: 2, offset: Offset(-2, -2))]),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('مسیرت تا تسلط انگلیسی', style: TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20)),
               const SizedBox(height: 6),
@@ -110,9 +110,9 @@ class _HeaderCounter extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.13),
+        color: Colors.white.withValues(alpha: .13),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withOpacity(.22)),
+        border: Border.all(color: Colors.white.withValues(alpha: .22)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         icon == Icons.local_fire_department_rounded
@@ -149,7 +149,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
     final statusColor = done ? AppColors.success : widget.isUnlocked ? levelColor : AppColors.textSecondaryLight;
     final bubble = Material(
       elevation: widget.isUnlocked ? 9 : 1,
-      shadowColor: statusColor.withOpacity(.32),
+      shadowColor: statusColor.withValues(alpha: .32),
       color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.circular(26),
       child: InkWell(
@@ -159,11 +159,11 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(26),
-            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Theme.of(context).cardColor, statusColor.withOpacity(.07)]),
-            border: Border.all(color: statusColor.withOpacity(.45), width: 1.4),
-            boxShadow: [BoxShadow(color: statusColor.withOpacity(.13), blurRadius: 20, offset: const Offset(0, 9)), const BoxShadow(color: Colors.white24, blurRadius: 2, offset: Offset(-2, -2))]),
+            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Theme.of(context).cardColor, statusColor.withValues(alpha: .07)]),
+            border: Border.all(color: statusColor.withValues(alpha: .45), width: 1.4),
+            boxShadow: [BoxShadow(color: statusColor.withValues(alpha: .13), blurRadius: 20, offset: const Offset(0, 9)), const BoxShadow(color: Colors.white24, blurRadius: 2, offset: Offset(-2, -2))]),
           child: Row(children: [
-            Container(width: 58, height: 58, decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: [statusColor.withOpacity(.24), statusColor.withOpacity(.08)]), border: Border.all(color: statusColor.withOpacity(.35), width: 2), boxShadow: [BoxShadow(color: statusColor.withOpacity(.16), blurRadius: 12, offset: const Offset(0, 5))]),
+            Container(width: 58, height: 58, decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: [statusColor.withValues(alpha: .24), statusColor.withValues(alpha: .08)]), border: Border.all(color: statusColor.withValues(alpha: .35), width: 2), boxShadow: [BoxShadow(color: statusColor.withValues(alpha: .16), blurRadius: 12, offset: const Offset(0, 5))]),
               child: Center(child: widget.isUnlocked ? AnimatedSymbolIcon(symbol: widget.unit.emoji, size: 31, color: statusColor) : const Icon(Icons.lock_rounded, size: 25))),
             const SizedBox(width: 13),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -186,9 +186,9 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
             margin: const EdgeInsets.only(top: 10),
             padding: const EdgeInsets.symmetric(vertical: 5),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(.65),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: .65),
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: levelColor.withOpacity(.2)),
+              border: Border.all(color: levelColor.withValues(alpha: .2)),
             ),
             child: Column(
               children: [
@@ -203,7 +203,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
                             ),
                     leading: CircleAvatar(
                       radius: 17,
-                      backgroundColor: levelColor.withOpacity(.12),
+                      backgroundColor: levelColor.withValues(alpha: .12),
                       child: AnimatedSymbolIcon(symbol: lesson.emoji, size: 19, color: levelColor),
                     ),
                     title: Text(lesson.titleFarsi, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, fontWeight: FontWeight.w700)),
@@ -280,7 +280,7 @@ class _RouteConnectorPainter extends CustomPainter {
       ..moveTo(start.dx, start.dy)
       ..cubicTo(start.dx, size.height * .45, end.dx, size.height * .55, end.dx, end.dy);
     final paint = Paint()
-      ..color = color.withOpacity(.42)
+      ..color = color.withValues(alpha: .42)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5
       ..strokeCap = StrokeCap.round;
@@ -420,9 +420,9 @@ class _LearningPathHeaderState extends State<_LearningPathHeader>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.white.withOpacity(.045),
+                    Colors.white.withValues(alpha: .045),
                     Colors.transparent,
-                    Colors.black.withOpacity(.13),
+                    Colors.black.withValues(alpha: .13),
                   ],
                 ),
               ),
@@ -504,7 +504,7 @@ class _LearningPathHeaderState extends State<_LearningPathHeader>
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontFamily: 'Vazirmatn',
-                            color: Colors.white.withOpacity(.76),
+                            color: Colors.white.withValues(alpha: .76),
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
                           ),
@@ -578,7 +578,7 @@ class _LearningPathHeaderState extends State<_LearningPathHeader>
                                     LinearProgressIndicator(
                                   value: value,
                                   minHeight: 6,
-                                  backgroundColor: Colors.white.withOpacity(.18),
+                                  backgroundColor: Colors.white.withValues(alpha: .18),
                                   valueColor:
                                       const AlwaysStoppedAnimation<Color>(
                                     Color(0xFFD9C7FF),
@@ -629,9 +629,9 @@ class _HeaderOrb extends StatelessWidget {
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [
-              color.withOpacity(opacity),
-              color.withOpacity(opacity * .18),
-              color.withOpacity(0),
+              color.withValues(alpha: opacity),
+              color.withValues(alpha: opacity * .18),
+              color.withValues(alpha: 0),
             ],
           ),
         ),
@@ -755,6 +755,6 @@ class _MetricDivider extends StatelessWidget {
         width: 1,
         height: 30,
         margin: const EdgeInsets.symmetric(horizontal: 6),
-        color: Colors.white.withOpacity(.15),
+        color: Colors.white.withValues(alpha: .15),
       );
 }
