@@ -13,6 +13,7 @@ import '../../gamification/screens/rewards_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../lessons/models/lesson_data.dart';
 import '../../../core/widgets/liquid_glass.dart';
+import '../../../core/widgets/user_required_state.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -59,7 +60,14 @@ class _HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
     final user = userProvider.user;
-    if (user == null) return const SizedBox.shrink();
+    if (user == null) {
+      return UserRequiredState(
+        title: 'حساب کاربری پیدا نشد',
+        message: 'برای نمایش داشبورد، ابتدا وارد مسیر شروع و ساخت حساب شو.',
+        actionLabel: 'رفتن به شروع',
+        onPressed: () => context.go('/welcome'),
+      );
+    }
 
     final nextLesson = _getNextLesson(user);
 
