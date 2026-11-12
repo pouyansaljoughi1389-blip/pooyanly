@@ -44,7 +44,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<UserProvider>().user;
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
@@ -231,7 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _SettingCard(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.refresh_rounded, color: scheme.primary),
+                  leading: Icon(Icons.refresh_rounded, color: scheme.primary),
                   title: const Text(
                     'انجام دوباره آزمون تعیین سطح',
                     style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15),
@@ -245,7 +244,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const Divider(height: 1, indent: 16, endIndent: 16),
                 ListTile(
-                  leading: const Icon(Icons.tune_rounded, color: scheme.secondary),
+                  leading: Icon(Icons.tune_rounded, color: scheme.secondary),
                   title: const Text(
                     'ویرایش اهداف یادگیری',
                     style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15),
@@ -305,7 +304,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                gradient: scheme.primaryGradient,
+                gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [scheme.primary, scheme.secondary],
+                ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
@@ -394,7 +397,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: () => _showResetDialog(context),
-                      icon: const Icon(Icons.delete_forever_rounded, color: scheme.error),
+                      icon: Icon(Icons.delete_forever_rounded, color: scheme.error),
                       label: const Text(
                         'بازنشانی کامل پیشرفت',
                         style: TextStyle(
@@ -404,7 +407,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: scheme.error),
+                        side: BorderSide(color: scheme.error),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
