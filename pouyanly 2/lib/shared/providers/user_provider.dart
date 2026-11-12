@@ -463,6 +463,12 @@ class UserProvider extends ChangeNotifier {
     await _save();
   }
 
+  Future<void> markAvatarShopPromptShown() async {
+    if (_user == null || _user!.avatarShopPromptShown) return;
+    _user = _user!.copyWith(avatarShopPromptShown: true);
+    await _save();
+  }
+
   // ── Dark Mode ─────────────────────────────────────────────────────
   Future<void> toggleDarkMode() async {
     if (_user == null) return;
