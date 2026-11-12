@@ -55,6 +55,10 @@ class StorageService {
     await _prefs.setString(_keyAssessmentHistory, jsonEncode(history));
   }
 
+  Future<void> clearAssessmentHistory() async {
+    await _prefs.remove(_keyAssessmentHistory);
+  }
+
 
   // ── Daily mission state ──────────────────────────────────────────
   Map<String, dynamic> loadDailyMissionState() {
