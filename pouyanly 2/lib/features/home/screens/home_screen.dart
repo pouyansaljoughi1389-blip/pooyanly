@@ -317,7 +317,7 @@ class _LessonCard extends StatelessWidget {
               ),
               child: Text(
                 '+${toPersianDigits(lesson.xpReward)} XP',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Vazirmatn',
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -353,14 +353,14 @@ class _QuickReviewCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'مرور سریع',
                   style: TextStyle(
                       fontFamily: 'Vazirmatn', fontSize: 15, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onTertiaryContainer),
                 ),
                 Text(
                   completedCount > 0 ? 'کلمات قدیمی را مرور کنید' : 'پس از یادگیری اول فعال می‌شود',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onTertiaryContainer.withValues(alpha: .78)),
                 ),
               ],
@@ -375,7 +375,7 @@ class _QuickReviewCard extends StatelessWidget {
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
+                child: Text(
                   'شروع',
                   style: TextStyle(
                       fontFamily: 'Vazirmatn', fontSize: 12, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface),
@@ -396,6 +396,7 @@ class _MiniStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -410,7 +411,7 @@ class _MiniStat extends StatelessWidget {
             const SizedBox(height: 4),
             Text(value, style: const TextStyle(
               fontFamily: 'Vazirmatn', fontSize: 16,
-              fontWeight: FontWeight.w700, color: AppColors.primary)),
+              fontWeight: FontWeight.w700, color: scheme.primary)),
             Text(label, style: TextStyle(
               fontFamily: 'Vazirmatn', fontSize: 11,
               color: Theme.of(context).colorScheme.onSurfaceVariant)),
