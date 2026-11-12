@@ -87,7 +87,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
             LinearProgressIndicator(
               value: progress,
               minHeight: 4,
-              backgroundColor: AppColors.dividerLight,
+              backgroundColor: Theme.of(context).dividerColor,
               valueColor: const AlwaysStoppedAnimation(AppColors.primary),
             ),
             Padding(
@@ -116,7 +116,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                     style: const TextStyle(
                       fontFamily: 'Vazirmatn',
                       fontSize: 12,
-                      color: AppColors.textSecondaryLight,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -136,7 +136,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                       decoration: BoxDecoration(
                         color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.dividerLight),
+                        border: Border.all(color: Theme.of(context).dividerColor),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +147,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                               fontFamily: 'Vazirmatn',
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimaryLight,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             textDirection: TextDirection.ltr,
                           ),
@@ -157,7 +157,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                             style: const TextStyle(
                               fontFamily: 'Vazirmatn',
                               fontSize: 13,
-                              color: AppColors.textSecondaryLight,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -222,7 +222,7 @@ class _OptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color? bgColor;
-    Color borderColor = AppColors.dividerLight;
+    Color borderColor = Theme.of(context).dividerColor;
     Color? textColor;
 
     if (correct) {
@@ -311,7 +311,7 @@ class _FeedbackPanel extends StatelessWidget {
             style: const TextStyle(
               fontFamily: 'Vazirmatn',
               fontSize: 13,
-              color: AppColors.textSecondaryLight,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
