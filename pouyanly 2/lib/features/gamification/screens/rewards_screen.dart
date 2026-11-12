@@ -79,7 +79,7 @@ class RewardsScreen extends StatelessWidget {
                             Text('سطح ${toPersianDigits(user.level)}', style: const TextStyle(
                               fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w800)),
                             Text('${toPersianDigits(user.xpInCurrentLevel)} از ۵۰۰ XP تا سطح بعدی',
-                              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11,
+                              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11,
                                 color: Theme.of(context).colorScheme.onSurfaceVariant)),
                           ],
                         )),
@@ -365,7 +365,7 @@ class _MissionCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text('${toPersianDigits(current)}/${toPersianDigits(total)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 11,
                             color: Theme.of(context).colorScheme.onSurfaceVariant)),
@@ -435,7 +435,7 @@ class _AchievementBadge extends StatelessWidget {
               ),
               textAlign: TextAlign.center),
           Text(subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                   fontFamily: 'Vazirmatn', fontSize: 10, color: Theme.of(context).colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center),
         ],
