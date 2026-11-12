@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/persian_digits.dart';
 import '../../../core/widgets/animated_game_icons.dart';
 import '../../../core/widgets/p_button.dart';
+import '../../../core/widgets/user_required_state.dart';
 import '../../../shared/providers/user_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -66,7 +67,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         textDirection: TextDirection.rtl,
         child: Consumer<UserProvider>(builder: (context, currentProvider, _) {
           final user = currentProvider.user;
-          if (user == null) return const SizedBox.shrink();
+          if (user == null) {
+      return UserRequiredState(
+        title: 'پروفایل هنوز آماده نیست',
+        message: 'اطلاعات حساب بارگذاری نشده است. برای ورود دوباره به مسیر شروع برنامه برو.',
+        actionLabel: 'رفتن به شروع',
+        onPressed: () => context.go('/welcome'),
+      );
+    }
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
