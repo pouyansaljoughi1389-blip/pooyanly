@@ -7,6 +7,47 @@ import 'lesson_data.dart';
 class ExpandedCourseData {
   ExpandedCourseData._();
 
+  static const Map<String, int> _lessonCounts = {
+    'a1_greetings': 6,
+    'a1_home': 6,
+    'a1_food': 6,
+    'a1_city': 6,
+    'a2_health': 6,
+    'a2_travel': 6,
+    'a2_work': 6,
+    'a2_weather': 6,
+    'b1_communication': 6,
+    'b1_media': 6,
+    'b1_environment': 6,
+    'b1_work': 6,
+    'b2_argument': 6,
+    'b2_academic': 6,
+    'b2_fluency': 6,
+    'b2_global': 6,
+    'c1_rhetoric': 6,
+    'c1_research': 6,
+    'c1_professional': 6,
+    'c2_expression': 5,
+    'c2_discourse': 5,
+    'a1_classroom': 6,
+    'a1_time': 6,
+    'a1_clothes': 6,
+    'a1_hobbies': 6,
+    'a2_transport': 6,
+    'a2_cooking': 6,
+    'a2_services': 6,
+    'b1_problem_solving': 6,
+    'b1_education': 6,
+    'b1_money': 6,
+    'b2_science': 6,
+    'b2_workplace': 6,
+    'b2_culture': 6,
+    'c1_academic_research': 6,
+    'c1_policy': 6,
+    'c2_rhetoric': 6,
+    'c2_academic_argument': 6,
+  };
+
   static final List<Unit> units = [..._topics, ..._newTopics].map(_buildUnit).toList();
 
   static Unit _buildUnit(_Topic topic) {
@@ -17,10 +58,18 @@ class ExpandedCourseData {
       final key = word.en.trim().toLowerCase();
       if (key.isNotEmpty && seenWords.add(key)) uniqueWords.add(word);
     }
-    const wordsPerLesson = 3;
-    final lessonCount = (uniqueWords.length / wordsPerLesson).ceil();
+    const wordsPerLesson = 5;
+    final lessonCount = _lessonCounts[topic.id];
+    if (lessonCount == null) {
+      throw StateError('Missing lesson-count configuration for topic: ${topic.id}');
+    }
+    final requiredWordCount = lessonCount * wordsPerLesson;
+    if (uniqueWords.length < requiredWordCount) {
+      throw StateError('Topic ${topic.id} has ${uniqueWords.length} unique words; ${requiredWordCount} are required.');
+    }
+    final selectedWords = uniqueWords.take(requiredWordCount).toList(growable: false);
     for (var i = 0; i < lessonCount; i++) {
-      final words = uniqueWords.skip(i * wordsPerLesson).take(wordsPerLesson).toList();
+      final words = selectedWords.skip(i * wordsPerLesson).take(wordsPerLesson).toList();
       final vocabulary = words.map((word) => VocabularyItem(
         english: word.en,
         pronunciation: word.ipa,
