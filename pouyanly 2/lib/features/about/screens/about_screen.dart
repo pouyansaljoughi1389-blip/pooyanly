@@ -99,7 +99,7 @@ class AboutScreen extends StatelessWidget {
             style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, height: 1.8, color: Theme.of(context).colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 20),
-          const Center(child: Text('نسخهٔ آموزشی • ساخته‌شده با Flutter', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant))),
+          Center(child: Text('نسخهٔ آموزشی • ساخته‌شده با Flutter', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant))),
         ],
       ),
     );
@@ -130,7 +130,7 @@ class _ContactTile extends StatelessWidget {
           CircleAvatar(backgroundColor: AppColors.primary.withValues(alpha: .12), child: Icon(icon, color: AppColors.primary)),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+            Text(title, style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
             const SizedBox(height: 3),
             SelectableText(value, style: const TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700, fontSize: 13)),
           ])),
@@ -162,7 +162,7 @@ class _SourceTile extends StatelessWidget {
         children: [
           Text(title, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, fontWeight: FontWeight.w800)),
           const SizedBox(height: 3),
-          Text(creator, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          Text(creator, style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 5),
           SelectableText(url, style: const TextStyle(fontSize: 10, color: AppColors.primary)),
         ],
