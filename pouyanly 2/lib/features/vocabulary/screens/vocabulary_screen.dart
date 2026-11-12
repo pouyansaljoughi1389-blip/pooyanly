@@ -100,7 +100,7 @@ class _AllVocabTab extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'جستجوی کلمه...',
               hintStyle: const TextStyle(fontFamily: 'Vazirmatn'),
-              prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textSecondaryLight),
+              prefixIcon: const Icon(Icons.search_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
               suffixIcon: search.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded),
@@ -120,7 +120,7 @@ class _AllVocabTab extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: 'Vazirmatn',
                   fontSize: 13,
-                  color: AppColors.textSecondaryLight,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -158,7 +158,7 @@ class _VocabTileState extends State<_VocabTile> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.dividerLight),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: InkWell(
         onTap: () => setState(() => _expanded = !_expanded),
@@ -188,7 +188,7 @@ class _VocabTileState extends State<_VocabTile> {
                           style: const TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 12,
-                            color: AppColors.textSecondaryLight,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           textDirection: TextDirection.ltr,
                         ),
@@ -244,7 +244,7 @@ class _VocabTileState extends State<_VocabTile> {
                   Icon(
                     _expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
                     size: 18,
-                    color: AppColors.textSecondaryLight,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ],
               ),
@@ -261,7 +261,7 @@ class _VocabTileState extends State<_VocabTile> {
                     fontFamily: 'Vazirmatn',
                     fontSize: 13,
                     fontStyle: FontStyle.italic,
-                    color: AppColors.textSecondaryLight,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                         textDirection: TextDirection.ltr,
                       ),
@@ -292,7 +292,7 @@ class _VocabTileState extends State<_VocabTile> {
                   style: const TextStyle(
                     fontFamily: 'Vazirmatn',
                     fontSize: 13,
-                    color: AppColors.textSecondaryLight,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -356,7 +356,7 @@ class _ReviewTabState extends State<_ReviewTab> {
               SizedBox(height: 8),
               Text('فعلاً لغت عقب‌افتاده‌ای نداری. فردا دوباره سر بزن.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontFamily: 'Vazirmatn', color: AppColors.textSecondaryLight)),
+                style: TextStyle(fontFamily: 'Vazirmatn', color: Theme.of(context).colorScheme.onSurfaceVariant)),
             ],
           ),
         ),
@@ -418,7 +418,7 @@ class _ReviewTabState extends State<_ReviewTab> {
           const SizedBox(height: 14),
           Text('${toPersianDigits(_reviewIndex + 1)} از ${toPersianDigits(items.length)} لغتِ موعددار',
             style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
-              color: AppColors.textSecondaryLight)),
+              color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 16),
           Expanded(
             child: GestureDetector(
@@ -442,7 +442,7 @@ class _ReviewTabState extends State<_ReviewTab> {
                     const SizedBox(height: 8),
                     Text(item.pronunciation, textDirection: TextDirection.ltr,
                       style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15,
-                        color: _revealed ? Colors.white70 : AppColors.textSecondaryLight)),
+                        color: _revealed ? Colors.white70 : Theme.of(context).colorScheme.onSurfaceVariant)),
                     if (_revealed) ...[
                       const SizedBox(height: 24),
                       const Divider(color: Colors.white30),
@@ -464,7 +464,7 @@ class _ReviewTabState extends State<_ReviewTab> {
                       const Text('معنی را در ذهنت حدس بزن؛ سپس کارت را لمس کن.',
                         textAlign: TextAlign.center,
                         style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
-                          color: AppColors.textSecondaryLight)),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant)),
                     ],
                   ],
                 ),
@@ -514,7 +514,7 @@ class _ReviewStat extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.dividerLight),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -524,7 +524,7 @@ class _ReviewStat extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title, style: const TextStyle(fontFamily: 'Vazirmatn',
-                fontSize: 10, color: AppColors.textSecondaryLight)),
+                fontSize: 10, color: Theme.of(context).colorScheme.onSurfaceVariant)),
               Text(value, style: const TextStyle(fontFamily: 'Vazirmatn',
                 fontSize: 17, fontWeight: FontWeight.w800)),
             ],
