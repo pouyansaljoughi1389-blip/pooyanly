@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/pouyanly_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -191,7 +192,7 @@ class _HomePage extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           backgroundColor: AppColors.primary,
-                          child: Icon(Icons.headphones_rounded, color: Colors.white),
+                          child: PouyanlyIcon(type: PouyanlyIconType.listening, color: Colors.white),
                         ),
                         SizedBox(width: 12),
                         Expanded(
@@ -228,7 +229,7 @@ class _HomePage extends StatelessWidget {
                       children: [
                         const CircleAvatar(
                           backgroundColor: AppColors.primary,
-                          child: Icon(Icons.auto_awesome_rounded, color: Colors.white),
+                          child: PouyanlyIcon(type: PouyanlyIconType.brain, color: Colors.white),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
