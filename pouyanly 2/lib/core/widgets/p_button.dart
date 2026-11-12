@@ -34,10 +34,7 @@ class PButton extends StatelessWidget {
     final foreground = color == null
         ? theme.colorScheme.onPrimary
         : Colors.white;
-    final child = _buildChild(
-      isText ? effectiveColor : foreground,
-      theme.colorScheme.onSurface,
-    );
+    final child = _buildChild(isText ? effectiveColor : foreground);
 
     if (isText) {
       return TextButton(
@@ -94,7 +91,7 @@ class PButton extends StatelessWidget {
     );
   }
 
-  Widget _buildChild(Color foreground, Color fallback) {
+  Widget _buildChild(Color foreground) {
     if (isLoading) {
       return SizedBox(
         width: 21,
