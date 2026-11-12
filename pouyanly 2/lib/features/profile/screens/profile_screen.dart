@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/pouyanly_icon.dart';
+import '../../../data/models/user_model.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -470,7 +471,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 await context.read<UserProvider>().resetProgress();
                 if (context.mounted) context.go('/placement-test');
               },
-              child: const Text('بازنشانی',
+              child: Text('بازنشانی',
                   style: TextStyle(
                       fontFamily: 'Vazirmatn', color: Theme.of(context).colorScheme.error)),
             ),
