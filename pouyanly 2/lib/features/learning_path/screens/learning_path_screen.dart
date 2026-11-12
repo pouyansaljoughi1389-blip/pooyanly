@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../../core/widgets/pouyanly_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -164,7 +165,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
             boxShadow: [BoxShadow(color: statusColor.withValues(alpha: .13), blurRadius: 20, offset: const Offset(0, 9)), const BoxShadow(color: Colors.white24, blurRadius: 2, offset: Offset(-2, -2))]),
           child: Row(children: [
             Container(width: 58, height: 58, decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: [statusColor.withValues(alpha: .24), statusColor.withValues(alpha: .08)]), border: Border.all(color: statusColor.withValues(alpha: .35), width: 2), boxShadow: [BoxShadow(color: statusColor.withValues(alpha: .16), blurRadius: 12, offset: const Offset(0, 5))]),
-              child: Center(child: widget.isUnlocked ? AnimatedSymbolIcon(symbol: widget.unit.emoji, size: 31, color: statusColor) : const Icon(Icons.lock_rounded, size: 25))),
+              child: Center(child: widget.isUnlocked ? AnimatedSymbolIcon(symbol: widget.unit.emoji, size: 31, color: statusColor) : const PouyanlyIcon(type: PouyanlyIconType.locked, size: 25))),
             const SizedBox(width: 13),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               if (done) const Text('تکمیل شد', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 10, color: AppColors.success, fontWeight: FontWeight.w700)),
