@@ -129,7 +129,7 @@ class _CheckpointScreenState extends State<CheckpointScreen> {
                       onTap: () => setState(() => _answers[_index] = option),
                       child: Container(
                         padding: const EdgeInsets.all(15),
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), border: Border.all(color: selected == option ? AppColors.primary : AppColors.dividerLight, width: selected == option ? 2 : 1)),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), border: Border.all(color: selected == option ? AppColors.primary : Theme.of(context).colorScheme.outlineVariant, width: selected == option ? 2 : 1)),
                         child: Text(option, textDirection: TextDirection.ltr, style: const TextStyle(fontWeight: FontWeight.w700)),
                       ),
                     ),
