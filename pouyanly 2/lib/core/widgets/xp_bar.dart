@@ -86,7 +86,7 @@ class XPBar extends StatelessWidget {
                     builder: (context, value, _) => LinearProgressIndicator(
                       value: value,
                       minHeight: compact ? 6 : 8,
-                      backgroundColor: scheme.outlineVariant.withOpacity(.45),
+                      backgroundColor: scheme.outlineVariant.withValues(alpha: .45),
                       valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
                     ),
                   ),
