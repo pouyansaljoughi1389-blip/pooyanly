@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'lesson_data.dart';
 
-/// Expanded, offline CEFR curriculum. Existing lesson IDs remain stable;
+/// Expanded, topic-based offline curriculum. Existing lesson IDs remain stable;
 /// lesson IDs are stable so saved progress survives app updates.
 class ExpandedCourseData {
   ExpandedCourseData._();
@@ -11,16 +11,22 @@ class ExpandedCourseData {
 
   static Unit _buildUnit(_Topic topic) {
     final lessons = <Lesson>[];
-    final lessonCount = topic.id == 'c2_academic_argument' ? 4 : 6;
+    final uniqueWords = <_Word>[];
+    final seenWords = <String>{};
+    for (final word in topic.words) {
+      final key = word.en.trim().toLowerCase();
+      if (key.isNotEmpty && seenWords.add(key)) uniqueWords.add(word);
+    }
+    const wordsPerLesson = 3;
+    final lessonCount = (uniqueWords.length / wordsPerLesson).ceil();
     for (var i = 0; i < lessonCount; i++) {
-      final words = List.generate(6, (index) => topic.words[(i * 2 + index) % topic.words.length]);
+      final words = uniqueWords.skip(i * wordsPerLesson).take(wordsPerLesson).toList();
       final vocabulary = words.map((word) => VocabularyItem(
         english: word.en,
         pronunciation: word.ipa,
         farsi: word.fa,
         exampleEn: word.example,
         exampleFa: word.exampleFa,
-        cefrLevel: topic.level,
         category: topic.id,
       )).toList();
       final meanings = words.map((word) => word.fa).toList();
@@ -57,24 +63,22 @@ class ExpandedCourseData {
       lessons.add(Lesson(
         id: '${topic.id}_l${i + 1}',
         title: topic.lessonTitles[i % topic.lessonTitles.length] +
-            (i >= topic.lessonTitles.length ? ' — Applied practice' : ''),
+            (i >= topic.lessonTitles.length ? ' — Practice ${i + 1}' : ''),
         titleFarsi: topic.lessonTitlesFa[i % topic.lessonTitlesFa.length] +
-            (i >= topic.lessonTitlesFa.length ? ' — تمرین کاربردی' : ''),
-        cefrLevel: topic.level,
+            (i >= topic.lessonTitlesFa.length ? ' — تمرین تکمیلی ${i + 1}' : ''),
         vocabulary: vocabulary,
         exercises: exercises,
-        xpReward: topic.level == 'B2' || topic.level == 'C1' || topic.level == 'C2' ? 35 : 25,
+        xpReward: 30,
         emoji: topic.lessonEmojis[i % topic.lessonEmojis.length],
         objectivesFarsi: [topic.objectives[i % topic.objectives.length] + (i >= topic.objectives.length ? ' در جمله‌ها و موقعیت‌های واقعی به کار ببری.' : '')],
         skillFocus: const ['vocabulary', 'reading', 'sentence building'],
-        estimatedMinutes: topic.level == 'A1' || topic.level == 'A2' ? 8 : 12,
+        estimatedMinutes: 10,
       ));
     }
     return Unit(
       id: topic.id,
       title: topic.title,
       titleFarsi: topic.titleFa,
-      cefrLevel: topic.level,
       emoji: topic.emoji,
       lessons: lessons,
     );
