@@ -354,9 +354,10 @@ class _ReviewTabState extends State<_ReviewTab> {
               Text('همه‌چیز مرتبه!', style: TextStyle(
                 fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
               SizedBox(height: 8),
-              Text('فعلاً لغت عقب‌افتاده‌ای نداری. فردا دوباره سر بزن.',
+              Text(
+                'فعلاً لغت عقب‌افتاده‌ای نداری. فردا دوباره سر بزن.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontFamily: 'Vazirmatn', color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              ),
             ],
           ),
         ),
