@@ -81,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Text('فروشگاه آواتار', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 20, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 4),
-                Text('سکهٔ در دسترس: ${toPersianDigits(user.coins)}', style: const TextStyle(fontFamily: 'Vazirmatn', color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                Text('سکهٔ در دسترس: ${toPersianDigits(user.coins)}', style: TextStyle(fontFamily: 'Vazirmatn', color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 const SizedBox(height: 16),
                 Wrap(spacing: 10, runSpacing: 10, children: ['🦊', '🐼', '🐯', '🐸', '🐧', '🦉', '🐙', '🐨'].map((emoji) {
                   final unlocked = user.unlockedAvatarEmojis.contains(emoji);
