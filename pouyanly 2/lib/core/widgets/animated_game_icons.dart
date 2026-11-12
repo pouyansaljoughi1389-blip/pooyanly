@@ -52,7 +52,7 @@ class _AnimatedCoinIconState extends State<AnimatedCoinIcon>
               border: Border.all(color: const Color(0xFFFFE8A0), width: 1.4),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFFB52E).withOpacity(.38),
+                  color: const Color(0xFFFFB52E).withValues(alpha: .38),
                   blurRadius: widget.size * .42,
                   spreadRadius: 1,
                 ),
