@@ -107,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Container(width: 76, height: 82, decoration: BoxDecoration(
                       color: selected ? AppColors.primary.withValues(alpha: .12) : Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: selected ? AppColors.primary : Theme.of(context).colorScheme.outlineVariant, width: selected ? 2 : 1),
+                      border: Border.all(color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outlineVariant, width: selected ? 2 : 1),
                     ), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Text(emoji, style: const TextStyle(fontSize: 30)),
                       const SizedBox(height: 3),
@@ -308,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         value: user.isDarkMode,
                         onChanged: (v) =>
                             context.read<UserProvider>().toggleDarkMode(),
-                        activeThumbColor: AppColors.primary,
+                        activeThumbColor: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     _SettingRow(
@@ -412,20 +412,20 @@ class _StatBox extends StatelessWidget {
         ),
         child: Column(
           children: [
-            AnimatedSymbolIcon(symbol: emoji, size: 25, color: AppColors.primary),
+            AnimatedSymbolIcon(symbol: emoji, size: 25, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 4),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Vazirmatn',
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Vazirmatn',
                 fontSize: 11,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -450,7 +450,7 @@ class _InfoSection extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Vazirmatn',
             fontSize: 15,
             fontWeight: FontWeight.w700,
@@ -483,7 +483,7 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          AnimatedSymbolIcon(symbol: emoji, size: 21, color: AppColors.primary),
+          AnimatedSymbolIcon(symbol: emoji, size: 21, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 12),
           Text(
             label,
@@ -495,11 +495,11 @@ class _InfoRow extends StatelessWidget {
           const Spacer(),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Vazirmatn',
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ],
@@ -574,7 +574,7 @@ class _SettingRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.primary),
+            Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
