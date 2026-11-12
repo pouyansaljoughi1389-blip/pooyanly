@@ -6,7 +6,7 @@ void main() {
     test('returns only one dictionary entry per English headword', () {
       final vocabulary = CourseData.getAllVocabulary();
       final keys = vocabulary
-          .map((item) => item.english.trim().toLowerCase().replaceAll(RegExp(r'\\s+'), ' '))
+          .map((item) => item.english.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' '))
           .toList();
 
       expect(keys.toSet().length, keys.length);
