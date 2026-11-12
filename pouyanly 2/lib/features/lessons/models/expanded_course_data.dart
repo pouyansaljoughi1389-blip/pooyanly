@@ -27,6 +27,7 @@ class ExpandedCourseData {
         farsi: word.fa,
         exampleEn: word.example,
         exampleFa: word.exampleFa,
+        cefrLevel: topic.level,
         category: topic.id,
       )).toList();
       final meanings = words.map((word) => word.fa).toList();
@@ -66,6 +67,7 @@ class ExpandedCourseData {
             (i >= topic.lessonTitles.length ? ' — Practice ${i + 1}' : ''),
         titleFarsi: topic.lessonTitlesFa[i % topic.lessonTitlesFa.length] +
             (i >= topic.lessonTitlesFa.length ? ' — تمرین تکمیلی ${i + 1}' : ''),
+        cefrLevel: topic.level,
         vocabulary: vocabulary,
         exercises: exercises,
         xpReward: 30,
@@ -79,6 +81,7 @@ class ExpandedCourseData {
       id: topic.id,
       title: topic.title,
       titleFarsi: topic.titleFa,
+      cefrLevel: topic.level,
       emoji: topic.emoji,
       lessons: lessons,
     );
