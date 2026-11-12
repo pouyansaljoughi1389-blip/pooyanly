@@ -33,7 +33,7 @@ class LearningPathScreen extends StatelessWidget {
       child: CustomScrollView(slivers: [
         SliverAppBar(
           pinned: true,
-          expandedHeight: 196,
+          expandedHeight: 220,
           toolbarHeight: 64,
           backgroundColor: AppColors.primaryDark,
           foregroundColor: Colors.white,
@@ -313,7 +313,7 @@ class _LearningPathHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = total == 0 ? 0.0 : (completed / total).clamp(0.0, 1.0);
+    final progress = total == 0 ? 0.0 : (completed / total).clamp(0.0, 1.0).toDouble();
     return Stack(
       fit: StackFit.expand,
       children: [
