@@ -144,10 +144,10 @@ class _ListeningScreenState extends State<ListeningScreen> {
           Color? background;
           Color? border;
           if (_answered && isCorrect) {
-            background = AppColors.success.withOpacity(0.12);
+            background = AppColors.success.withValues(alpha: 0.12);
             border = AppColors.success;
           } else if (_answered && isSelected) {
-            background = AppColors.error.withOpacity(0.10);
+            background = AppColors.error.withValues(alpha: 0.10);
             border = AppColors.error;
           }
           return Padding(
@@ -184,7 +184,7 @@ class _ListeningScreenState extends State<ListeningScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.07),
+              color: AppColors.primary.withValues(alpha: 0.07),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
