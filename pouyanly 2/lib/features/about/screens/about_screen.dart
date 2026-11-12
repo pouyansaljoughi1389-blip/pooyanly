@@ -35,7 +35,14 @@ class AboutScreen extends StatelessWidget {
             ),
             child: const Column(
               children: [
-                CircleAvatar(radius: 42, backgroundColor: Colors.white, child: Text('🦁', style: TextStyle(fontSize: 48))),
+                ClipOval(
+                  child: Image.asset(
+                    'assets/images/app_icon.jpg',
+                    width: 84,
+                    height: 84,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 SizedBox(height: 14),
                 Text('POUYANLY', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 25, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 2)),
                 SizedBox(height: 6),
