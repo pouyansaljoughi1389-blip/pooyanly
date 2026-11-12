@@ -98,7 +98,7 @@ class PlacementResultScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.dividerLight),
+                      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,7 +128,7 @@ class PlacementResultScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.dividerLight),
+                      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +148,7 @@ class PlacementResultScreen extends StatelessWidget {
                             fontFamily: 'Vazirmatn',
                             fontSize: 12,
                             height: 1.8,
-                            color: AppColors.textSecondaryLight,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                         if (user.dailyStudyTime != null) ...[
@@ -191,7 +191,7 @@ class PlacementResultScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontFamily: 'Vazirmatn',
                           fontSize: 13,
-                          color: AppColors.textSecondaryLight,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           height: 1.7,
                         ),
                       ),
@@ -293,7 +293,7 @@ class _SkillBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: val,
                 minHeight: 10,
-                backgroundColor: AppColors.dividerLight,
+                backgroundColor: Theme.of(context).colorScheme.outlineVariant,
                 valueColor: AlwaysStoppedAnimation(color),
               ),
             ),
