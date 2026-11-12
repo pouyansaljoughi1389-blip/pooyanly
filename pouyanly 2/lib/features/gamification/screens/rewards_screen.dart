@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/persian_digits.dart';
 import '../../../core/widgets/animated_game_icons.dart';
 import '../../../shared/providers/user_provider.dart';
 
@@ -31,10 +32,10 @@ class RewardsScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _TopStat('${user.xp}', 'XP', '⭐'),
-                    _TopStat('${user.coins}', 'سکه', '🪙'),
-                    _TopStat('${user.streak}', 'Streak', '🔥'),
-                    _TopStat('${user.longestStreak}', 'رکورد', '🏆'),
+                    _TopStat(toPersianDigits(user.xp), 'XP', '⭐'),
+                    _TopStat(toPersianDigits(user.coins), 'سکه', '🪙'),
+                    _TopStat(toPersianDigits(user.streak), 'Streak', '🔥'),
+                    _TopStat(toPersianDigits(user.longestStreak), 'رکورد', '🏆'),
                   ],
                 ),
               ),
@@ -66,9 +67,9 @@ class RewardsScreen extends StatelessWidget {
                         Expanded(child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('سطح ${user.level}', style: const TextStyle(
+                            Text('سطح ${toPersianDigits(user.level)}', style: const TextStyle(
                               fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w800)),
-                            Text('${user.xpInCurrentLevel} از ۵۰۰ XP تا سطح بعدی',
+                            Text('${toPersianDigits(user.xpInCurrentLevel)} از ۵۰۰ XP تا سطح بعدی',
                               style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11,
                                 color: AppColors.textSecondaryLight)),
                           ],
@@ -91,7 +92,7 @@ class RewardsScreen extends StatelessWidget {
                                 Text(emoji, style: const TextStyle(fontSize: 16)),
                                 if (!unlocked) ...[
                                   const SizedBox(width: 4),
-                                  Text('$cost', style: const TextStyle(fontSize: 11)),
+                                  Text(toPersianDigits(cost), style: const TextStyle(fontSize: 11)),
                                   const SizedBox(width: 3),
                                   const AnimatedCoinIcon(size: 14),
                                 ],
@@ -323,12 +324,12 @@ class _MissionCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        Text('+$reward XP', style: const TextStyle(
+                        Text('+${toPersianDigits(reward)} XP', style: const TextStyle(
                           fontFamily: 'Vazirmatn', fontSize: 11,
                           fontWeight: FontWeight.w700, color: AppColors.warning)),
                         if (coinReward > 0) ...[
                           const SizedBox(width: 5),
-                          Text('+$coinReward', style: const TextStyle(
+                          Text('+${toPersianDigits(coinReward)}', style: const TextStyle(
                             fontFamily: 'Vazirmatn', fontSize: 11,
                             fontWeight: FontWeight.w700, color: AppColors.warning)),
                           const SizedBox(width: 3),
@@ -354,7 +355,7 @@ class _MissionCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text('$current/$total',
+                    Text('${toPersianDigits(current)}/${toPersianDigits(total)}',
                         style: const TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 11,
@@ -513,7 +514,7 @@ class _OfflineLeagueCard extends StatelessWidget {
           children: [
             Text('لیگ $tier', style: const TextStyle(fontFamily: 'Vazirmatn',
               color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17)),
-            Text(xp >= 3500 ? 'بالاترین لیگ فعلی را باز کردی' : 'برای لیگ بعدی به $next XP برس',
+            Text(xp >= 3500 ? 'بالاترین لیگ فعلی را باز کردی' : 'برای لیگ بعدی به ${toPersianDigits(next)} XP برس',
               style: const TextStyle(fontFamily: 'Vazirmatn', color: Colors.white70, fontSize: 11)),
             const SizedBox(height: 8),
             LinearProgressIndicator(value: progress, backgroundColor: Colors.white24,
