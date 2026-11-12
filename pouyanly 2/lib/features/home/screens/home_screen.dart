@@ -59,8 +59,8 @@ class _HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = context.watch<UserProvider>();
-    final user = userProvider.user;
+    final provider = context.watch<UserProvider>();
+    final user = provider.user;
     if (user == null) {
       return UserRequiredState(
         title: 'حساب کاربری پیدا نشد',
@@ -69,243 +69,112 @@ class _HomePage extends StatelessWidget {
         onPressed: () => context.go('/welcome'),
       );
     }
-
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final nextLesson = _getNextLesson(user);
+    final firstName = user.firstName?.trim().isNotEmpty == true
+        ? user.firstName!.trim()
+        : (user.name?.trim().split(' ').first ?? 'زبان‌آموز');
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final dueReviews = user.vocabularyReviewDueDates.values.where((value) {
+      final due = DateTime.tryParse(value);
+      return due == null || !DateTime(due.year, due.month, due.day).isAfter(today);
+    }).length;
+    const targetXp = 50;
+    final progress = (provider.dailyXpEarned / targetXp).clamp(0.0, 1.0);
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: CustomScrollView(
+        key: const PageStorageKey<String>('pouyanly-dashboard-scroll'),
         slivers: [
-          // ── App Bar ──
           SliverAppBar(
             floating: true,
             snap: true,
-            pinned: false,
-            title: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.asset(
-                    'assets/images/app_icon.jpg',
-                    width: 26,
-                    height: 26,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const Text('POUYANLY',
-                    style: TextStyle(
-                        fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w800)),
-                const Spacer(),
-                _StatChip(icon: const AnimatedFlameIcon(size: 19), value: toPersianDigits(user.streak)),
-                const SizedBox(width: 8),
-                _StatChip(icon: const AnimatedCoinIcon(size: 19), value: toPersianDigits(user.coins)),
-              ],
-            ),
+            titleSpacing: 20,
+            title: Row(children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(9),
+                child: Image.asset('assets/images/app_icon.jpg', width: 34, height: 34, fit: BoxFit.cover),
+              ),
+              const SizedBox(width: 10),
+              const Text('POUYANLY', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 17, fontWeight: FontWeight.w900)),
+              const Spacer(),
+              _StatChip(icon: const AnimatedFlameIcon(size: 18), value: toPersianDigits(user.streak)),
+              const SizedBox(width: 7),
+              _StatChip(icon: const AnimatedCoinIcon(size: 18), value: toPersianDigits(user.coins)),
+            ]),
           ),
-
           SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                // ── XP Bar ──
-                XPBar(
-                  level: user.level,
-                  xp: user.xp,
-                  progress: user.levelProgress,
+            padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
+            sliver: SliverList(delegate: SliverChildListDelegate([
+              Text('سلام ' + firstName + ' 👋', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900)),
+              const SizedBox(height: 4),
+              Text('آماده‌ای امروز یک قدم جلوتر بروی؟', style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [scheme.primary, Color.lerp(scheme.primary, scheme.secondary, .42)!]),
+                  borderRadius: BorderRadius.circular(23),
+                  boxShadow: [BoxShadow(color: scheme.primary.withValues(alpha: .2), blurRadius: 20, offset: const Offset(0, 8))],
                 ),
-                const SizedBox(height: 20),
-
-                // ── Daily Goal Card ──
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.heroGradient,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    const PouyanlyIcon(type: PouyanlyIconType.target, color: Colors.white, size: 23),
+                    const SizedBox(width: 8),
+                    const Expanded(child: Text('هدف روزانه', style: TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontWeight: FontWeight.w700))),
+                    Text(toPersianDigits(provider.dailyXpEarned) + ' / ' + toPersianDigits(targetXp) + ' XP', style: const TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
+                  ]),
+                  const SizedBox(height: 14),
+                  ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                    child: LinearProgressIndicator(value: progress, minHeight: 9, backgroundColor: Colors.white.withValues(alpha: .24), valueColor: const AlwaysStoppedAnimation<Color>(Colors.white)),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'هدف امروز',
-                        style: TextStyle(
-                          fontFamily: 'Vazirmatn',
-                          fontSize: 13,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${user.dailyStudyTime?.farsiLabel ?? '۱۰ دقیقه در روز'} • ${toPersianDigits(userProvider.dailyXpEarned)}/۵۰ XP',
-                        style: const TextStyle(
-                          fontFamily: 'Vazirmatn',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: LinearProgressIndicator(
-                          value: (userProvider.dailyProgressPercent / 100),
-                          minHeight: 8,
-                          backgroundColor: Colors.white24,
-                          valueColor: const AlwaysStoppedAnimation(Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // ── Next Lesson Card ──
-                if (nextLesson != null) ...[
-                  const Text(
-                    'درس بعدی',
-                    style: TextStyle(
-                        fontFamily: 'Vazirmatn', fontSize: 16, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 10),
-                  _LessonCard(lesson: nextLesson),
-                  const SizedBox(height: 20),
-                ],
-
-                // ── Listening practice ──
-                InkWell(
-                  onTap: () => context.push('/listening'),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: AppColors.primary,
-                          child: PouyanlyIcon(type: PouyanlyIconType.listening, color: Colors.white),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('آزمایشگاه شنیداری', style: TextStyle(
-                                fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700)),
-                              Text('گوش کن، مفهوم را بفهم و پاسخ بده',
-                                style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11,
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                            ],
-                          ),
-                        ),
-                        Icon(Icons.arrow_back_ios_new_rounded, size: 16),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // ── Tutor entry ──
-                InkWell(
-                  onTap: () => context.push('/tutor'),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
-                    ),
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          backgroundColor: AppColors.primary,
-                          child: PouyanlyIcon(type: PouyanlyIconType.brain, color: Colors.white),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('معلم زبان POUYANLY',
-                                  style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700)),
-                              Text('تمرین کن و بازخورد بگیر • نسخهٔ آزمایشی',
-                                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                            ],
-                          ),
-                        ),
-                        const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // ── Community preview ──
-                InkWell(
-                  onTap: () => context.push('/community'),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Theme.of(context).dividerColor),
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: AppColors.primary,
-                          child: Icon(Icons.groups_rounded, color: Colors.white),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('جامعهٔ POUYANLY',
-                                  style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700)),
-                              Text('پیش‌نمایش بخش اجتماعی و اصول ایمنی',
-                                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                            ],
-                          ),
-                        ),
-                        Icon(Icons.arrow_back_ios_new_rounded, size: 16),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // ── Quick Review Card ──
-                _QuickReviewCard(
-                  completedCount: user.completedLessonIds.length,
-                  onTap: onReviewTap,
-                ),
-                const SizedBox(height: 20),
-
-                // ── Stats Row ──
-                Row(
-                  children: [
-                    _MiniStat(toPersianDigits(user.streak), 'Streak', const AnimatedFlameIcon(size: 22)),
-                    const SizedBox(width: 12),
-                    _MiniStat(toPersianDigits(user.completedLessonIds.length), 'درس', const AnimatedSymbolIcon(symbol: '✅', size: 22)),
-                    const SizedBox(width: 12),
-                    _MiniStat(toPersianDigits(user.xp), 'XP', const AnimatedSymbolIcon(symbol: '⭐', size: 22)),
-                  ],
-                ),
-                const SizedBox(height: 30),
+                  const SizedBox(height: 9),
+                  Text(progress >= 1 ? 'آفرین! هدف XP امروز را تکمیل کردی.' : 'با هر درس و تمرین، به هدف امروز نزدیک‌تر می‌شوی.', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Colors.white.withValues(alpha: .92))),
+                ]),
+              ),
+              const SizedBox(height: 18),
+              Row(children: [
+                Expanded(child: _MiniStat(toPersianDigits(user.xp), 'مجموع XP', const PouyanlyIcon(type: PouyanlyIconType.trophy, size: 22))),
+                const SizedBox(width: 9),
+                Expanded(child: _MiniStat(toPersianDigits(user.completedLessonIds.length), 'درس تکمیل‌شده', const PouyanlyIcon(type: PouyanlyIconType.completed, size: 22))),
+                const SizedBox(width: 9),
+                Expanded(child: _MiniStat(toPersianDigits(user.longestStreak), 'بهترین زنجیره', const PouyanlyIcon(type: PouyanlyIconType.streak, size: 22))),
               ]),
-            ),
+              const SizedBox(height: 25),
+              Text('ادامهٔ یادگیری', style: theme.textTheme.titleLarge),
+              const SizedBox(height: 4),
+              Text('از همان‌جایی که باید، ادامه بده', style: theme.textTheme.bodySmall),
+              const SizedBox(height: 11),
+              if (nextLesson != null)
+                _LessonCard(lesson: nextLesson)
+              else
+                _QuickReviewCard(completedCount: user.completedLessonIds.length, onTap: onReviewTap),
+              const SizedBox(height: 25),
+              Text('تمرین‌های سریع', style: theme.textTheme.titleLarge),
+              const SizedBox(height: 11),
+              _DashboardAction(
+                icon: PouyanlyIconType.review,
+                title: 'مرور واژگان',
+                description: dueReviews == 0 ? 'واژهٔ سررسیدشده‌ای برای مرور نداری' : toPersianDigits(dueReviews) + ' واژه آمادهٔ مرور است',
+                action: 'مرور',
+                onTap: onReviewTap,
+              ),
+              const SizedBox(height: 9),
+              _DashboardAction(icon: PouyanlyIconType.listening, title: 'آزمایشگاه شنیداری', description: 'درک مطلب شنیداری را تمرین کن', action: 'شروع', onTap: () => context.push('/listening')),
+              const SizedBox(height: 9),
+              _DashboardAction(icon: PouyanlyIconType.brain, title: 'معلم زبان POUYANLY', description: 'پرسش‌هایت را دربارهٔ زبان بررسی کن', action: 'ورود', onTap: () => context.push('/tutor')),
+              const SizedBox(height: 24),
+              Text('سطح فعلی تو', style: theme.textTheme.titleLarge),
+              const SizedBox(height: 4),
+              Text(user.cefrLevel.farsiDescription, style: theme.textTheme.bodySmall),
+              const SizedBox(height: 10),
+              XPBar(level: user.level, xp: user.xp, progress: user.levelProgress),
+              const SizedBox(height: 20),
+            ])),
           ),
         ],
       ),
@@ -313,19 +182,53 @@ class _HomePage extends StatelessWidget {
   }
 
   Lesson? _getNextLesson(UserModel user) {
-    final units = CourseData.getUnitsForLevel(user.cefrLevel.label);
-    for (final unit in units) {
+    final completed = user.completedLessonIds.toSet();
+    for (final unit in CourseData.getUnitsForLevel(user.cefrLevel.label)) {
       for (final lesson in unit.lessons) {
-        if (!user.completedLessonIds.contains(lesson.id)) return lesson;
-      }
-    }
-    // If all done for current level, try A2
-    for (final unit in CourseData.a2Units) {
-      for (final lesson in unit.lessons) {
-        if (!user.completedLessonIds.contains(lesson.id)) return lesson;
+        if (!completed.contains(lesson.id)) return lesson;
       }
     }
     return null;
+  }
+}
+
+class _DashboardAction extends StatelessWidget {
+  final PouyanlyIconType icon;
+  final String title, description, action;
+  final VoidCallback onTap;
+  const _DashboardAction({required this.icon, required this.title, required this.description, required this.action, required this.onTap});
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 76),
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), border: Border.all(color: scheme.outlineVariant.withValues(alpha: .65))),
+          child: Row(children: [
+            Container(
+              width: 44, height: 44,
+              decoration: BoxDecoration(color: scheme.primaryContainer, borderRadius: BorderRadius.circular(14)),
+              child: Center(child: PouyanlyIcon(type: icon, color: scheme.onPrimaryContainer, size: 22)),
+            ),
+            const SizedBox(width: 11),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(title, style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 2),
+              Text(description, maxLines: 2, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodySmall),
+            ])),
+            const SizedBox(width: 5),
+            Text(action, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: scheme.primary, fontWeight: FontWeight.w800)),
+            Icon(Icons.chevron_left_rounded, size: 19, color: scheme.onSurfaceVariant),
+          ]),
+        ),
+      ),
+    );
   }
 }
 
