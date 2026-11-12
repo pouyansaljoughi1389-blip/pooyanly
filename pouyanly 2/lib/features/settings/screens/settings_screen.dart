@@ -266,7 +266,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 8),
             _SettingCard(
               children: [
-                const ListTile(
+                ListTile(
                   leading: Icon(Icons.tag_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   title: Text(
                     'نسخه برنامه',
@@ -282,7 +282,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const Divider(height: 1, indent: 16, endIndent: 16),
-                const ListTile(
+                ListTile(
                   leading: Icon(Icons.translate_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   title: Text(
                     'زبان رابط',
@@ -552,7 +552,7 @@ class _SectionHeader extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Vazirmatn',
             fontSize: 14,
             fontWeight: FontWeight.w700,
