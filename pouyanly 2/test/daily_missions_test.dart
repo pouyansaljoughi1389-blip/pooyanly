@@ -24,6 +24,26 @@ void main() {
       expect(restored.user!.studyDateKeys, provider.user!.studyDateKeys);
     });
 
+    test('provider rejects out-of-order lessons and checkpoint attempts', () async {
+      final provider = UserProvider();
+      await provider.init();
+      await provider.createUser();
+      final units = CourseData.getAllUnits();
+      final firstUnit = units.first;
+      final secondUnit = units[1];
+
+      await provider.completeLesson(secondUnit.lessons.first.id);
+      expect(provider.user!.completedLessonIds, isNot(contains(secondUnit.lessons.first.id)));
+      expect(provider.user!.xp, 0);
+      expect(await provider.completeCheckpoint(secondUnit.id), isFalse);
+
+      await provider.completeLesson(firstUnit.lessons.first.id);
+      await provider.completeLesson(firstUnit.lessons[1].id);
+      expect(await provider.completeCheckpoint(firstUnit.id), isTrue);
+      await provider.completeLesson(secondUnit.lessons.first.id);
+      expect(provider.user!.completedLessonIds, contains(secondUnit.lessons.first.id));
+    });
+
     test('negative XP and coin grants cannot reduce balances', () async {
       final provider = UserProvider();
       await provider.init();

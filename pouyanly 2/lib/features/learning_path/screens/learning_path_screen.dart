@@ -343,7 +343,7 @@ int _goalPriority(Unit unit, String? goal) {
     'exam' => ['academic', 'grammar', 'vocabulary', 'reading', 'writing', 'exam', 'آزمون', 'گرامر'],
     _ => const <String>[],
   };
-  if (keywords.isEmpty) return 0;
+  if (keywords.isEmpty) return 1;
   return keywords.any(text.contains) ? 0 : 1;
 }
 
