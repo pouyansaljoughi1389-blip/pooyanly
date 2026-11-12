@@ -547,7 +547,7 @@ class CourseData {
           final key = item.english
               .trim()
               .toLowerCase()
-              .replaceAll(RegExp(r'\\s+'), ' ');
+              .replaceAll(RegExp(r'\s+'), ' ');
           if (key.isNotEmpty) unique.putIfAbsent(key, () => item);
         }
       }
