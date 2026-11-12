@@ -8,7 +8,7 @@ void main() {
     test('light and dark themes expose complete readable typography', () {
       for (final theme in [AppTheme.light, AppTheme.dark]) {
         expect(theme.useMaterial3, isTrue);
-        expect(theme.fontFamily, 'Vazirmatn');
+        expect(theme.textTheme.bodyMedium?.fontFamily, 'Vazirmatn');
         expect(theme.textTheme.displayLarge?.fontFamily, 'Vazirmatn');
         expect(theme.textTheme.headlineMedium?.fontFamily, 'Vazirmatn');
         expect(theme.textTheme.headlineSmall?.fontFamily, 'Vazirmatn');
