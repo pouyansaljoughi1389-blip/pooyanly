@@ -107,10 +107,10 @@ class _CheckpointScreenState extends State<CheckpointScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [Theme.of(context).cardColor, AppColors.cefrColor(unit.cefrLevel).withOpacity(.12)]),
+                    gradient: LinearGradient(colors: [Theme.of(context).cardColor, AppColors.cefrColor(unit.cefrLevel).withValues(alpha: .12)]),
                     borderRadius: BorderRadius.circular(26),
-                    border: Border.all(color: AppColors.cefrColor(unit.cefrLevel).withOpacity(.3)),
-                    boxShadow: [BoxShadow(color: AppColors.cefrColor(unit.cefrLevel).withOpacity(.16), blurRadius: 24, offset: const Offset(0, 10))],
+                    border: Border.all(color: AppColors.cefrColor(unit.cefrLevel).withValues(alpha: .3)),
+                    boxShadow: [BoxShadow(color: AppColors.cefrColor(unit.cefrLevel).withValues(alpha: .16), blurRadius: 24, offset: const Offset(0, 10))],
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(question.question, textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
@@ -122,7 +122,7 @@ class _CheckpointScreenState extends State<CheckpointScreen> {
                 ...question.options.map((option) => Padding(
                   padding: const EdgeInsets.only(bottom: 9),
                   child: Material(
-                    color: selected == option ? AppColors.primary.withOpacity(.13) : Theme.of(context).cardColor,
+                    color: selected == option ? AppColors.primary.withValues(alpha: .13) : Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(18),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(18),
