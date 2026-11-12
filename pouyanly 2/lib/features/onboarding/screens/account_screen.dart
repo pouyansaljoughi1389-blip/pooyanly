@@ -66,7 +66,7 @@ class _AccountScreenState extends State<AccountScreen> {
               decoration: BoxDecoration(
                 gradient: AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(28),
-                boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(.22), blurRadius: 24, offset: const Offset(0, 10))],
+                boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: .22), blurRadius: 24, offset: const Offset(0, 10))],
               ),
               child: const Column(children: [
                 Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 42),
