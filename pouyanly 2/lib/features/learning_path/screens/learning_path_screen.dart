@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/animated_game_icons.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../lessons/models/lesson_data.dart';
 
@@ -102,6 +103,34 @@ class LearningPathScreen extends StatelessWidget {
   }
 }
 
+class _HeaderCounter extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final Color color;
+  const _HeaderCounter({required this.icon, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(.13),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withOpacity(.22)),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        icon == Icons.local_fire_department_rounded
+            ? const AnimatedFlameIcon(size: 19)
+            : Icon(icon, size: 18, color: color),
+        const SizedBox(width: 5),
+        Text(value, style: const TextStyle(
+          fontFamily: 'Vazirmatn', color: Colors.white,
+          fontSize: 12, fontWeight: FontWeight.w800)),
+      ]),
+    );
+  }
+}
+
 class _LevelPill extends StatelessWidget {
   final String level;
   const _LevelPill({required this.level});
@@ -151,7 +180,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
             boxShadow: [BoxShadow(color: statusColor.withOpacity(.13), blurRadius: 20, offset: const Offset(0, 9)), const BoxShadow(color: Colors.white24, blurRadius: 2, offset: Offset(-2, -2))]),
           child: Row(children: [
             Container(width: 58, height: 58, decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: [statusColor.withOpacity(.24), statusColor.withOpacity(.08)]), border: Border.all(color: statusColor.withOpacity(.35), width: 2), boxShadow: [BoxShadow(color: statusColor.withOpacity(.16), blurRadius: 12, offset: const Offset(0, 5))]),
-              child: Center(child: widget.isUnlocked ? Text(widget.unit.emoji, style: const TextStyle(fontSize: 29)) : const Icon(Icons.lock_rounded, size: 25))),
+              child: Center(child: widget.isUnlocked ? AnimatedSymbolIcon(symbol: widget.unit.emoji, size: 31, color: statusColor) : const Icon(Icons.lock_rounded, size: 25))),
             const SizedBox(width: 13),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: levelColor.withOpacity(.13), borderRadius: BorderRadius.circular(20)), child: Text(widget.unit.cefrLevel, style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 10, fontWeight: FontWeight.w900, color: levelColor))),
@@ -192,7 +221,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
                     leading: CircleAvatar(
                       radius: 17,
                       backgroundColor: levelColor.withOpacity(.12),
-                      child: Text(lesson.emoji, style: const TextStyle(fontSize: 16)),
+                      child: AnimatedSymbolIcon(symbol: lesson.emoji, size: 19, color: levelColor),
                     ),
                     title: Text(lesson.titleFarsi, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, fontWeight: FontWeight.w700)),
                     subtitle: Text(
