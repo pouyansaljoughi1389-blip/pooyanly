@@ -49,7 +49,23 @@ class AppColors {
   static const Color cardDark           = Color(0xFF202640);
   static const Color textPrimaryDark    = Color(0xFFF1F1FF);
   static const Color textSecondaryDark  = Color(0xFF9CA3AF);
-  static const Color dividerDark        = Color(0xFF374151);
+  static const Color dividerDark        = Color(0xFF39374B);
+
+  // ── Theme surface roles ─────────────────────────────────────────
+  // Keep these roles as the single source of truth for AppTheme.
+  static const Color backgroundLightRole = Color(0xFFF6F5FA);
+  static const Color surfaceLightRole = Color(0xFFFFFFFF);
+  static const Color cardLightRole = Color(0xFFFFFFFF);
+  static const Color foregroundLightRole = Color(0xFF211D32);
+  static const Color secondaryTextLightRole = Color(0xFF6D687C);
+  static const Color outlineLightRole = Color(0xFFE7E3EF);
+
+  static const Color backgroundDarkRole = Color(0xFF10111B);
+  static const Color surfaceDarkRole = Color(0xFF191A27);
+  static const Color cardDarkRole = Color(0xFF202131);
+  static const Color foregroundDarkRole = Color(0xFFF4F2FC);
+  static const Color secondaryTextDarkRole = Color(0xFFB5B1C5);
+  static const Color outlineDarkRole = Color(0xFF39374B);
 
   // ── Gradients ────────────────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(
