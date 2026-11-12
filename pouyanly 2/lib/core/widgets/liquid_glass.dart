@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_design_tokens.dart';
+import 'premium_icon.dart';
 
 /// A restrained translucent surface for controls and navigation only.
 /// Keep lesson copy, vocabulary definitions and long-form content unwrapped.
@@ -163,12 +164,14 @@ class LiquidGlassNavigationBar extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                item.icon,
-                                size: 22,
+                              PremiumIcon(
+                                icon: item.icon,
+                                size: 21,
                                 color: active
                                     ? color
                                     : theme.colorScheme.onSurfaceVariant,
+                                elevated: active,
+                                semanticLabel: item.label,
                               ),
                               const SizedBox(height: 3),
                               Text(
