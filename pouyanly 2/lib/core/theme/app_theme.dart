@@ -53,7 +53,7 @@ class AppTheme {
       surfaceContainerHighest: card,
       onSurfaceVariant: secondaryText,
       outline: outline,
-      outlineVariant: outline.withOpacity(.72),
+      outlineVariant: outline.withValues(alpha: .72),
     );
 
     final baseText = ThemeData(
@@ -146,7 +146,7 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDesignTokens.radiusLarge),
-          side: BorderSide(color: outline.withOpacity(.78)),
+          side: BorderSide(color: outline.withValues(alpha: .78)),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -180,7 +180,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: scheme.primary,
           minimumSize: const Size(48, 48),
-          side: BorderSide(color: scheme.primary.withOpacity(.55)),
+          side: BorderSide(color: scheme.primary.withValues(alpha: .55)),
           shape: shape,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
           textStyle: const TextStyle(
@@ -324,8 +324,8 @@ class AppTheme {
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: scheme.primary,
-        linearTrackColor: scheme.primary.withOpacity(.12),
-        circularTrackColor: scheme.primary.withOpacity(.12),
+        linearTrackColor: scheme.primary.withValues(alpha: .12),
+        circularTrackColor: scheme.primary.withValues(alpha: .12),
       ),
       iconTheme: IconThemeData(color: foreground),
     );
