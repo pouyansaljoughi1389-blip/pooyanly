@@ -37,28 +37,28 @@ class LiquidGlass extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final baseTint = tint ?? (dark ? const Color(0xFF25203D) : Colors.white);
     final border = dark
-        ? Colors.white.withOpacity(.16)
-        : AppColors.primary.withOpacity(.12);
+        ? Colors.white.withValues(alpha: .16)
+        : AppColors.primary.withValues(alpha: .12);
     final decoration = BoxDecoration(
       borderRadius: borderRadius,
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          baseTint.withOpacity(dark ? .84 : .78),
-          baseTint.withOpacity(dark ? .70 : .66),
+          baseTint.withValues(alpha: dark ? .84 : .78),
+          baseTint.withValues(alpha: dark ? .70 : .66),
         ],
       ),
       border: Border.all(color: border, width: 1),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(dark ? .20 : .055),
+          color: Colors.black.withValues(alpha: dark ? .20 : .055),
           blurRadius: 18,
           offset: const Offset(0, 7),
         ),
         if (showHighlight)
           BoxShadow(
-            color: Colors.white.withOpacity(dark ? .07 : .72),
+            color: Colors.white.withValues(alpha: dark ? .07 : .72),
             blurRadius: 1,
             offset: const Offset(0, -1),
           ),
@@ -153,12 +153,12 @@ class LiquidGlassNavigationBar extends StatelessWidget {
                           margin: const EdgeInsets.symmetric(horizontal: 2),
                           decoration: BoxDecoration(
                             color: active
-                                ? color.withOpacity(.13)
+                                ? color.withValues(alpha: .13)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(22),
                             border: Border.all(
                               color: active
-                                  ? color.withOpacity(.18)
+                                  ? color.withValues(alpha: .18)
                                   : Colors.transparent,
                             ),
                           ),
