@@ -113,7 +113,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                   ),
                   Text(
                     'سوال ${_current + 1} از ${_questions.length}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Vazirmatn',
                       fontSize: 12,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -143,7 +143,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                         children: [
                           Text(
                             q.question,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Vazirmatn',
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -154,7 +154,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                           const SizedBox(height: 8),
                           Text(
                             q.questionFarsi,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Vazirmatn',
                               fontSize: 13,
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -308,7 +308,7 @@ class _FeedbackPanel extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             explanation,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Vazirmatn',
               fontSize: 13,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
