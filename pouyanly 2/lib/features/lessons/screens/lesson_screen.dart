@@ -196,7 +196,7 @@ class _VocabPhase extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${lesson.estimatedMinutes} دقیقه • ${lesson.skillFocus.join('، ')}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Vazirmatn',
                         fontSize: 10,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -422,7 +422,7 @@ class _CardBack extends StatelessWidget {
                     vocab.exampleEn,
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.ltr,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Vazirmatn',
                       fontSize: 14,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -439,7 +439,7 @@ class _CardBack extends StatelessWidget {
                   Text(
                     vocab.exampleFa,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Vazirmatn',
                       fontSize: 13,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -533,7 +533,7 @@ class _ExercisePhase extends StatelessWidget {
                             textDirection: TextDirection.ltr),
                         const SizedBox(height: 6),
                         Text(exercise.questionFarsi,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Vazirmatn',
                               fontSize: 13,
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
