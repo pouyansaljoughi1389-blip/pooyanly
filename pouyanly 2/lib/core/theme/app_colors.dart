@@ -8,27 +8,27 @@ class AppColors {
   static const Color primaryLight   = Color(0xFF898DFF);
   static const Color primaryDark    = Color(0xFF4145C8);
 
-  static const Color secondary      = Color(0xFF13BFA4);
+  static const Color secondary      = Color(0xFF08745D);
   static const Color secondaryLight = Color(0xFF55D9C0);
-  static const Color secondaryDark  = Color(0xFF08745D);
+  static const Color secondaryDark  = Color(0xFF065C4B);
 
-  static const Color accent         = Color(0xFFFF6B6B);
+  static const Color accent         = Color(0xFFC43F4A);
   static const Color accentLight    = Color(0xFFFF9E9E);
-  static const Color accentDark     = Color(0xFFD94040);
+  static const Color accentDark     = Color(0xFF9F2838);
 
   // ── Semantic Colors ──────────────────────────────────────────────
-  static const Color success  = Color(0xFF2ECC71);
-  static const Color warning  = Color(0xFFF39C12);
-  static const Color error    = Color(0xFFE74C3C);
-  static const Color info     = Color(0xFF3498DB);
+  static const Color success  = Color(0xFF16834A);
+  static const Color warning  = Color(0xFF9A5B00);
+  static const Color error    = Color(0xFFB42318);
+  static const Color info     = Color(0xFF1D5FA7);
 
   // ── CEFR Level Colors ────────────────────────────────────────────
-  static const Color cefrA1   = Color(0xFF4CAF50);
-  static const Color cefrA2   = Color(0xFF8BC34A);
-  static const Color cefrB1   = Color(0xFF2196F3);
+  static const Color cefrA1   = Color(0xFF2E7D32);
+  static const Color cefrA2   = Color(0xFF558B2F);
+  static const Color cefrB1   = Color(0xFF1565C0);
   static const Color cefrB2   = Color(0xFF9C27B0);
-  static const Color cefrC1   = Color(0xFFFF9800);
-  static const Color cefrC2   = Color(0xFFF44336);
+  static const Color cefrC1   = Color(0xFFA64B00);
+  static const Color cefrC2   = Color(0xFFC62828);
 
   // ── Gamification Colors ──────────────────────────────────────────
   static const Color xpColor     = Color(0xFFFFD700);
