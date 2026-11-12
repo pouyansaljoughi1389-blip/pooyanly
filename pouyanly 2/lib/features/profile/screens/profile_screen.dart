@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/persian_digits.dart';
 import '../../../core/widgets/animated_game_icons.dart';
 import '../../../core/widgets/p_button.dart';
 import '../../../shared/providers/user_provider.dart';
@@ -65,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Text('فروشگاه آواتار', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 20, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 4),
-                Text('سکهٔ در دسترس: ${user.coins}', style: const TextStyle(fontFamily: 'Vazirmatn', color: AppColors.textSecondaryLight)),
+                Text('سکهٔ در دسترس: ${toPersianDigits(user.coins)}', style: const TextStyle(fontFamily: 'Vazirmatn', color: AppColors.textSecondaryLight)),
                 const SizedBox(height: 16),
                 Wrap(spacing: 10, runSpacing: 10, children: ['🦊', '🐼', '🐯', '🐸', '🐧', '🦉', '🐙', '🐨'].map((emoji) {
                   final unlocked = user.unlockedAvatarEmojis.contains(emoji);
@@ -95,7 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Text(emoji, style: const TextStyle(fontSize: 30)),
                       const SizedBox(height: 3),
-                      if (!unlocked) Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('$cost', style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10)), const SizedBox(width: 3), const AnimatedCoinIcon(size: 12)])
+                      if (!unlocked) Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(toPersianDigits(cost), style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10)), const SizedBox(width: 3), const AnimatedCoinIcon(size: 12)])
                       else Text(selected ? 'انتخاب‌شده' : 'رایگان', style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 9)),
                     ])),
                   );
@@ -192,11 +193,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // Stats row
                 Row(
                   children: [
-                    _StatBox('${user.xp}', 'امتیاز XP', '⭐'),
+                    _StatBox(toPersianDigits(user.xp), 'امتیاز XP', '⭐'),
                     const SizedBox(width: 10),
-                    _StatBox('${user.streak}', 'روز پیاپی', '🔥'),
+                    _StatBox(toPersianDigits(user.streak), 'روز پیاپی', '🔥'),
                     const SizedBox(width: 10),
-                    _StatBox('${user.completedLessonIds.length}', 'درس', '✅'),
+                    _StatBox(toPersianDigits(user.completedLessonIds.length), 'درس', '✅'),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -475,7 +476,7 @@ class _ScoreRow extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '$score%',
+            toPersianDigits('$score٪'),
             style: TextStyle(
               fontFamily: 'Vazirmatn',
               fontSize: 13,
