@@ -483,6 +483,36 @@ class UserProvider extends ChangeNotifier {
   }
 
   // ── Reset ─────────────────────────────────────────────────────────
+  /// Clears learning progress while preserving the local account and preferences.
+  Future<void> resetProgress() async {
+    final current = _user;
+    if (current == null) return;
+    _user = current.copyWith(
+      cefrLevel: CefrLevel.unknown,
+      xp: 0,
+      coins: 0,
+      streak: 0,
+      longestStreak: 0,
+      clearLastStudyDate: true,
+      onboardingComplete: true,
+      placementTestComplete: false,
+      skillScores: const <String, int>{},
+      completedLessonIds: const <String>[],
+      vocabularyReviewDueDates: const <String, String>{},
+      vocabularyReviewIntervals: const <String, int>{},
+      vocabularyReviewRepetitions: const <String, int>{},
+      vocabularyReviewMistakes: const <String, int>{},
+      avatarShopPromptShown: false,
+    );
+    _dailyMissionState = <String, dynamic>{};
+    _weeklyMissionState = <String, dynamic>{};
+    _assessmentHistory.clear();
+    await StorageService.instance.saveDailyMissionState(_dailyMissionState);
+    await StorageService.instance.saveWeeklyMissionState(_weeklyMissionState);
+    await StorageService.instance.clearAssessmentHistory();
+    await _save();
+  }
+
   Future<void> reset() async {
     await StorageService.instance.clearUser();
     _user = null;
