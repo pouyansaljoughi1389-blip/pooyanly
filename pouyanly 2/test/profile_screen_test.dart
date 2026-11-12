@@ -32,8 +32,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('پروفایل هنوز آماده نیست'), findsOneWidget);
-    expect(find.text('رفتن به شروع'), findsOneWidget);
+    expect(find.text('هنوز حسابی برای نمایش وجود ندارد'), findsOneWidget);
+    expect(find.text('رفتن به صفحهٔ شروع'), findsOneWidget);
   });
 
   test('user provider initialization is idempotent', () async {
