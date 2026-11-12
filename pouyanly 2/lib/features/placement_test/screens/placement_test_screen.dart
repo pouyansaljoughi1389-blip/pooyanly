@@ -20,6 +20,18 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
   String? _selectedAnswer;
   bool _showFeedback = false;
 
+  String _skillBandLabel(String level) {
+    switch (level.toUpperCase()) {
+      case 'A1':
+      case 'A2': return 'مبتدی';
+      case 'B1': return 'متوسط';
+      case 'B2': return 'متوسط رو به بالا';
+      case 'C1':
+      case 'C2': return 'پیشرفته';
+      default: return 'ارزیابی';
+    }
+  }
+
   void _select(String ans) {
     if (_showFeedback) return;
     setState(() {
@@ -90,7 +102,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      q.cefrLevel,
+                      _skillBandLabel(q.cefrLevel),
                       style: TextStyle(
                         fontFamily: 'Vazirmatn',
                         fontSize: 12,
