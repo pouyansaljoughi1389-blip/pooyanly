@@ -88,7 +88,7 @@ class _TutorScreenState extends State<TutorScreen> {
                   alignment: Alignment.centerRight,
                   child: Text('سطح فعلی: ${user.cefrLevel.label}',
                       style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12,
-                          color: AppColors.textSecondaryLight)),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 ),
               ),
             Expanded(
@@ -109,7 +109,7 @@ class _TutorScreenState extends State<TutorScreen> {
                             ? Theme.of(context).cardColor
                             : AppColors.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.dividerLight),
+                        border: Border.all(color: Theme.of(context).dividerColor),
                       ),
                       child: Text(message.text,
                           style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, height: 1.7)),
