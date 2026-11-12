@@ -109,7 +109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       child: Text(
                         _formatTime(_reminderTime),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Vazirmatn',
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -487,7 +487,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Navigator.pop(ctx);
                 context.go('/placement-test');
               },
-              child: const Text(
+              child: Text(
                 'شروع آزمون',
                 style: TextStyle(
                   fontFamily: 'Vazirmatn',
@@ -527,7 +527,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 await context.read<UserProvider>().reset();
                 if (context.mounted) context.go('/welcome');
               },
-              child: const Text(
+              child: Text(
                 'بازنشانی',
                 style: TextStyle(
                   fontFamily: 'Vazirmatn',
