@@ -14,23 +14,23 @@ class AppTheme {
   static ThemeData _buildTheme(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
     final background = isDark
-        ? const Color(0xFF10111B)
-        : const Color(0xFFF6F5FA);
+        ? AppColors.backgroundDarkRole
+        : AppColors.backgroundLightRole;
     final surface = isDark
-        ? const Color(0xFF191A27)
-        : const Color(0xFFFFFFFF);
+        ? AppColors.surfaceDarkRole
+        : AppColors.surfaceLightRole;
     final card = isDark
-        ? const Color(0xFF202131)
-        : const Color(0xFFFFFFFF);
+        ? AppColors.cardDarkRole
+        : AppColors.cardLightRole;
     final foreground = isDark
-        ? const Color(0xFFF4F2FC)
-        : const Color(0xFF211D32);
+        ? AppColors.foregroundDarkRole
+        : AppColors.foregroundLightRole;
     final secondaryText = isDark
-        ? const Color(0xFFB5B1C5)
-        : const Color(0xFF6D687C);
+        ? AppColors.secondaryTextDarkRole
+        : AppColors.secondaryTextLightRole;
     final outline = isDark
-        ? const Color(0xFF39374B)
-        : const Color(0xFFE7E3EF);
+        ? AppColors.outlineDarkRole
+        : AppColors.outlineLightRole;
 
     final seeded = ColorScheme.fromSeed(
       seedColor: AppColors.primary,
@@ -75,9 +75,22 @@ class AppTheme {
         color: foreground,
         height: 1.2,
       ),
+      headlineMedium: baseText.headlineMedium?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontWeight: FontWeight.w800,
+        color: foreground,
+        height: 1.22,
+      ),
       headlineSmall: baseText.headlineSmall?.copyWith(
         fontFamily: 'Vazirmatn',
         fontWeight: FontWeight.w800,
+        color: foreground,
+        height: 1.25,
+      ),
+      titleSmall: baseText.titleSmall?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
         color: foreground,
       ),
       titleLarge: baseText.titleLarge?.copyWith(
@@ -112,7 +125,21 @@ class AppTheme {
       ),
       labelLarge: baseText.labelLarge?.copyWith(
         fontFamily: 'Vazirmatn',
+        fontSize: 14,
         fontWeight: FontWeight.w700,
+        color: foreground,
+      ),
+      labelMedium: baseText.labelMedium?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: secondaryText,
+      ),
+      labelSmall: baseText.labelSmall?.copyWith(
+        fontFamily: 'Vazirmatn',
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: secondaryText,
       ),
     );
 
@@ -141,7 +168,7 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: card,
-        elevation: 0,
+        elevation: AppDesignTokens.elevationNone,
         margin: EdgeInsets.zero,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
@@ -154,7 +181,7 @@ class AppTheme {
           backgroundColor: scheme.primary,
           foregroundColor: scheme.onPrimary,
           elevation: 0,
-          minimumSize: const Size(48, 48),
+          minimumSize: const Size(AppDesignTokens.minTouchTarget, AppDesignTokens.minTouchTarget),
           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
@@ -192,7 +219,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: scheme.primary,
-          minimumSize: const Size(44, 44),
+          minimumSize: const Size(AppDesignTokens.minTouchTarget, AppDesignTokens.minTouchTarget),
           textStyle: const TextStyle(
             fontFamily: 'Vazirmatn',
             fontWeight: FontWeight.w700,
@@ -321,6 +348,26 @@ class AppTheme {
         color: outline,
         thickness: 1,
         space: 1,
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF302D40) : const Color(0xFF292538),
+          borderRadius: BorderRadius.circular(AppDesignTokens.radiusSmall),
+        ),
+        textStyle: const TextStyle(
+          fontFamily: 'Vazirmatn',
+          color: Colors.white,
+          fontSize: 12,
+        ),
+        waitDuration: const Duration(milliseconds: 500),
+      ),
+      scrollbarTheme: ScrollbarThemeData(
+        thumbVisibility: const WidgetStatePropertyAll(false),
+        thickness: const WidgetStatePropertyAll(4),
+        radius: const Radius.circular(AppDesignTokens.radiusPill),
+        thumbColor: WidgetStatePropertyAll(
+          secondaryText.withValues(alpha: .45),
+        ),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: scheme.primary,
