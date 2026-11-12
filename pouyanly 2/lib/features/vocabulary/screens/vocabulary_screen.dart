@@ -29,15 +29,7 @@ class _VocabularyScreenState extends State<VocabularyScreen>
     super.dispose();
   }
 
-  List<VocabularyItem> get _allVocab {
-    final all = <VocabularyItem>[];
-    for (final unit in CourseData.getAllUnits()) {
-      for (final lesson in unit.lessons) {
-        all.addAll(lesson.vocabulary);
-      }
-    }
-    return all;
-  }
+  List<VocabularyItem> get _allVocab => CourseData.getAllVocabulary();
 
   List<VocabularyItem> get _filteredVocab {
     if (_search.isEmpty) return _allVocab;
@@ -342,15 +334,7 @@ class _ReviewTabState extends State<_ReviewTab> {
         .toList();
   }
 
-  List<VocabularyItem> get _allReviewItems {
-    final all = <VocabularyItem>[];
-    for (final unit in CourseData.getAllUnits()) {
-      for (final lesson in unit.lessons) {
-        all.addAll(lesson.vocabulary);
-      }
-    }
-    return all;
-  }
+  List<VocabularyItem> get _allReviewItems => CourseData.getAllVocabulary();
 
   @override
   Widget build(BuildContext context) {
