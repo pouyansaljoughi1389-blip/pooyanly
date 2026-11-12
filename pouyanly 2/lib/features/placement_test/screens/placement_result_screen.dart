@@ -81,7 +81,7 @@ class PlacementResultScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${cefrLevel.farsiDescription} — ${cefrLevel.label}',
+                  _skillBandLabel(cefrLevel),
                   style: TextStyle(
                     fontFamily: 'Vazirmatn',
                     fontSize: 15,
@@ -214,6 +214,18 @@ class PlacementResultScreen extends StatelessWidget {
     );
   }
 
+  String _skillBandLabel(CefrLevel level) {
+    switch (level) {
+      case CefrLevel.a1:
+      case CefrLevel.a2: return 'مبتدی';
+      case CefrLevel.b1: return 'متوسط';
+      case CefrLevel.b2: return 'متوسط رو به بالا';
+      case CefrLevel.c1:
+      case CefrLevel.c2: return 'پیشرفته';
+      case CefrLevel.unknown: return 'هنوز ارزیابی نشده';
+    }
+  }
+
   String _getSkillRecommendation(Map<String, int> scores) {
     const labels = {
       'vocabulary': 'واژگان',
@@ -237,13 +249,13 @@ class PlacementResultScreen extends StatelessWidget {
       case CefrLevel.a2:
         return 'پایه‌های خوبی دارید. زندگی روزمره، خرید، و مکالمات ساده را تقویت کنید.';
       case CefrLevel.b1:
-        return 'سطح متوسط خوب! روی گرامر پیشرفته و واژگان تخصصی تمرکز کنید.';
+        return 'در محدودهٔ متوسط هستید. روی گرامر پیشرفته و واژگان تخصصی تمرکز کنید.';
       case CefrLevel.b2:
-        return 'سطح B2: روی استدلال‌نویسی، زبان آکادمیک، اصطلاحات دقیق و متون پیچیده تمرکز کن.';
+        return 'در محدودهٔ متوسط رو به بالا هستید؛ روی استدلال‌نویسی، زبان آکادمیک و متون پیچیده تمرکز کنید.';
       case CefrLevel.c1:
-        return 'سطح C1: مسیر پیشرفته شامل بلاغت، تحلیل پژوهش، زبان حرفه‌ای و ظرافت‌های سبکی است.';
+        return 'در محدودهٔ پیشرفته هستید؛ روی بلاغت، تحلیل پژوهش، زبان حرفه‌ای و ظرافت‌های سبکی کار کنید.';
       case CefrLevel.c2:
-        return 'سطح C2: مسیر تسلط پیشرفته روی دقت معنایی، گفتمان پیچیده و انتخاب سبک تمرکز دارد.';
+        return 'در محدودهٔ پیشرفته هستید؛ روی دقت معنایی، گفتمان پیچیده و انتخاب سبک تمرکز کنید.';
       case CefrLevel.unknown:
         return 'برای تعیین سطح دقیق‌تر، آزمون را کامل کن.';
     }
