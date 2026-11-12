@@ -29,7 +29,7 @@ class AboutScreen extends StatelessWidget {
               gradient: AppColors.heroGradient,
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
-                BoxShadow(color: AppColors.primary.withOpacity(.25), blurRadius: 28, offset: const Offset(0, 12)),
+                BoxShadow(color: AppColors.primary.withValues(alpha: .25), blurRadius: 28, offset: const Offset(0, 12)),
                 const BoxShadow(color: Colors.white24, blurRadius: 2, offset: Offset(-2, -2)),
               ],
             ),
@@ -62,8 +62,8 @@ class AboutScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(.35)),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(.05), blurRadius: 18, offset: const Offset(0, 8))],
+              border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: .35)),
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .05), blurRadius: 18, offset: const Offset(0, 8))],
             ),
             child: const Text(
               'POUYANLY یک پروژهٔ یادگیری زبان انگلیسی برای فارسی‌زبانان است. هدف آن ساختن مسیری مرحله‌به‌مرحله، تمرین‌محور و قابل استفاده به‌صورت آفلاین است.',
@@ -123,11 +123,11 @@ class _ContactTile extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(.35)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(.04), blurRadius: 14, offset: const Offset(0, 6))],
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: .35)),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .04), blurRadius: 14, offset: const Offset(0, 6))],
         ),
         child: Row(children: [
-          CircleAvatar(backgroundColor: AppColors.primary.withOpacity(.12), child: Icon(icon, color: AppColors.primary)),
+          CircleAvatar(backgroundColor: AppColors.primary.withValues(alpha: .12), child: Icon(icon, color: AppColors.primary)),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: AppColors.textSecondaryLight)),
