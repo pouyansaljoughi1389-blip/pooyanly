@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/animated_game_icons.dart';
 import '../../../core/widgets/p_button.dart';
 import '../../../shared/providers/user_provider.dart';
 
@@ -236,7 +237,7 @@ class _StatBox extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 22)),
+            AnimatedSymbolIcon(symbol: emoji, size: 25, color: AppColors.primary),
             const SizedBox(height: 4),
             Text(
               value,
@@ -307,7 +308,7 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 18)),
+          AnimatedSymbolIcon(symbol: emoji, size: 21, color: AppColors.primary),
           const SizedBox(width: 12),
           Text(
             label,
