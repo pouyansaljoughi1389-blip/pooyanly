@@ -31,8 +31,43 @@ class LearningPathScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: CustomScrollView(slivers: [
-        SliverAppBar(pinned: true, title: const Text('نقشهٔ یادگیری'),
-          actions: [Padding(padding: const EdgeInsetsDirectional.only(end: 16), child: Center(child: Text(completedLessons.toString() + '/' + totalLessons.toString(), style: const TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w800))))]),
+        SliverAppBar(
+          pinned: true,
+          expandedHeight: 196,
+          toolbarHeight: 64,
+          backgroundColor: AppColors.primaryDark,
+          foregroundColor: Colors.white,
+          title: const Text(
+            'مسیر یادگیری',
+            style: TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsetsDirectional.only(end: 14),
+              child: Center(
+                child: _HeaderCounter(
+                  icon: Icons.local_fire_department_rounded,
+                  value: (user?.streak ?? 0).toString(),
+                  color: const Color(0xFFFFB45B),
+                ),
+              ),
+            ),
+          ],
+          flexibleSpace: FlexibleSpaceBar(
+            background: _LearningPathHeader(
+              name: user?.firstName ?? user?.name ?? 'زبان‌آموز',
+              cefrLevel: user?.cefrLevel.label ?? 'نامشخص',
+              xp: user?.xp ?? 0,
+              coins: user?.coins ?? 0,
+              completed: completedLessons,
+              total: totalLessons,
+            ),
+          ),
+        ),
         SliverToBoxAdapter(child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 22),
           child: Container(
@@ -256,4 +291,265 @@ int _goalPriority(Unit unit, String? goal) {
   };
   if (keywords.isEmpty) return 0;
   return keywords.any(text.contains) ? 0 : 1;
+}
+
+
+class _LearningPathHeader extends StatelessWidget {
+  final String name;
+  final String cefrLevel;
+  final int xp;
+  final int coins;
+  final int completed;
+  final int total;
+
+  const _LearningPathHeader({
+    required this.name,
+    required this.cefrLevel,
+    required this.xp,
+    required this.coins,
+    required this.completed,
+    required this.total,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = total == 0 ? 0.0 : (completed / total).clamp(0.0, 1.0);
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const DecoratedBox(
+          decoration: BoxDecoration(gradient: AppColors.heroGradient),
+        ),
+        Positioned(
+          top: -54,
+          left: -28,
+          child: _HeaderGlow(size: 168, opacity: .12),
+        ),
+        Positioned(
+          top: 28,
+          right: -46,
+          child: _HeaderGlow(size: 132, opacity: .10),
+        ),
+        Positioned(
+          bottom: -78,
+          right: 92,
+          child: _HeaderGlow(size: 176, opacity: .08),
+        ),
+        SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(18, 68, 18, 12),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 650),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, child) => Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(0, 14 * (1 - value)),
+                  child: child,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.asset(
+                          'assets/images/app_icon.jpg',
+                          width: 46,
+                          height: 46,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'سلام، $name 👋',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontFamily: 'Vazirmatn',
+                                fontSize: 17,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              'آماده‌ای امروز یک قدم جلوتر بری؟',
+                              style: TextStyle(
+                                fontFamily: 'Vazirmatn',
+                                fontSize: 10,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(.18),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: Colors.white.withOpacity(.28)),
+                        ),
+                        child: Text(
+                          cefrLevel,
+                          style: const TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _HeaderMetric(
+                          icon: Icons.bolt_rounded,
+                          label: 'XP',
+                          value: xp.toString(),
+                          tint: const Color(0xFFFFE082),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _HeaderMetric(
+                          icon: Icons.monetization_on_rounded,
+                          label: 'سکه',
+                          value: coins.toString(),
+                          tint: const Color(0xFFFFD180),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _HeaderMetric(
+                          icon: Icons.flag_rounded,
+                          label: 'پیشرفت',
+                          value: '$completed/$total',
+                          tint: const Color(0xFFB9F6CA),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 9),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0, end: progress),
+                      duration: const Duration(milliseconds: 900),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, value, child) => LinearProgressIndicator(
+                        value: value,
+                        minHeight: 5,
+                        backgroundColor: Colors.white.withOpacity(.22),
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HeaderMetric extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color tint;
+
+  const _HeaderMetric({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.tint,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(.15),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.white.withOpacity(.18)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: tint),
+          const SizedBox(width: 5),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(label, style: const TextStyle(fontFamily: 'Vazirmatn', color: Colors.white70, fontSize: 9)),
+                Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeaderCounter extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final Color color;
+
+  const _HeaderCounter({required this.icon, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(.16),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(.25)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 17, color: color),
+          const SizedBox(width: 4),
+          Text(value, style: const TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900)),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeaderGlow extends StatelessWidget {
+  final double size;
+  final double opacity;
+
+  const _HeaderGlow({required this.size, required this.opacity});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: size,
+    height: size,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: Colors.white.withOpacity(opacity),
+    ),
+  );
 }
