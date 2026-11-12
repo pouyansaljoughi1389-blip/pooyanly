@@ -35,42 +35,50 @@ class LiquidGlass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final useBlur = enableBlur && blurSigma > 0;
     final baseTint = tint ?? (dark ? const Color(0xFF25203D) : Colors.white);
     final border = dark
         ? Colors.white.withOpacity(.16)
         : AppColors.primary.withOpacity(.12);
-
-    Widget surface = DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: borderRadius,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            baseTint.withOpacity(dark ? .84 : .78),
-            baseTint.withOpacity(dark ? .70 : .66),
-          ],
-        ),
-        border: Border.all(color: border, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(dark ? .20 : .055),
-            blurRadius: 18,
-            offset: const Offset(0, 7),
-          ),
-          if (showHighlight)
-            BoxShadow(
-              color: Colors.white.withOpacity(dark ? .07 : .72),
-              blurRadius: 1,
-              offset: const Offset(0, -1),
-            ),
+    final decoration = BoxDecoration(
+      borderRadius: borderRadius,
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          baseTint.withOpacity(dark ? .84 : .78),
+          baseTint.withOpacity(dark ? .70 : .66),
         ],
       ),
-      child: Padding(padding: padding, child: child),
+      border: Border.all(color: border, width: 1),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(dark ? .20 : .055),
+          blurRadius: 18,
+          offset: const Offset(0, 7),
+        ),
+        if (showHighlight)
+          BoxShadow(
+            color: Colors.white.withOpacity(dark ? .07 : .72),
+            blurRadius: 1,
+            offset: const Offset(0, -1),
+          ),
+      ],
     );
 
-    if (useBlur) {
+    Widget content = Padding(padding: padding, child: child);
+    if (onTap != null) {
+      content = InkWell(
+        onTap: onTap,
+        borderRadius: borderRadius,
+        child: content,
+      );
+    }
+    Widget surface = Ink(
+      decoration: decoration,
+      child: content,
+    );
+
+    if (enableBlur && blurSigma > 0) {
       surface = ClipRRect(
         borderRadius: borderRadius,
         child: BackdropFilter(
@@ -82,15 +90,9 @@ class LiquidGlass extends StatelessWidget {
       surface = ClipRRect(borderRadius: borderRadius, child: surface);
     }
 
-    if (onTap == null) return surface;
-
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: borderRadius,
-        child: surface,
-      ),
+      child: surface,
     );
   }
 }
