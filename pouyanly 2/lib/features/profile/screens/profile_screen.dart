@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/pouyanly_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -287,7 +288,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   title: 'تنظیمات',
                   children: [
                     _SettingRow(
-                      icon: Icons.dark_mode_rounded,
+                      icon: PouyanlyIconType.settings,
                       label: 'حالت تاریک',
                       trailing: Switch(
                         value: user.isDarkMode,
@@ -297,19 +298,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     _SettingRow(
-                      icon: Icons.notifications_rounded,
+                      icon: PouyanlyIconType.timer,
                       label: 'یادآور روزانه',
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => context.go('/settings'),
                     ),
                     _SettingRow(
-                      icon: Icons.info_outline_rounded,
+                      icon: PouyanlyIconType.school,
                       label: 'دربارهٔ POUYANLY',
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => context.push('/about'),
                     ),
                     _SettingRow(
-                      icon: Icons.map_rounded,
+                      icon: PouyanlyIconType.learningPath,
                       label: 'انجام دوباره آزمون سطح',
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => context.go('/placement-test'),
@@ -540,7 +541,7 @@ class _ScoreRow extends StatelessWidget {
 }
 
 class _SettingRow extends StatelessWidget {
-  final IconData icon;
+  final PouyanlyIconType icon;
   final String label;
   final Widget trailing;
   final VoidCallback? onTap;
@@ -559,7 +560,7 @@ class _SettingRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+            PouyanlyIcon(type: icon, size: 20, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
