@@ -114,7 +114,7 @@ class _HomePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -177,7 +177,7 @@ class _HomePage extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.primary.withOpacity(0.35)),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
                     ),
                     child: const Row(
                       children: [
@@ -214,7 +214,7 @@ class _HomePage extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.primary.withOpacity(0.35)),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
                     ),
                     child: Row(
                       children: [
@@ -399,7 +399,7 @@ class _LessonCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: AppColors.xpColor.withOpacity(0.15),
+                color: AppColors.xpColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
