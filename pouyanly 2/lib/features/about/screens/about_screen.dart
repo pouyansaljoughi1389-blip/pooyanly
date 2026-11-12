@@ -94,7 +94,7 @@ class AboutScreen extends StatelessWidget {
             url: 'https://lottiefiles.com/free-animation/trophy-yEGPe40FVr',
           ),
           const SizedBox(height: 10),
-          const Text(
+          Text(
             'این صفحه‌ها مرجع الهام بصری هستند؛ فایل‌های Lottie آن‌ها داخل برنامه کپی نشده‌اند. آیکون‌های فعلی با نقاشی و انیمیشن بومی Flutter ساخته شده‌اند. برای فایل‌های عمومی LottieFiles، مجوز Lottie Simple License استفادهٔ تجاری و تغییر را مجاز می‌داند و ذکر نام سازنده را توصیه می‌کند.',
             style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, height: 1.8, color: Theme.of(context).colorScheme.onSurfaceVariant),
           ),
