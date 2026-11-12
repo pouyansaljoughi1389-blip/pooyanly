@@ -78,6 +78,7 @@ void main() {
     expect(user.coins, 0);
     expect(user.streak, 0);
     expect(user.longestStreak, 0);
+    expect(user.lastStudyDate, isNull);
     expect(user.completedLessonIds, isEmpty);
     expect(user.vocabularyReviewDueDates, isEmpty);
     expect(user.skillScores, isEmpty);
@@ -85,6 +86,41 @@ void main() {
     expect(user.placementTestComplete, isFalse);
     expect(user.onboardingComplete, isTrue);
     expect(StorageService.instance.loadUser()!.id, originalId);
+  });
+
+
+  testWidgets('profile editor updates persisted local account details',
+      (tester) async {
+    final provider = UserProvider();
+    await provider.init();
+    await provider.createUser(
+      firstName: 'Old',
+      lastName: 'Name',
+      contact: 'old@example.com',
+      contactType: 'email',
+    );
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: provider,
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const ProfileScreen(),
+        ),
+      ),
+    );
+    await tester.tap(find.byTooltip('ویرایش اطلاعات حساب'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).at(0), 'New');
+    await tester.enterText(find.byType(TextFormField).at(1), 'Learner');
+    await tester.enterText(find.byType(TextFormField).at(2), 'new@example.com');
+    await tester.tap(find.text('ذخیره'));
+    await tester.pumpAndSettle();
+
+    expect(provider.user!.name, 'New Learner');
+    expect(provider.user!.contact, 'new@example.com');
+    expect(StorageService.instance.loadUser()!.name, 'New Learner');
   });
 
 }
