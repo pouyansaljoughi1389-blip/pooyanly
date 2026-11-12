@@ -4,6 +4,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/persian_digits.dart';
 import '../../../core/widgets/animated_game_icons.dart';
 import '../../../shared/providers/user_provider.dart';
+import '../../../core/widgets/user_required_state.dart';
+import 'package:go_router/go_router.dart';
 
 class RewardsScreen extends StatelessWidget {
   const RewardsScreen({super.key});
@@ -11,7 +13,14 @@ class RewardsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
-    if (user == null) return const SizedBox.shrink();
+    if (user == null) {
+      return UserRequiredState(
+        title: 'جوایز در دسترس نیست',
+        message: 'برای نمایش XP، سکه‌ها و مأموریت‌ها ابتدا حساب کاربری را بارگذاری کن.',
+        actionLabel: 'رفتن به شروع',
+        onPressed: () => context.go('/welcome'),
+      );
+    }
     final missionProgress = context.watch<UserProvider>().dailyMissionProgress;
     final claimedMissions = context.watch<UserProvider>().claimedDailyMissions;
     final weeklyProgress = context.watch<UserProvider>().weeklyMissionProgress;
