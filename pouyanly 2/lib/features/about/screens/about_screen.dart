@@ -70,6 +70,34 @@ class AboutScreen extends StatelessWidget {
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, height: 1.9),
             ),
           ),
+          const SizedBox(height: 24),
+          const Text(
+            'سورس آیکون‌ها و الهام طراحی',
+            style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 16, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 10),
+          _SourceTile(
+            title: 'سکهٔ طلایی چرخان',
+            creator: 'Ariadi Ahmad • LottieFiles',
+            url: 'https://lottiefiles.com/free-animation/fintech-3d-rotating-gold-coin-animation-HsbBGvSL2Z',
+          ),
+          const SizedBox(height: 8),
+          _SourceTile(
+            title: 'شعلهٔ متحرک',
+            creator: 'Izhar Hussain • LottieFiles',
+            url: 'https://lottiefiles.com/free-animation/fire-flame-4De5RVVPag',
+          ),
+          const SizedBox(height: 8),
+          _SourceTile(
+            title: 'جام قهرمانی و دستاورد',
+            creator: 'Mahendra Bhunwal • LottieFiles',
+            url: 'https://lottiefiles.com/free-animation/trophy-yEGPe40FVr',
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'این صفحه‌ها مرجع الهام بصری هستند؛ فایل‌های Lottie آن‌ها داخل برنامه کپی نشده‌اند. آیکون‌های فعلی با نقاشی و انیمیشن بومی Flutter ساخته شده‌اند. برای فایل‌های عمومی LottieFiles، مجوز Lottie Simple License استفادهٔ تجاری و تغییر را مجاز می‌داند و ذکر نام سازنده را توصیه می‌کند.',
+            style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, height: 1.8, color: AppColors.textSecondaryLight),
+          ),
           const SizedBox(height: 20),
           const Center(child: Text('نسخهٔ آموزشی • ساخته‌شده با Flutter', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: AppColors.textSecondaryLight))),
         ],
@@ -111,4 +139,34 @@ class _ContactTile extends StatelessWidget {
       ),
     ),
   );
+}
+
+
+class _SourceTile extends StatelessWidget {
+  final String title;
+  final String creator;
+  final String url;
+  const _SourceTile({required this.title, required this.creator, required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.dividerLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 3),
+          Text(creator, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: AppColors.textSecondaryLight)),
+          const SizedBox(height: 5),
+          SelectableText(url, style: const TextStyle(fontSize: 10, color: AppColors.primary)),
+        ],
+      ),
+    );
+  }
 }
