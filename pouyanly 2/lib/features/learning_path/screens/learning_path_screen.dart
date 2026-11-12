@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/persian_digits.dart';
 import '../../../core/widgets/animated_game_icons.dart';
+import '../../../core/widgets/liquid_glass.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../lessons/models/lesson_data.dart';
 
@@ -622,14 +622,17 @@ class _HeaderOrb extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => ImageFiltered(
-        imageFilter: ImageFilter.blur(sigmaX: 42, sigmaY: 42),
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color.withOpacity(opacity),
+  Widget build(BuildContext context) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              color.withOpacity(opacity),
+              color.withOpacity(opacity * .18),
+              color.withOpacity(0),
+            ],
           ),
         ),
       );
@@ -645,35 +648,12 @@ class _GlassPanel extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => ClipRRect(
+  Widget build(BuildContext context) => LiquidGlass(
+        padding: padding,
         borderRadius: BorderRadius.circular(23),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.105),
-              borderRadius: BorderRadius.circular(23),
-              border: Border.all(
-                color: Colors.white.withOpacity(.19),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(.12),
-                  blurRadius: 22,
-                  offset: const Offset(0, 9),
-                ),
-                BoxShadow(
-                  color: Colors.white.withOpacity(.06),
-                  blurRadius: 1,
-                  offset: const Offset(0, -1),
-                ),
-              ],
-            ),
-            child: child,
-          ),
-        ),
+        enableBlur: false,
+        tint: Theme.of(context).colorScheme.surface,
+        child: child,
       );
 }
 
@@ -689,99 +669,27 @@ class _GlassChip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => ClipRRect(
+  Widget build(BuildContext context) => LiquidGlass(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
         borderRadius: BorderRadius.circular(30),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.13),
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: Colors.white.withOpacity(.22)),
+        enableBlur: false,
+        tint: Theme.of(context).colorScheme.surface,
+        showHighlight: false,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 15, color: tint),
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 15, color: tint),
-                const SizedBox(width: 5),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontFamily: 'Vazirmatn',
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          ],
         ),
-      );
-}
-
-class _HeaderMetric extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color tint;
-
-  const _HeaderMetric({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.tint,
-  });
-
-  @override
-  Widget build(BuildContext context) => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 17, color: tint),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontFamily: 'Vazirmatn',
-                    color: Colors.white70,
-                    fontSize: 9,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontFamily: 'Vazirmatn',
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-}
-
-class _MetricDivider extends StatelessWidget {
-  const _MetricDivider();
-
-  @override
-  Widget build(BuildContext context) => Container(
-        width: 1,
-        height: 30,
-        margin: const EdgeInsets.symmetric(horizontal: 6),
-        color: Colors.white.withOpacity(.15),
       );
 }
