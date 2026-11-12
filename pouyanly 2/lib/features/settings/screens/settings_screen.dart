@@ -158,7 +158,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   shape: BoxShape.circle,
                                   color: active ? AppColors.primary : Colors.transparent,
                                   border: Border.all(
-                                    color: active ? AppColors.primary : AppColors.dividerLight,
+                                    color: active ? AppColors.primary : Theme.of(context).dividerColor,
                                     width: 2,
                                   ),
                                 ),
@@ -169,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       fontFamily: 'Vazirmatn',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,
-                                      color: active ? Colors.white : AppColors.textSecondaryLight,
+                                      color: active ? Colors.white : Theme.of(context).colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ),
@@ -267,7 +267,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _SettingCard(
               children: [
                 const ListTile(
-                  leading: Icon(Icons.tag_rounded, color: AppColors.textSecondaryLight),
+                  leading: Icon(Icons.tag_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   title: Text(
                     'نسخه برنامه',
                     style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15),
@@ -277,13 +277,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextStyle(
                       fontFamily: 'Vazirmatn',
                       fontSize: 14,
-                      color: AppColors.textSecondaryLight,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
                 const Divider(height: 1, indent: 16, endIndent: 16),
                 const ListTile(
-                  leading: Icon(Icons.translate_rounded, color: AppColors.textSecondaryLight),
+                  leading: Icon(Icons.translate_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   title: Text(
                     'زبان رابط',
                     style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15),
@@ -293,7 +293,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: TextStyle(
                       fontFamily: 'Vazirmatn',
                       fontSize: 14,
-                      color: AppColors.textSecondaryLight,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -556,7 +556,7 @@ class _SectionHeader extends StatelessWidget {
             fontFamily: 'Vazirmatn',
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: AppColors.textSecondaryLight,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       ],
