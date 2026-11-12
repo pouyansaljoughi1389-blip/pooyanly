@@ -398,7 +398,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () => _showResetDialog(context),
                       icon: Icon(Icons.delete_forever_rounded, color: scheme.error),
-                      label: const Text(
+                      label: Text(
                         'بازنشانی کامل پیشرفت',
                         style: TextStyle(
                           fontFamily: 'Vazirmatn',
