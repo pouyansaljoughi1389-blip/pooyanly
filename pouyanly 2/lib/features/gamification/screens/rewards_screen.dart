@@ -87,8 +87,15 @@ class RewardsScreen extends StatelessWidget {
                             final unlocked = user.unlockedAvatarEmojis.contains(emoji);
                             final cost = UserProvider.avatarUnlockCosts[emoji] ?? 0;
                             return ChoiceChip(
-                              label: Text(unlocked ? emoji : '$emoji $cost🪙',
-                                style: const TextStyle(fontSize: 16)),
+                              label: Row(mainAxisSize: MainAxisSize.min, children: [
+                                Text(emoji, style: const TextStyle(fontSize: 16)),
+                                if (!unlocked) ...[
+                                  const SizedBox(width: 4),
+                                  Text('$cost', style: const TextStyle(fontSize: 11)),
+                                  const SizedBox(width: 3),
+                                  const AnimatedCoinIcon(size: 14),
+                                ],
+                              ]),
                               selected: user.avatarEmoji == emoji,
                               onSelected: (_) async {
                                 final provider = context.read<UserProvider>();
@@ -470,9 +477,9 @@ class _StreakCalendar extends StatelessWidget {
                   ),
                 ),
                 child: Center(
-                  child: Text(
-                    inStreak ? const AnimatedFlameIcon(size: 22) : const Icon(Icons.circle_outlined, size: 14),
-                  ),
+                  child: inStreak
+                      ? const AnimatedFlameIcon(size: 22)
+                      : const Icon(Icons.circle_outlined, size: 14),
                 ),
               ),
             ],
