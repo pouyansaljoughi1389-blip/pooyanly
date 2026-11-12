@@ -16,10 +16,7 @@ class LearningPathScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
     final units = CourseData.getAllUnits();
-    final levelRank = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
     units.sort((a, b) {
-      final byLevel = (levelRank[a.cefrLevel] ?? 99).compareTo(levelRank[b.cefrLevel] ?? 99);
-      if (byLevel != 0) return byLevel;
       final byGoal = _goalPriority(a, user?.goal?.name).compareTo(_goalPriority(b, user?.goal?.name));
       return byGoal != 0 ? byGoal : a.id.compareTo(b.id);
     });
@@ -65,7 +62,6 @@ class LearningPathScreen extends StatelessWidget {
             background: _LearningPathHeader(
               name: user?.firstName ?? user?.name ?? 'زبان‌آموز',
               streak: user?.streak ?? 0,
-              cefrLevel: user?.cefrLevel.label ?? 'نامشخص',
               xp: user?.xp ?? 0,
               coins: user?.coins ?? 0,
               completed: completedLessons,
@@ -90,7 +86,6 @@ class LearningPathScreen extends StatelessWidget {
             ]),
           ),
         )),
-        SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Wrap(spacing: 8, runSpacing: 8, children: ['A1','A2','B1','B2','C1','C2'].map((level) => _LevelPill(level: level)).toList()))),
         SliverPadding(padding: const EdgeInsets.fromLTRB(14, 24, 14, 30), sliver: SliverList(delegate: SliverChildBuilderDelegate((context, index) {
           final unit = units[index];
           final completed = unit.lessons.where((l) => completedIds.contains(l.id)).length;
@@ -131,18 +126,6 @@ class _HeaderCounter extends StatelessWidget {
   }
 }
 
-class _LevelPill extends StatelessWidget {
-  final String level;
-  const _LevelPill({required this.level});
-  @override
-  Widget build(BuildContext context) {
-    final color = AppColors.cefrColor(level);
-    return Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
-      decoration: BoxDecoration(color: color.withOpacity(.10), borderRadius: BorderRadius.circular(30), border: Border.all(color: color.withOpacity(.35)), boxShadow: [BoxShadow(color: color.withOpacity(.08), blurRadius: 9, offset: const Offset(0, 4))]),
-      child: Text(level, style: TextStyle(fontFamily: 'Vazirmatn', color: color, fontWeight: FontWeight.w900, fontSize: 12)));
-  }
-}
-
 class _MapUnitNode extends StatefulWidget {
   final Unit unit;
   final int completed;
@@ -161,7 +144,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
   @override
   Widget build(BuildContext context) {
     final done = widget.completed == widget.unit.lessons.length;
-    final levelColor = AppColors.cefrColor(widget.unit.cefrLevel);
+    final levelColor = AppColors.primary;
     final statusColor = done ? AppColors.success : widget.isUnlocked ? levelColor : AppColors.textSecondaryLight;
     final bubble = Material(
       elevation: widget.isUnlocked ? 9 : 1,
@@ -183,8 +166,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
               child: Center(child: widget.isUnlocked ? AnimatedSymbolIcon(symbol: widget.unit.emoji, size: 31, color: statusColor) : const Icon(Icons.lock_rounded, size: 25))),
             const SizedBox(width: 13),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: levelColor.withOpacity(.13), borderRadius: BorderRadius.circular(20)), child: Text(widget.unit.cefrLevel, style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 10, fontWeight: FontWeight.w900, color: levelColor))),
-                const SizedBox(width: 6), if (done) const Text('تکمیل شد', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 10, color: AppColors.success, fontWeight: FontWeight.w700))]),
+              if (done) const Text('تکمیل شد', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 10, color: AppColors.success, fontWeight: FontWeight.w700)),
               const SizedBox(height: 5),
               Text(widget.unit.titleFarsi, style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 14, fontWeight: FontWeight.w900)),
               const SizedBox(height: 3),
@@ -330,7 +312,6 @@ int _goalPriority(Unit unit, String? goal) {
 
 class _LearningPathHeader extends StatefulWidget {
   final String name;
-  final String cefrLevel;
   final int xp;
   final int coins;
   final int completed;
@@ -339,7 +320,6 @@ class _LearningPathHeader extends StatefulWidget {
 
   const _LearningPathHeader({
     required this.name,
-    required this.cefrLevel,
     required this.xp,
     required this.coins,
     required this.completed,
@@ -531,7 +511,7 @@ class _LearningPathHeaderState extends State<_LearningPathHeader>
                       ),
                       _GlassChip(
                         icon: Icons.auto_awesome_rounded,
-                        label: widget.cefrLevel,
+                        label: 'مسیر یادگیری',
                         tint: const Color(0xFFC8B5FF),
                       ),
                     ],
