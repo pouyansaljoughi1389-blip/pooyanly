@@ -1,0 +1,132 @@
+name: Build POUYANLY Android APK
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Validate feature work through its pull request, avoiding duplicate push and
+# pull_request runs. A newer commit supersedes an older validation attempt.
+concurrency:
+  group: pouyanly-apk-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.9'
+          cache: true
+
+      - name: Verify Flutter project
+        working-directory: "pouyanly 2"
+        run: |
+          flutter --version
+          test -f pubspec.yaml
+          test -d android
+
+      - name: Install dependencies
+        working-directory: "pouyanly 2"
+        run: flutter pub get
+
+      - name: Generate App Icons
+        working-directory: "pouyanly 2"
+        run: dart run flutter_launcher_icons
+
+      - name: Check Flutter code
+        working-directory: "pouyanly 2"
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: Run tests
+        working-directory: "pouyanly 2"
+        run: flutter test
+
+      - name: Build Release APK
+        working-directory: "pouyanly 2"
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: POUYANLY-APK
+          path: "pouyanly 2/build/app/outputs/flutter-apk/app-release.apk"
+          if-no-files-found: error
+          retention-days: 14
+
+  emulator-smoke:
+    name: Launch Android app and capture emulator screenshots
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.9'
+          cache: true
+
+      - name: Install dependencies
+        working-directory: "pouyanly 2"
+        run: flutter pub get
+
+      - name: Build debug APK for emulator
+        working-directory: "pouyanly 2"
+        run: flutter build apk --debug
+
+      - name: Install, launch and capture on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            adb install -r "pouyanly 2/build/app/outputs/flutter-apk/app-debug.apk"
+            adb shell am force-stop com.pouyanly.app || true
+            adb shell monkey -p com.pouyanly.app 1
+            sleep 10
+            mkdir -p "pouyanly 2/artifacts/emulator"
+            adb exec-out screencap -p > "pouyanly 2/artifacts/emulator/app-startup.png"
+            adb shell dumpsys activity activities > "pouyanly 2/artifacts/emulator/activities.txt"
+            test -s "pouyanly 2/artifacts/emulator/app-startup.png"
+
+      - name: Upload emulator evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: POUYANLY-Android-Emulator-Evidence
+          path: |
+            pouyanly 2/artifacts/emulator/app-startup.png
+            pouyanly 2/artifacts/emulator/activities.txt
+          if-no-files-found: error
+          retention-days: 14
