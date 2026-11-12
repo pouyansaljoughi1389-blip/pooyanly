@@ -10,6 +10,28 @@ void main() {
   });
 
   group('Daily missions', () {
+    test('study calendar records unique local dates and survives restart', () async {
+      final provider = UserProvider();
+      await provider.init();
+      await provider.createUser();
+      await provider.completeLesson('calendar-1');
+      await provider.completeLesson('calendar-2');
+      expect(provider.user!.studyDateKeys, hasLength(1));
+      final restored = UserProvider();
+      await restored.init();
+      expect(restored.user!.studyDateKeys, provider.user!.studyDateKeys);
+    });
+
+    test('negative XP and coin grants cannot reduce balances', () async {
+      final provider = UserProvider();
+      await provider.init();
+      await provider.createUser();
+      await provider.addXP(-500);
+      await provider.addCoins(-100);
+      expect(provider.user!.xp, 0);
+      expect(provider.user!.coins, 0);
+    });
+
     test('lesson reward is claimable only once and persists', () async {
       final provider = UserProvider();
       await provider.init();

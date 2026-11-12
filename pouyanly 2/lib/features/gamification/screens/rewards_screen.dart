@@ -210,7 +210,7 @@ class RewardsScreen extends StatelessWidget {
                 // ── Streak Calendar ──
                 _SectionTitle('تقویم هفتگی'),
                 const SizedBox(height: 10),
-                _StreakCalendar(streak: user.streak),
+                _StreakCalendar(studyDateKeys: user.studyDateKeys),
                 const SizedBox(height: 30),
               ]),
             ),
@@ -446,14 +446,14 @@ class _AchievementBadge extends StatelessWidget {
 }
 
 class _StreakCalendar extends StatelessWidget {
-  final int streak;
-  const _StreakCalendar({required this.streak});
-
+  final List<String> studyDateKeys;
+  const _StreakCalendar({required this.studyDateKeys});
   @override
   Widget build(BuildContext context) {
-    final days = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
-    final today = DateTime.now().weekday % 7; // 0=Sun … 6=Sat
-
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final activeDates = studyDateKeys.toSet();
+    const labels = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -462,39 +462,30 @@ class _StreakCalendar extends StatelessWidget {
         border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(7, (i) {
-          final isToday = i == today;
-          final inStreak = i <= today && i >= (today - streak + 1).clamp(0, 6);
-          return Column(
-            children: [
-              Text(days[i],
-                  style: TextStyle(
-                      fontFamily: 'Vazirmatn',
-                      fontSize: 11,
-                      color: isToday ? AppColors.primary : Theme.of(context).colorScheme.onSurfaceVariant)),
-              const SizedBox(height: 6),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: inStreak
-                      ? AppColors.streakColor.withValues(alpha: 0.15)
-                      : Colors.transparent,
-                  border: Border.all(
-                    color: isToday ? AppColors.primary : Colors.transparent,
-                    width: 2,
-                  ),
-                ),
-                child: Center(
-                  child: inStreak
-                      ? const AnimatedFlameIcon(size: 22)
-                      : const Icon(Icons.circle_outlined, size: 14),
-                ),
-              ),
-            ],
-          );
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: List.generate(7, (index) {
+          final date = today.subtract(Duration(days: 6 - index));
+          final key = '\${date.year.toString().padLeft(4, '0')}-\${date.month.toString().padLeft(2, '0')}-\${date.day.toString().padLeft(2, '0')}';
+          final isToday = index == 6;
+          final studied = activeDates.contains(key);
+          return Expanded(child: Column(children: [
+            Text(labels[date.weekday - 1], style: TextStyle(
+              fontFamily: 'Vazirmatn', fontSize: 11,
+              color: isToday ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant)),
+            const SizedBox(height: 6),
+            Container(width: 34, height: 34, decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: studied ? AppColors.streakColor.withValues(alpha: 0.16) : Colors.transparent,
+              border: Border.all(
+                color: isToday ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor,
+                width: isToday ? 2 : 1)),
+              child: Center(child: studied
+                ? const AnimatedFlameIcon(size: 20)
+                : Text(toPersianDigits(date.day), style: TextStyle(
+                    fontFamily: 'Vazirmatn', fontSize: 11,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant))),
+            ),
+          ]));
         }),
       ),
     );

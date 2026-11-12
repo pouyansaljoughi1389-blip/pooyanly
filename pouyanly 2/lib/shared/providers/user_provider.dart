@@ -282,13 +282,13 @@ class UserProvider extends ChangeNotifier {
 
   // ── XP & Coins ────────────────────────────────────────────────────
   Future<void> addXP(int amount) async {
-    if (_user == null) return;
+    if (_user == null || amount <= 0) return;
     _user = _user!.copyWith(xp: _user!.xp + amount);
     await _save();
   }
 
   Future<void> addCoins(int amount) async {
-    if (_user == null) return;
+    if (_user == null || amount <= 0) return;
     _user = _user!.copyWith(coins: _user!.coins + amount);
     await _save();
   }
@@ -363,9 +363,13 @@ class UserProvider extends ChangeNotifier {
 
     final safeXpGain = xpGain < 0 ? 0 : xpGain;
     final safeCoinGain = coinGain < 0 ? 0 : coinGain;
+    final studyDateKey = '${today.year.toString().padLeft(4, '0')}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final studyDateKeys = List<String>.from(currentUser.studyDateKeys);
+    if (!studyDateKeys.contains(studyDateKey)) studyDateKeys.add(studyDateKey);
     _ensureDailyMissionDay();
     _user = currentUser.copyWith(
       completedLessonIds: ids,
+      studyDateKeys: studyDateKeys,
       xp: currentUser.xp + safeXpGain,
       coins: currentUser.coins + safeCoinGain,
       streak: newStreak,
@@ -498,6 +502,7 @@ class UserProvider extends ChangeNotifier {
       placementTestComplete: false,
       skillScores: const <String, int>{},
       completedLessonIds: const <String>[],
+      studyDateKeys: const <String>[],
       vocabularyReviewDueDates: const <String, String>{},
       vocabularyReviewIntervals: const <String, int>{},
       vocabularyReviewRepetitions: const <String, int>{},

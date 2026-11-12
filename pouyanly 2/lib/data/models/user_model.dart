@@ -126,6 +126,8 @@ class UserModel {
   final bool placementTestComplete;
   final Map<String, int> skillScores;
   final List<String> completedLessonIds;
+  /// Local calendar dates (yyyy-MM-dd) on which the learner completed a lesson.
+  final List<String> studyDateKeys;
   final Map<String, String> vocabularyReviewDueDates;
   final Map<String, int> vocabularyReviewIntervals;
   final Map<String, int> vocabularyReviewRepetitions;
@@ -159,6 +161,7 @@ class UserModel {
     this.placementTestComplete = false,
     this.skillScores = const {},
     this.completedLessonIds = const [],
+    this.studyDateKeys = const [],
     this.vocabularyReviewDueDates = const {},
     this.vocabularyReviewIntervals = const {},
     this.vocabularyReviewRepetitions = const {},
@@ -200,6 +203,7 @@ class UserModel {
     bool? placementTestComplete,
     Map<String, int>? skillScores,
     List<String>? completedLessonIds,
+    List<String>? studyDateKeys,
     Map<String, String>? vocabularyReviewDueDates,
     Map<String, int>? vocabularyReviewIntervals,
     Map<String, int>? vocabularyReviewRepetitions,
@@ -233,6 +237,7 @@ class UserModel {
       placementTestComplete: placementTestComplete ?? this.placementTestComplete,
       skillScores: skillScores ?? this.skillScores,
       completedLessonIds: completedLessonIds ?? this.completedLessonIds,
+      studyDateKeys: studyDateKeys ?? this.studyDateKeys,
       vocabularyReviewDueDates: vocabularyReviewDueDates ?? this.vocabularyReviewDueDates,
       vocabularyReviewIntervals: vocabularyReviewIntervals ?? this.vocabularyReviewIntervals,
       vocabularyReviewRepetitions: vocabularyReviewRepetitions ?? this.vocabularyReviewRepetitions,
@@ -269,6 +274,7 @@ class UserModel {
     'placementTestComplete': placementTestComplete,
     'skillScores': skillScores,
     'completedLessonIds': completedLessonIds,
+    'studyDateKeys': studyDateKeys,
     'vocabularyReviewDueDates': vocabularyReviewDueDates,
     'vocabularyReviewIntervals': vocabularyReviewIntervals,
     'vocabularyReviewRepetitions': vocabularyReviewRepetitions,
@@ -317,6 +323,7 @@ class UserModel {
     placementTestComplete: j['placementTestComplete'] ?? false,
     skillScores: Map<String, int>.from(j['skillScores'] ?? {}),
     completedLessonIds: List<String>.from(j['completedLessonIds'] ?? []),
+    studyDateKeys: List<String>.from(j['studyDateKeys'] ?? []),
     vocabularyReviewDueDates: Map<String, String>.from(j['vocabularyReviewDueDates'] ?? {}),
     vocabularyReviewIntervals: Map<String, int>.from(j['vocabularyReviewIntervals'] ?? {}),
     vocabularyReviewRepetitions: Map<String, int>.from(j['vocabularyReviewRepetitions'] ?? {}),
