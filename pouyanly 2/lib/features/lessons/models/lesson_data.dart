@@ -561,9 +561,15 @@ class CourseData {
 
   static List<Unit> getAllUnits() {
     final units = <Unit>[...a1Units, ...a2Units, ...ExpandedCourseData.units];
-    const order = {'A1': 0, 'A2': 1, 'B1': 2, 'B2': 3, 'C1': 4, 'C2': 5};
-    units.sort((a, b) => (order[a.cefrLevel] ?? 99).compareTo(order[b.cefrLevel] ?? 99));
-    return units;
+    const levelOrder = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    // Grouping preserves declaration order within each level. That order is
+    // also the prerequisite order, so an unstable List.sort is not suitable.
+    final ordered = <Unit>[];
+    for (final level in levelOrder) {
+      ordered.addAll(units.where((unit) => unit.cefrLevel == level));
+    }
+    ordered.addAll(units.where((unit) => !levelOrder.contains(unit.cefrLevel)));
+    return ordered;
   }
 
   /// Returns one dictionary entry per English headword across the complete course.
