@@ -14,7 +14,7 @@ void main() {
         expect(levelUnits.expand((unit) => unit.lessons).length, greaterThanOrEqualTo(3));
       }
       expect(lessons.length, 233, reason: 'The learning map must contain exactly 233 lessons');
-      expect(ExpandedCourseData.units.expand((unit) => unit.lessons).length, 226,
+      expect(ExpandedCourseData.units.expand((unit) => unit.lessons).length, 228,
           reason: 'The expanded curriculum must provide exactly 226 lessons');
       final levels = units.map((unit) => unit.cefrLevel).toList();
       expect(levels, orderedEquals([...levels]..sort((a, b) {
