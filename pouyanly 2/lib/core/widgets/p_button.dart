@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
 
+import '../theme/app_design_tokens.dart';
+
+/// Shared, accessible action button used across onboarding and learning flows.
 class PButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -27,106 +29,104 @@ class PButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = color ?? AppColors.primary;
+    final theme = Theme.of(context);
+    final effectiveColor = color ?? theme.colorScheme.primary;
+    final foreground = color == null
+        ? theme.colorScheme.onPrimary
+        : Colors.white;
+    final child = _buildChild(
+      isText ? effectiveColor : foreground,
+      theme.colorScheme.onSurface,
+    );
 
     if (isText) {
       return TextButton(
         onPressed: isLoading ? null : onPressed,
-        child: Text(label,
-            style: TextStyle(
-              fontFamily: 'Vazirmatn',
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: effectiveColor,
-            )),
-      );
-    }
-
-    if (outlined) {
-      return SizedBox(
-        width: width ?? double.infinity,
-        height: height,
-        child: OutlinedButton(
-          onPressed: isLoading ? null : onPressed,
-          style: OutlinedButton.styleFrom(
-            foregroundColor: effectiveColor,
-            side: BorderSide(color: effectiveColor, width: 1.5),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(21)),
+        style: TextButton.styleFrom(
+          foregroundColor: effectiveColor,
+          minimumSize: Size(width ?? 44, height),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          textStyle: const TextStyle(
+            fontFamily: 'Vazirmatn',
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
           ),
-          child: _buildChild(effectiveColor),
         ),
+        child: child,
       );
     }
 
-    // Gradient filled button
+    final button = outlined
+        ? OutlinedButton(
+            onPressed: isLoading ? null : onPressed,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: effectiveColor,
+              minimumSize: Size(48, height),
+              side: BorderSide(color: effectiveColor.withOpacity(.65)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  AppDesignTokens.radiusMedium,
+                ),
+              ),
+            ),
+            child: child,
+          )
+        : FilledButton(
+            onPressed: isLoading ? null : onPressed,
+            style: FilledButton.styleFrom(
+              backgroundColor: effectiveColor,
+              foregroundColor: foreground,
+              minimumSize: Size(48, height),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  AppDesignTokens.radiusMedium,
+                ),
+              ),
+            ),
+            child: child,
+          );
+
     return SizedBox(
       width: width ?? double.infinity,
       height: height,
-      child: Material(
-        borderRadius: BorderRadius.circular(14),
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isLoading ? null : onPressed,
-          borderRadius: BorderRadius.circular(14),
-          child: Ink(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [effectiveColor, Color.lerp(effectiveColor, Colors.white, 0.25)!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: effectiveColor.withOpacity(0.35),
-                  blurRadius: 20,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Center(child: _buildChild(Colors.white)),
-          ),
-        ),
-      ),
+      child: button,
     );
   }
 
-  Widget _buildChild(Color textColor) {
+  Widget _buildChild(Color foreground, Color fallback) {
     if (isLoading) {
       return SizedBox(
-        width: 22,
-        height: 22,
+        width: 21,
+        height: 21,
         child: CircularProgressIndicator(
-          strokeWidth: 2.5,
-          valueColor: AlwaysStoppedAnimation(textColor),
+          strokeWidth: 2.2,
+          valueColor: AlwaysStoppedAnimation<Color>(foreground),
         ),
       );
     }
 
-    if (icon != null) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: textColor),
-          const SizedBox(width: 8),
-          Text(label,
-              style: TextStyle(
-                fontFamily: 'Vazirmatn',
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: textColor,
-              )),
-        ],
-      );
-    }
+    final text = Text(
+      label,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontFamily: 'Vazirmatn',
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: foreground,
+      ),
+    );
 
-    return Text(label,
-        style: TextStyle(
-          fontFamily: 'Vazirmatn',
-          fontSize: 15,
-          fontWeight: FontWeight.w700,
-          color: textColor,
-        ));
+    if (icon == null) return text;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 18, color: foreground),
+        const SizedBox(width: 8),
+        Flexible(child: text),
+      ],
+    );
   }
 }
