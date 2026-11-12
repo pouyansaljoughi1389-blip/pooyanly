@@ -34,8 +34,8 @@ class LiquidGlass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dark = theme.brightness == Brightness.dark;
     final scheme = theme.colorScheme;
+    final dark = scheme.brightness == Brightness.dark;
     final baseTint = tint ?? scheme.surfaceContainerHighest;
     final border = scheme.outline.withValues(alpha: dark ? .62 : .72);
     final decoration = BoxDecoration(
