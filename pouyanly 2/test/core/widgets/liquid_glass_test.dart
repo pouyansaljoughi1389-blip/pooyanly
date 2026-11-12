@@ -16,6 +16,26 @@ void main() {
     expect(find.byType(BackdropFilter), findsNothing);
   });
 
+  testWidgets('glass tint and border follow both theme brightnesses',
+      (tester) async {
+    for (final theme in [ThemeData.light(), ThemeData.dark()]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: theme,
+          home: const Scaffold(
+            body: LiquidGlass(child: Text('Theme-aware surface')),
+          ),
+        ),
+      );
+      final ink = tester.widget<Ink>(find.byType(Ink).first);
+      final decoration = ink.decoration! as BoxDecoration;
+      final colors = (decoration.gradient! as LinearGradient).colors;
+      expect(colors.first, theme.colorScheme.surfaceContainerHighest
+          .withValues(alpha: theme.brightness == Brightness.dark ? .84 : .78));
+      expect(decoration.border, isA<Border>());
+    }
+  });
+
   testWidgets('interactive glass surface invokes its action', (tester) async {
     var tapped = false;
 
