@@ -19,7 +19,12 @@ void main() {
             ),
           ),
         );
-        final customPaint = tester.widget<CustomPaint>(find.byType(CustomPaint));
+        final customPaint = tester.widget<CustomPaint>(
+          find.descendant(
+            of: find.byType(PouyanlyIcon),
+            matching: find.byType(CustomPaint),
+          ),
+        );
         expect(customPaint.size, const Size.square(32), reason: type.name);
         expect(find.bySemanticsLabel(type.name), findsOneWidget, reason: type.name);
       }
@@ -39,13 +44,10 @@ void main() {
       );
 
       expect(find.bySemanticsLabel('Achievement'), findsOneWidget);
-      final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(PouyanlyIconBadge),
-          matching: find.byType(Container),
-        ).first,
+      expect(
+        tester.getSize(find.byType(PouyanlyIconBadge)),
+        const Size(48, 48),
       );
-      expect(container.constraints?.maxWidth, isNull);
       expect(find.byType(PouyanlyIcon), findsOneWidget);
     });
   });
