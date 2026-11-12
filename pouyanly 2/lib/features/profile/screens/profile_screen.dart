@@ -19,6 +19,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _promptScheduled = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Keep this screen safe when reached directly, outside the splash route.
+    context.read<UserProvider>().init();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _maybePromptAvatarShop();
@@ -66,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Text('فروشگاه آواتار', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 20, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 4),
-                Text('سکهٔ در دسترس: ${toPersianDigits(user.coins)}', style: const TextStyle(fontFamily: 'Vazirmatn', color: AppColors.textSecondaryLight)),
+                Text('سکهٔ در دسترس: ${toPersianDigits(user.coins)}', style: const TextStyle(fontFamily: 'Vazirmatn', color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 const SizedBox(height: 16),
                 Wrap(spacing: 10, runSpacing: 10, children: ['🦊', '🐼', '🐯', '🐸', '🐧', '🦉', '🐙', '🐨'].map((emoji) {
                   final unlocked = user.unlockedAvatarEmojis.contains(emoji);
@@ -111,8 +118,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<UserProvider>().user;
-    if (user == null) return const SizedBox.shrink();
+    final provider = context.watch<UserProvider>();
+    final user = provider.user;
+    if (user == null) {
+      final theme = Theme.of(context);
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  provider.isInitialized
+                      ? Icons.person_off_outlined
+                      : Icons.person_outline_rounded,
+                  size: 54,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  provider.isInitialized
+                      ? 'هنوز حسابی برای نمایش وجود ندارد'
+                      : 'در حال بارگذاری پروفایل…',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  provider.isInitialized
+                      ? 'برای ساخت حساب و شروع یادگیری، به صفحهٔ شروع برو.'
+                      : 'اطلاعات حساب در حال آماده‌سازی است.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (!provider.isInitialized)
+                  const CircularProgressIndicator()
+                else
+                  FilledButton(
+                    onPressed: () => context.go('/welcome'),
+                    child: const Text('رفتن به صفحهٔ شروع'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     _maybePromptAvatarShop();
 
     return Directionality(
@@ -344,7 +400,7 @@ class _StatBox extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.dividerLight),
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Column(
           children: [
@@ -398,7 +454,7 @@ class _InfoSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.dividerLight),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
           child: Column(children: children),
         ),
