@@ -44,6 +44,16 @@ void main() {
       );
     });
 
+    test('both themes provide complete semantic surface and error roles', () {
+      for (final theme in [AppTheme.light, AppTheme.dark]) {
+        expect(theme.colorScheme.surface, isNot(theme.colorScheme.onSurface));
+        expect(theme.colorScheme.surfaceContainerHighest,
+            isNot(theme.colorScheme.onSurface));
+        expect(theme.colorScheme.error, isNot(theme.colorScheme.onError));
+        expect(theme.scaffoldBackgroundColor, isNot(theme.colorScheme.onSurface));
+      }
+    });
+
     test('light and dark themes use their intended distinct surfaces', () {
       expect(
         AppTheme.light.scaffoldBackgroundColor,
