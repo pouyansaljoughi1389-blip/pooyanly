@@ -74,7 +74,7 @@ class _TutorScreenState extends State<TutorScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
-              color: AppColors.primary.withOpacity(0.08),
+              color: AppColors.primary.withValues(alpha: 0.08),
               child: const Text(
                 'فرهنگ لغت و پاسخ‌های آموزشی آفلاین • برای پاسخ آزاد به هر موضوعی هنوز مدل هوش مصنوعی مولد متصل نیست.',
                 textAlign: TextAlign.center,
@@ -107,7 +107,7 @@ class _TutorScreenState extends State<TutorScreen> {
                       decoration: BoxDecoration(
                         color: message.fromTutor
                             ? Theme.of(context).cardColor
-                            : AppColors.primary.withOpacity(0.12),
+                            : AppColors.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: AppColors.dividerLight),
                       ),
