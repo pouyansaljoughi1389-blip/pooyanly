@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/pouyanly_icon.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/persian_digits.dart';
@@ -388,7 +389,7 @@ class _MissionCard extends StatelessWidget {
           ),
           if (done && !claimed) ...[
             const SizedBox(width: 8),
-            const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 24),
+            const PouyanlyIcon(type: PouyanlyIconType.completed, color: AppColors.success, size: 24),
           ],
         ],
       ),
