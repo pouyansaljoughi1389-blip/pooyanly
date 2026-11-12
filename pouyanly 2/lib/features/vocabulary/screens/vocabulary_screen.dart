@@ -348,8 +348,8 @@ class _ReviewTabState extends State<_ReviewTab> {
           padding: const EdgeInsets.all(28),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text('🎉', style: TextStyle(fontSize: 56)),
+            children: [
+              const Text('🎉', style: TextStyle(fontSize: 56)),
               SizedBox(height: 16),
               Text('همه‌چیز مرتبه!', style: TextStyle(
                 fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
