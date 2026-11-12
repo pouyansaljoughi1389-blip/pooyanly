@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_design_tokens.dart';
+import 'premium_icon.dart';
 
 /// Shared, accessible action button used across onboarding and learning flows.
 class PButton extends StatelessWidget {
@@ -120,7 +121,7 @@ class PButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, size: 18, color: foreground),
+        PremiumIcon(icon: icon!, size: 18, color: foreground),
         const SizedBox(width: 8),
         Flexible(child: text),
       ],
