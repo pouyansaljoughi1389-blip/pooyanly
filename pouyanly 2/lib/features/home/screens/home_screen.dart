@@ -202,7 +202,7 @@ class _HomePage extends StatelessWidget {
                                 fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700)),
                               Text('گوش کن، مفهوم را بفهم و پاسخ بده',
                                 style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11,
-                                  color: AppColors.textSecondaryLight)),
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant)),
                             ],
                           ),
                         ),
@@ -238,7 +238,7 @@ class _HomePage extends StatelessWidget {
                               Text('معلم زبان POUYANLY',
                                   style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700)),
                               Text('تمرین کن و بازخورد بگیر • نسخهٔ آزمایشی',
-                                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: AppColors.textSecondaryLight)),
+                                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
                             ],
                           ),
                         ),
@@ -258,7 +258,7 @@ class _HomePage extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.dividerLight),
+                      border: Border.all(color: Theme.of(context).dividerColor),
                     ),
                     child: const Row(
                       children: [
@@ -274,7 +274,7 @@ class _HomePage extends StatelessWidget {
                               Text('جامعهٔ POUYANLY',
                                   style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700)),
                               Text('پیش‌نمایش بخش اجتماعی و اصول ایمنی',
-                                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: AppColors.textSecondaryLight)),
+                                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
                             ],
                           ),
                         ),
@@ -340,7 +340,7 @@ class _StatChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.dividerLight),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -371,7 +371,7 @@ class _LessonCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.dividerLight),
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Row(
           children: [
@@ -399,7 +399,7 @@ class _LessonCard extends StatelessWidget {
                   Text(
                     '${toPersianDigits(lesson.vocabulary.length)} لغت • ${toPersianDigits(lesson.exercises.length)} تمرین',
                     style: const TextStyle(
-                        fontFamily: 'Vazirmatn', fontSize: 12, color: AppColors.textSecondaryLight),
+                        fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
@@ -497,7 +497,7 @@ class _MiniStat extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.dividerLight),
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Column(
           children: [
@@ -508,7 +508,7 @@ class _MiniStat extends StatelessWidget {
               fontWeight: FontWeight.w700, color: AppColors.primary)),
             Text(label, style: const TextStyle(
               fontFamily: 'Vazirmatn', fontSize: 11,
-              color: AppColors.textSecondaryLight)),
+              color: Theme.of(context).colorScheme.onSurfaceVariant)),
           ],
         ),
       ),
