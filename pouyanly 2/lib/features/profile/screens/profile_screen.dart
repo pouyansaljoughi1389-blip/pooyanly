@@ -6,8 +6,102 @@ import '../../../core/widgets/animated_game_icons.dart';
 import '../../../core/widgets/p_button.dart';
 import '../../../shared/providers/user_provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  static const int _avatarShopXpThreshold = 1000;
+  bool _promptScheduled = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _maybePromptAvatarShop();
+  }
+
+  void _maybePromptAvatarShop() {
+    final user = context.read<UserProvider>().user;
+    if (_promptScheduled || user == null || user.xp < _avatarShopXpThreshold || user.avatarShopPromptShown) return;
+    _promptScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await context.read<UserProvider>().markAvatarShopPromptShown();
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        builder: (dialogContext) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: const Text('وقتشه آواتارت رو ارتقا بدی!', style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w800)),
+            content: const Text('امتیاز XP خوبی جمع کردی. به فروشگاه پروفایل سر بزن و یک آواتار تازه انتخاب کن.', style: TextStyle(fontFamily: 'Vazirmatn')),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('بعداً')),
+              FilledButton(onPressed: () { Navigator.pop(dialogContext); _showAvatarShop(); }, child: const Text('فروشگاه آواتار')),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  Future<void> _showAvatarShop() async {
+    final provider = context.read<UserProvider>();
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Consumer<UserProvider>(builder: (context, currentProvider, _) {
+          final user = currentProvider.user;
+          if (user == null) return const SizedBox.shrink();
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('فروشگاه آواتار', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 20, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 4),
+                Text('سکهٔ در دسترس: ${user.coins}', style: const TextStyle(fontFamily: 'Vazirmatn', color: AppColors.textSecondaryLight)),
+                const SizedBox(height: 16),
+                Wrap(spacing: 10, runSpacing: 10, children: ['🦊', '🐼', '🐯', '🐸', '🐧', '🦉', '🐙', '🐨'].map((emoji) {
+                  final unlocked = user.unlockedAvatarEmojis.contains(emoji);
+                  final cost = UserProvider.avatarUnlockCosts[emoji] ?? 0;
+                  final selected = user.avatarEmoji == emoji;
+                  return InkWell(
+                    onTap: () async {
+                      if (unlocked) {
+                        await provider.setAvatarEmoji(emoji);
+                        if (sheetContext.mounted) Navigator.pop(sheetContext);
+                        return;
+                      }
+                      final success = await provider.unlockAvatarEmoji(emoji);
+                      if (!sheetContext.mounted) return;
+                      ScaffoldMessenger.of(sheetContext).showSnackBar(SnackBar(content: Text(success ? 'آواتار باز شد؛ دوباره لمسش کن تا انتخاب شود.' : 'سکهٔ کافی نداری.')));
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(width: 76, height: 82, decoration: BoxDecoration(
+                      color: selected ? AppColors.primary.withOpacity(.12) : Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: selected ? AppColors.primary : AppColors.dividerLight, width: selected ? 2 : 1),
+                    ), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Text(emoji, style: const TextStyle(fontSize: 30)),
+                      const SizedBox(height: 3),
+                      if (!unlocked) Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('$cost', style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10)), const SizedBox(width: 3), const AnimatedCoinIcon(size: 12)])
+                      else Text(selected ? 'انتخاب‌شده' : 'رایگان', style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 9)),
+                    ])),
+                  );
+                }).toList()),
+              ]),
+            ),
+          );
+        }),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,21 +114,26 @@ class ProfileScreen extends StatelessWidget {
         slivers: [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 200,
+            expandedHeight: 220,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: const BoxDecoration(gradient: AppColors.heroGradient),
-                child: SafeArea(
+                child: Stack(children: [
+                  Positioned.fill(child: Center(child: Opacity(opacity: .16, child: FittedBox(fit: BoxFit.contain, child: Text(user.avatarEmoji, style: const TextStyle(fontSize: 190)))))),
+                  SafeArea(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 72,
-                        height: 72,
+                      InkWell(
+                        onTap: _showAvatarShop,
+                        customBorder: const CircleBorder(),
+                        child: Container(
+                        width: 88,
+                        height: 88,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 3),
+                          border: Border.all(color: user.xp >= _avatarShopXpThreshold ? AppColors.error : Colors.white, width: user.xp >= _avatarShopXpThreshold ? 5 : 3),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.15),
@@ -43,14 +142,9 @@ class ProfileScreen extends StatelessWidget {
                           ],
                         ),
                         child: Center(
-                          child: Text(
-                            user.name?.isNotEmpty == true
-                                ? user.name![0].toUpperCase()
-                                : '🦁',
-                            style: const TextStyle(fontSize: 32),
-                          ),
+                          child: Text(user.avatarEmoji, style: const TextStyle(fontSize: 48)),
                         ),
-                      ),
+                      )),
                       const SizedBox(height: 10),
                       Text(
                         user.name ?? 'زبان‌آموز',
@@ -69,7 +163,7 @@ class ProfileScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          'سطح ${user.cefrLevel.label} — ${user.cefrLevel.farsiDescription}',
+                          'ردهٔ مهارت: ${_skillBandLabel(user.cefrLevel)}',
                           style: const TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 12,
@@ -80,6 +174,7 @@ class ProfileScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+                ]),
               ),
             ),
           ),
@@ -107,7 +202,7 @@ class ProfileScreen extends StatelessWidget {
                     _InfoRow('هدف', user.goal?.farsiLabel ?? 'تنظیم نشده', '🎯'),
                     _InfoRow('زمان روزانه',
                         user.dailyStudyTime?.farsiLabel ?? 'تنظیم نشده', '⏱️'),
-                    _InfoRow('سطح CEFR', user.cefrLevel.label, '📊'),
+                    _InfoRow('ردهٔ مهارت', _skillBandLabel(user.cefrLevel), '📊'),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -180,6 +275,15 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _skillBandLabel(dynamic level) {
+    final name = level.name.toString();
+    if (name == 'a1' || name == 'a2') return 'مبتدی';
+    if (name == 'b1') return 'متوسط';
+    if (name == 'b2') return 'متوسط رو به بالا';
+    if (name == 'c1' || name == 'c2') return 'پیشرفته';
+    return 'هنوز ارزیابی نشده';
   }
 
   void _showResetDialog(BuildContext context) {
