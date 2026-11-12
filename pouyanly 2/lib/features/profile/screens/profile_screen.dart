@@ -5,7 +5,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/persian_digits.dart';
 import '../../../core/widgets/animated_game_icons.dart';
 import '../../../core/widgets/p_button.dart';
-import '../../../core/widgets/user_required_state.dart';
 import '../../../shared/providers/user_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
