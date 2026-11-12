@@ -24,7 +24,7 @@ class AppColors {
 
   // ── CEFR Level Colors ────────────────────────────────────────────
   static const Color cefrA1   = Color(0xFF2E7D32);
-  static const Color cefrA2   = Color(0xFF558B2F);
+  static const Color cefrA2   = Color(0xFF4D7C0F);
   static const Color cefrB1   = Color(0xFF1565C0);
   static const Color cefrB2   = Color(0xFF9C27B0);
   static const Color cefrC1   = Color(0xFFA64B00);
