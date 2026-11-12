@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../../core/services/learning_reminder_service.dart';
 import '../../../core/widgets/liquid_glass.dart';
@@ -46,7 +45,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
-    final isDark = user?.isDarkMode == true;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -84,7 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       await LearningReminderService.cancelAll();
                     }
                   },
-                  activeThumbColor: AppColors.primary,
+                  activeThumbColor: scheme.primary,
                   title: const Text(
                     'فعال‌سازی یادآور',
                     style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15),
@@ -104,7 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
+                        color: scheme.primaryContainer,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -113,7 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           fontFamily: 'Vazirmatn',
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: scheme.primary,
                         ),
                       ),
                     ),
@@ -156,9 +157,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 height: 38,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: active ? AppColors.primary : Colors.transparent,
+                                  color: active ? scheme.primary : Colors.transparent,
                                   border: Border.all(
-                                    color: active ? AppColors.primary : Theme.of(context).dividerColor,
+                                    color: active ? scheme.primary : scheme.outline,
                                     width: 2,
                                   ),
                                 ),
@@ -169,7 +170,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       fontFamily: 'Vazirmatn',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,
-                                      color: active ? Colors.white : Theme.of(context).colorScheme.onSurfaceVariant,
+                                      color: active ? scheme.onPrimary : scheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ),
@@ -187,9 +188,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 20),
             _SectionHeader(title: 'ویجت صفحهٔ اصلی اندروید', icon: Icons.widgets_rounded),
             const SizedBox(height: 8),
-            _SettingCard(children: const [
+            _SettingCard(children: [
               ListTile(
-                leading: Icon(Icons.auto_graph_rounded, color: AppColors.primary),
+                leading: Icon(Icons.auto_graph_rounded, color: scheme.primary),
                 title: Text('نمایش پیشرفت روزانه', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 14, fontWeight: FontWeight.w700)),
                 subtitle: Text('در صفحهٔ اصلی گوشی، روی فضای خالی چند لحظه نگه دار؛ سپس «ابزارک‌ها» و POUYANLY را انتخاب کن.', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, height: 1.6)),
               ),
@@ -205,7 +206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SwitchListTile(
                   value: isDark,
                   onChanged: (_) => context.read<UserProvider>().toggleDarkMode(),
-                  activeThumbColor: AppColors.primary,
+                  activeThumbColor: scheme.primary,
                   title: const Text(
                     'حالت تاریک',
                     style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15),
@@ -216,7 +217,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   secondary: Icon(
                     isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                    color: AppColors.primary,
+                    color: scheme.primary,
                   ),
                 ),
               ],
@@ -230,7 +231,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _SettingCard(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.refresh_rounded, color: AppColors.primary),
+                  leading: const Icon(Icons.refresh_rounded, color: scheme.primary),
                   title: const Text(
                     'انجام دوباره آزمون تعیین سطح',
                     style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15),
@@ -244,7 +245,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const Divider(height: 1, indent: 16, endIndent: 16),
                 ListTile(
-                  leading: const Icon(Icons.tune_rounded, color: AppColors.secondary),
+                  leading: const Icon(Icons.tune_rounded, color: scheme.secondary),
                   title: const Text(
                     'ویرایش اهداف یادگیری',
                     style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15),
@@ -304,11 +305,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                gradient: scheme.primaryGradient,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.18),
+                    color: scheme.primary.withValues(alpha: 0.18),
                     blurRadius: 22,
                     offset: const Offset(0, 10),
                   ),
@@ -320,11 +321,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     width: 52,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.18),
+                      color: scheme.onPrimary.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+                      border: Border.all(color: scheme.onPrimary.withValues(alpha: 0.24)),
                     ),
-                    child: const Icon(Icons.code_rounded, color: Colors.white, size: 27),
+                    child: Icon(Icons.code_rounded, color: scheme.onPrimary, size: 27),
                   ),
                   const SizedBox(width: 14),
                   const Expanded(
@@ -336,7 +337,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 12,
-                            color: Colors.white70,
+                            color: scheme.onPrimary.withValues(alpha: 0.78),
                           ),
                         ),
                         SizedBox(height: 3),
@@ -346,7 +347,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             fontFamily: 'Vazirmatn',
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
-                            color: Colors.white,
+                            color: scheme.onPrimary,
                           ),
                         ),
                         SizedBox(height: 2),
@@ -361,7 +362,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ],
                     ),
                   ),
-                  const Icon(Icons.auto_awesome_rounded, color: Colors.white70, size: 22),
+                  Icon(Icons.auto_awesome_rounded, color: scheme.onPrimary.withValues(alpha: 0.82), size: 22),
                 ],
               ),
             ),
@@ -372,9 +373,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.error.withValues(alpha: 0.06),
+                color: scheme.errorContainer.withValues(alpha: 0.55),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
+                border: Border.all(color: scheme.error.withValues(alpha: 0.35)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,7 +386,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       fontFamily: 'Vazirmatn',
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.error,
+                      color: scheme.error,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -393,17 +394,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: () => _showResetDialog(context),
-                      icon: const Icon(Icons.delete_forever_rounded, color: AppColors.error),
+                      icon: const Icon(Icons.delete_forever_rounded, color: scheme.error),
                       label: const Text(
                         'بازنشانی کامل پیشرفت',
                         style: TextStyle(
                           fontFamily: 'Vazirmatn',
-                          color: AppColors.error,
+                          color: scheme.error,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.error),
+                        side: const BorderSide(color: scheme.error),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -487,7 +488,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 'شروع آزمون',
                 style: TextStyle(
                   fontFamily: 'Vazirmatn',
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -527,7 +528,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 'بازنشانی',
                 style: TextStyle(
                   fontFamily: 'Vazirmatn',
-                  color: AppColors.error,
+                  color: Theme.of(context).colorScheme.error,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -548,7 +549,7 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.primary),
+        Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 8),
         Text(
           title,
