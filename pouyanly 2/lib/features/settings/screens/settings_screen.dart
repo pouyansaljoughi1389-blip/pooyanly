@@ -331,7 +331,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: Icon(Icons.code_rounded, color: scheme.onPrimary, size: 27),
                   ),
                   const SizedBox(width: 14),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -359,7 +359,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 11,
-                            color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.78),
+                            color: scheme.onPrimary.withValues(alpha: 0.78),
                           ),
                         ),
                       ],
@@ -383,7 +383,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     '⚠️ منطقه خطر',
                     style: TextStyle(
                       fontFamily: 'Vazirmatn',
