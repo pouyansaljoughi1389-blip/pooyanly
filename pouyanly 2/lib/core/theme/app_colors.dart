@@ -10,7 +10,7 @@ class AppColors {
 
   static const Color secondary      = Color(0xFF13BFA4);
   static const Color secondaryLight = Color(0xFF55D9C0);
-  static const Color secondaryDark  = Color(0xFF079A83);
+  static const Color secondaryDark  = Color(0xFF08745D);
 
   static const Color accent         = Color(0xFFFF6B6B);
   static const Color accentLight    = Color(0xFFFF9E9E);
@@ -53,25 +53,28 @@ class AppColors {
 
   // ── Gradients ────────────────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF5057E8), Color(0xFF898DFF)],
+    // Both stops maintain readable white foreground text in light mode.
+    colors: [Color(0xFF5057E8), Color(0xFF4145C8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient successGradient = LinearGradient(
-    colors: [Color(0xFF00C896), Color(0xFF4DDBAF)],
+    // Darker teal stops preserve contrast for white labels and icons.
+    colors: [Color(0xFF087F68), Color(0xFF08745D)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient heroGradient = LinearGradient(
-    colors: [Color(0xFF5057E8), Color(0xFF18BFA5)],
+    // Avoid the low-contrast mint endpoint used behind white hero text.
+    colors: [Color(0xFF5057E8), Color(0xFF087A6B)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient warmGradient = LinearGradient(
-    colors: [Color(0xFFFF6B6B), Color(0xFFFF9E9E)],
+    colors: [Color(0xFFB53A4B), Color(0xFF8F2E47)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
