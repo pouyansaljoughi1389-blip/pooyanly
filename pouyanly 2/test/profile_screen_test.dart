@@ -13,8 +13,15 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
+    // The Android launcher-widget plugin has no host implementation in unit
+    // tests. Use a non-Android test platform so provider hydration stays local.
+    debugDefaultTargetPlatformOverride = TargetPlatform.linux;
     SharedPreferences.setMockInitialValues({});
     await StorageService.instance.init();
+  });
+
+  tearDown(() {
+    debugDefaultTargetPlatformOverride = null;
   });
 
   testWidgets('profile never renders a blank screen without a user',
@@ -110,13 +117,17 @@ void main() {
       ),
     );
     await tester.tap(find.byTooltip('ویرایش اطلاعات حساب'));
-    await tester.pumpAndSettle();
+    // Profile contains repeating decorative animations; settle only the
+    // dialog transition instead of waiting for every ticker on the page.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     await tester.enterText(find.byType(TextFormField).at(0), 'New');
     await tester.enterText(find.byType(TextFormField).at(1), 'Learner');
     await tester.enterText(find.byType(TextFormField).at(2), 'new@example.com');
     await tester.tap(find.text('ذخیره'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(provider.user!.name, 'New Learner');
     expect(provider.user!.contact, 'new@example.com');

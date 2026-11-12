@@ -27,11 +27,21 @@ void main() {
           ),
         ),
       );
-      final ink = tester.widget<Ink>(find.byType(Ink).first);
+      final glassFinder = find.byType(LiquidGlass);
+      final inkFinder = find.descendant(
+        of: glassFinder,
+        matching: find.byType(Ink),
+      ).first;
+      final ink = tester.widget<Ink>(inkFinder);
       final decoration = ink.decoration! as BoxDecoration;
       final colors = (decoration.gradient! as LinearGradient).colors;
-      expect(colors.first, theme.colorScheme.surfaceContainerHighest
-          .withValues(alpha: theme.brightness == Brightness.dark ? .84 : .78));
+      final scheme = Theme.of(tester.element(glassFinder)).colorScheme;
+      expect(
+        colors.first,
+        scheme.surfaceContainerHighest.withValues(
+          alpha: scheme.brightness == Brightness.dark ? .84 : .78,
+        ),
+      );
       expect(decoration.border, isA<Border>());
     }
   });
