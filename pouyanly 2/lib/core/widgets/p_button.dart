@@ -60,7 +60,7 @@ class PButton extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               foregroundColor: effectiveColor,
               minimumSize: Size(48, height),
-              side: BorderSide(color: effectiveColor.withOpacity(.65)),
+              side: BorderSide(color: effectiveColor.withValues(alpha: .65)),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(
                   AppDesignTokens.radiusMedium,
