@@ -217,7 +217,7 @@ class _VocabTileState extends State<_VocabTile> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.12),
+                      color: color.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -430,7 +430,7 @@ class _ReviewTabState extends State<_ReviewTab> {
                   gradient: _revealed ? AppColors.primaryGradient :
                     const LinearGradient(colors: [Color(0xFFF8F7FF), Color(0xFFF0EEFF)]),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 2),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 2),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
