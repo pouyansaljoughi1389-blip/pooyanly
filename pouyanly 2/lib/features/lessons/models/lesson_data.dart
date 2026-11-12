@@ -536,6 +536,25 @@ class CourseData {
     return units;
   }
 
+  /// Returns one dictionary entry per English headword across the complete course.
+  /// Repeated appearances in lessons remain available for teaching and practice,
+  /// but they must not create duplicate dictionary or SRS cards.
+  static List<VocabularyItem> getAllVocabulary() {
+    final unique = <String, VocabularyItem>{};
+    for (final unit in getAllUnits()) {
+      for (final lesson in unit.lessons) {
+        for (final item in lesson.vocabulary) {
+          final key = item.english
+              .trim()
+              .toLowerCase()
+              .replaceAll(RegExp(r'\\s+'), ' ');
+          if (key.isNotEmpty) unique.putIfAbsent(key, () => item);
+        }
+      }
+    }
+    return unique.values.toList(growable: false);
+  }
+
   static Lesson? getLessonById(String id) {
     for (final unit in getAllUnits()) {
       for (final lesson in unit.lessons) {
