@@ -60,8 +60,14 @@ class WelcomeScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            child: const Center(
-                              child: Text('🦁', style: TextStyle(fontSize: 54)),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: Image.asset(
+                                'assets/images/app_icon.jpg',
+                                width: 94,
+                                height: 94,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 18),
