@@ -146,7 +146,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
   Widget build(BuildContext context) {
     final done = widget.completed == widget.unit.lessons.length;
     final levelColor = AppColors.primary;
-    final statusColor = done ? AppColors.success : widget.isUnlocked ? levelColor : AppColors.textSecondaryLight;
+    final statusColor = done ? AppColors.success : widget.isUnlocked ? levelColor : Theme.of(context).colorScheme.onSurfaceVariant;
     final bubble = Material(
       elevation: widget.isUnlocked ? 9 : 1,
       shadowColor: statusColor.withValues(alpha: .32),
@@ -233,7 +233,7 @@ class _MapUnitNodeState extends State<_MapUnitNode> {
                                 ),
                                 Icon(Icons.play_circle_fill_rounded, color: levelColor),
                               ])
-                            : const Icon(Icons.lock_rounded, color: AppColors.textSecondaryLight),
+                            : Icon(Icons.lock_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   );
                 }),
                 if (done)
