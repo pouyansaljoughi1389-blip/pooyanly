@@ -84,7 +84,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       await LearningReminderService.cancelAll();
                     }
                   },
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   title: const Text(
                     'فعال‌سازی یادآور',
                     style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15),
@@ -104,7 +104,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -205,7 +205,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SwitchListTile(
                   value: isDark,
                   onChanged: (_) => context.read<UserProvider>().toggleDarkMode(),
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   title: const Text(
                     'حالت تاریک',
                     style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15),
@@ -308,7 +308,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.18),
+                    color: AppColors.primary.withValues(alpha: 0.18),
                     blurRadius: 22,
                     offset: const Offset(0, 10),
                   ),
@@ -320,9 +320,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     width: 52,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.18),
+                      color: Colors.white.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.24)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
                     ),
                     child: const Icon(Icons.code_rounded, color: Colors.white, size: 27),
                   ),
@@ -372,9 +372,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.06),
+                color: AppColors.error.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.error.withOpacity(0.2)),
+                border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
