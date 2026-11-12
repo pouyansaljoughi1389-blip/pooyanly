@@ -297,10 +297,10 @@ class _MissionCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: done ? AppColors.success.withOpacity(0.08) : Theme.of(context).cardColor,
+        color: done ? AppColors.success.withValues(alpha: 0.08) : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: done ? AppColors.success.withOpacity(0.4) : AppColors.dividerLight,
+          color: done ? AppColors.success.withValues(alpha: 0.4) : AppColors.dividerLight,
         ),
       ),
       child: Row(
@@ -320,7 +320,7 @@ class _MissionCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.xpColor.withOpacity(0.15),
+                        color: AppColors.xpColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -401,11 +401,11 @@ class _AchievementBadge extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: unlocked
-            ? AppColors.primary.withOpacity(0.08)
+            ? AppColors.primary.withValues(alpha: 0.08)
             : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: unlocked ? AppColors.primary.withOpacity(0.3) : AppColors.dividerLight,
+          color: unlocked ? AppColors.primary.withValues(alpha: 0.3) : AppColors.dividerLight,
         ),
       ),
       child: Column(
@@ -470,7 +470,7 @@ class _StreakCalendar extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: inStreak
-                      ? AppColors.streakColor.withOpacity(0.15)
+                      ? AppColors.streakColor.withValues(alpha: 0.15)
                       : Colors.transparent,
                   border: Border.all(
                     color: isToday ? AppColors.primary : Colors.transparent,
