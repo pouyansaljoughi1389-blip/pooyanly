@@ -171,7 +171,7 @@ class _VocabPhase extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.07),
+                  color: AppColors.primary.withValues(alpha: 0.07),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -313,7 +313,7 @@ class _CardFront extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.35),
+            color: AppColors.primary.withValues(alpha: 0.35),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -395,7 +395,7 @@ class _CardBack extends StatelessWidget {
           border: Border.all(color: AppColors.primary, width: 2),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.15),
+              color: AppColors.primary.withValues(alpha: 0.15),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -558,10 +558,10 @@ class _ExercisePhase extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: (selected == exercise.correctAnswer ? AppColors.success : AppColors.error).withOpacity(0.08),
+                        color: (selected == exercise.correctAnswer ? AppColors.success : AppColors.error).withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: (selected == exercise.correctAnswer ? AppColors.success : AppColors.error).withOpacity(0.3),
+                          color: (selected == exercise.correctAnswer ? AppColors.success : AppColors.error).withValues(alpha: 0.3),
                         ),
                       ),
                       child: Column(
@@ -629,9 +629,9 @@ class _OptionTile extends StatelessWidget {
     Color border = AppColors.dividerLight;
     Color? bg;
 
-    if (isCorrect) { border = AppColors.success; bg = AppColors.success.withOpacity(0.1); }
-    else if (isWrong) { border = AppColors.error; bg = AppColors.error.withOpacity(0.1); }
-    else if (isSelected) { border = AppColors.primary; bg = AppColors.primary.withOpacity(0.06); }
+    if (isCorrect) { border = AppColors.success; bg = AppColors.success.withValues(alpha: 0.1); }
+    else if (isWrong) { border = AppColors.error; bg = AppColors.error.withValues(alpha: 0.1); }
+    else if (isSelected) { border = AppColors.primary; bg = AppColors.primary.withValues(alpha: 0.06); }
 
     return GestureDetector(
       onTap: onTap,
@@ -732,9 +732,9 @@ class _StatBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
