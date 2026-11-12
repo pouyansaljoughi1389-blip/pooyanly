@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'pouyanly_icon.dart';
 
 /// Lightweight, offline animated game icons built with Flutter primitives.
 class AnimatedCoinIcon extends StatefulWidget {
@@ -166,7 +167,7 @@ class _FlamePainter extends CustomPainter {
       oldDelegate.phase != phase;
 }
 
-class AnimatedSymbolIcon extends StatefulWidget {
+class AnimatedSymbolIcon extends StatelessWidget {
   final String symbol;
   final double size;
   final Color? color;
@@ -178,67 +179,35 @@ class AnimatedSymbolIcon extends StatefulWidget {
     this.color,
   });
 
-  @override
-  State<AnimatedSymbolIcon> createState() => _AnimatedSymbolIconState();
-}
-
-class _AnimatedSymbolIconState extends State<AnimatedSymbolIcon>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1600),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  IconData get _icon {
-    switch (widget.symbol) {
-      case '🔥': return Icons.local_fire_department_rounded;
-      case '🪙': return Icons.monetization_on_rounded;
-      case '⭐': return Icons.star_rounded;
-      case '🏆': return Icons.emoji_events_rounded;
-      case '🏅': return Icons.military_tech_rounded;
+  PouyanlyIconType get _type {
+    switch (symbol) {
+      case '🔥': return PouyanlyIconType.streak;
+      case '🪙': return PouyanlyIconType.coin;
+      case '⭐': return PouyanlyIconType.xp;
+      case '🏆': return PouyanlyIconType.trophy;
+      case '🏅': return PouyanlyIconType.medal;
       case '📚':
-      case '📖': return Icons.menu_book_rounded;
-      case '🌱': return Icons.eco_rounded;
-      case '💪': return Icons.fitness_center_rounded;
-      case '🔁': return Icons.sync_rounded;
-      case '🧠': return Icons.psychology_rounded;
-      case '📅': return Icons.calendar_month_rounded;
-      case '🎯': return Icons.track_changes_rounded;
-      case '⏱️': return Icons.timer_rounded;
-      case '📊': return Icons.bar_chart_rounded;
-      case '✅': return Icons.check_circle_rounded;
-      case '🔒': return Icons.lock_rounded;
-      default: return Icons.auto_awesome_rounded;
+      case '📖': return PouyanlyIconType.vocabulary;
+      case '🌱': return PouyanlyIconType.growth;
+      case '💪': return PouyanlyIconType.target;
+      case '🔁': return PouyanlyIconType.review;
+      case '🧠': return PouyanlyIconType.brain;
+      case '📅': return PouyanlyIconType.calendar;
+      case '🎯': return PouyanlyIconType.target;
+      case '⏱️': return PouyanlyIconType.timer;
+      case '📊': return PouyanlyIconType.statistics;
+      case '✅': return PouyanlyIconType.completed;
+      case '🔒': return PouyanlyIconType.locked;
+      default: return PouyanlyIconType.school;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.symbol == '🔥') {
-      return AnimatedFlameIcon(size: widget.size);
-    }
-    if (widget.symbol == '🪙') {
-      return AnimatedCoinIcon(size: widget.size);
-    }
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) => Transform.translate(
-        offset: Offset(0, -1.2 * _controller.value),
-        child: Icon(_icon, size: widget.size, color: widget.color),
-      ),
-    );
+    // Keep distinctive coin/flame motion isolated to the places that request it.
+    if (symbol == '🔥') return AnimatedFlameIcon(size: size);
+    if (symbol == '🪙') return AnimatedCoinIcon(size: size);
+    return PouyanlyIcon(type: _type, size: size, color: color);
   }
 }
 
