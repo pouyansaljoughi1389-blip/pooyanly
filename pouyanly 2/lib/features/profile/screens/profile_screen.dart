@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/pouyanly_icon.dart';
+import '../../../data/models/user_model.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -108,6 +109,1494 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }),
       ),
     );
+  }
+
+  Future<void> _editAccount(UserModel user) async {
+    final first = TextEditingController(text: user.firstName ?? '');
+    final last = TextEditingController(text: user.lastName ?? '');
+    final contact = TextEditingController(text: user.contact ?? '');
+    final formKey = GlobalKey<FormState>();
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text('ویرایش اطلاعات حساب'),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                TextFormField(
+                  controller: first,
+                  decoration: const InputDecoration(labelText: 'نام'),
+                  validator: (v) => v == null || v.trim().isEmpty ? 'نام را وارد کن.' : null,
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: last,
+                  decoration: const InputDecoration(labelText: 'نام خانوادگی'),
+                  validator: (v) => v == null || v.trim().isEmpty ? 'نام خانوادگی را وارد کن.' : null,
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: contact,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(labelText: 'ایمیل یا شماره تلفن'),
+                  validator: (v) {
+                    final value = v?.trim() ?? '';
+                    final email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+
+    final provider = context.watch<UserProvider>();
+    final user = provider.user;
+    if (user == null) {
+      final theme = Theme.of(context);
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  provider.isInitialized
+                      ? Icons.person_off_outlined
+                      : Icons.person_outline_rounded,
+                  size: 54,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  provider.isInitialized
+                      ? 'هنوز حسابی برای نمایش وجود ندارد'
+                      : 'در حال بارگذاری پروفایل…',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  provider.isInitialized
+                      ? 'برای ساخت حساب و شروع یادگیری، به صفحهٔ شروع برو.'
+                      : 'اطلاعات حساب در حال آماده‌سازی است.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (!provider.isInitialized)
+                  const CircularProgressIndicator()
+                else
+                  FilledButton(
+                    onPressed: () => context.go('/welcome'),
+                    child: const Text('رفتن به صفحهٔ شروع'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    _maybePromptAvatarShop();
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            actions: [
+              IconButton(
+                tooltip: 'ویرایش اطلاعات حساب',
+                onPressed: () => _editAccount(user),
+                icon: const Icon(Icons.edit_outlined),
+              ),
+            ],
+            expandedHeight: 220,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+                child: Stack(children: [
+                  Positioned.fill(child: Center(child: Opacity(opacity: .16, child: FittedBox(fit: BoxFit.contain, child: Text(user.avatarEmoji, style: const TextStyle(fontSize: 190)))))),
+                  SafeArea(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: _showAvatarShop,
+                        customBorder: const CircleBorder(),
+                        child: Container(
+                        width: 88,
+                        height: 88,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: user.xp >= _avatarShopXpThreshold ? AppColors.error : Colors.white, width: user.xp >= _avatarShopXpThreshold ? 5 : 3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 15,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(user.avatarEmoji, style: const TextStyle(fontSize: 48)),
+                        ),
+                      )),
+                      const SizedBox(height: 10),
+                      Text(
+                        user.name ?? 'زبان‌آموز',
+                        style: const TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'ردهٔ مهارت: ${_skillBandLabel(user.cefrLevel)}',
+                          style: const TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ]),
+              ),
+            ),
+          ),
+
+          SliverPadding(
+            padding: const EdgeInsets.all(20),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // Stats row
+                Row(
+                  children: [
+                    _StatBox(toPersianDigits(user.xp), 'امتیاز XP', '⭐'),
+                    const SizedBox(width: 10),
+                    _StatBox(toPersianDigits(user.streak), 'روز پیاپی', '🔥'),
+                    const SizedBox(width: 10),
+                    _StatBox(toPersianDigits(user.completedLessonIds.length), 'درس', '✅'),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                _InfoSection(
+                  title: 'اطلاعات حساب',
+                  children: [
+                    _InfoRow('نام و نام خانوادگی', user.name ?? 'زبان‌آموز', '👤'),
+                    _InfoRow(user.contactType == 'phone' ? 'شماره تلفن' : 'ایمیل', user.contact ?? 'ثبت نشده', '✉️'),
+                    _InfoRow('نوع حساب', 'محلی · ذخیره‌شده روی دستگاه', '📱'),
+                    _InfoRow('تاریخ ساخت پروفایل', toPersianDigits('${user.createdAt.year}/${user.createdAt.month}/${user.createdAt.day}'), '📅'),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Learning info
+                _InfoSection(
+                  title: 'اطلاعات یادگیری',
+                  children: [
+                    _InfoRow('هدف', user.goal?.farsiLabel ?? 'تنظیم نشده', '🎯'),
+                    _InfoRow('زمان روزانه',
+                        user.dailyStudyTime?.farsiLabel ?? 'تنظیم نشده', '⏱️'),
+                    _InfoRow('ردهٔ مهارت', _skillBandLabel(user.cefrLevel), '📊'),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Skill scores
+                if (user.skillScores.isNotEmpty) ...[
+                  _InfoSection(
+                    title: 'نتایج آزمون',
+                    children: [
+                      if (user.skillScores.containsKey('vocabulary'))
+                        _ScoreRow('لغت', user.skillScores['vocabulary']!,
+                            AppColors.primary),
+                      if (user.skillScores.containsKey('grammar'))
+                        _ScoreRow('گرامر', user.skillScores['grammar']!,
+                            AppColors.secondary),
+                      if (user.skillScores.containsKey('reading'))
+                        _ScoreRow('خواندن', user.skillScores['reading']!,
+                            AppColors.accent),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                // Settings
+                _InfoSection(
+                  title: 'تنظیمات',
+                  children: [
+                    _SettingRow(
+                      icon: PouyanlyIconType.settings,
+                      label: 'حالت تاریک',
+                      trailing: Switch(
+                        value: user.isDarkMode,
+                        onChanged: (v) =>
+                            context.read<UserProvider>().toggleDarkMode(),
+                        activeThumbColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    _SettingRow(
+                      icon: PouyanlyIconType.timer,
+                      label: 'یادآور روزانه',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.go('/settings'),
+                    ),
+                    _SettingRow(
+                      icon: PouyanlyIconType.school,
+                      label: 'دربارهٔ POUYANLY',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.push('/about'),
+                    ),
+                    _SettingRow(
+                      icon: PouyanlyIconType.learningPath,
+                      label: 'انجام دوباره آزمون سطح',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.go('/placement-test'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                PButton(
+                  label: 'بازنشانی پیشرفت',
+                  outlined: true,
+                  color: AppColors.error,
+                  onPressed: () => _showResetDialog(context),
+                ),
+                const SizedBox(height: 40),
+              ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _skillBandLabel(dynamic level) {
+    final name = level.name.toString();
+    if (name == 'a1' || name == 'a2') return 'مبتدی';
+    if (name == 'b1') return 'متوسط';
+    if (name == 'b2') return 'متوسط رو به بالا';
+    if (name == 'c1' || name == 'c2') return 'پیشرفته';
+    return 'هنوز ارزیابی نشده';
+  }
+
+  void _showResetDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text(
+            'بازنشانی پیشرفت؟',
+            style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700),
+          ),
+          content: const Text(
+            'درس‌های تکمیل‌شده، XP، سکه‌ها، زنجیرهٔ روزانه، مرور واژگان و نتایج آزمون پاک می‌شوند؛ اما اطلاعات حساب و آواتار باقی می‌مانند. این عمل قابل بازگشت نیست.',
+            style: TextStyle(fontFamily: 'Vazirmatn'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('لغو',
+                  style: TextStyle(fontFamily: 'Vazirmatn')),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(ctx);
+                await context.read<UserProvider>().resetProgress();
+                if (context.mounted) context.go('/placement-test');
+              },
+              child: const Text('بازنشانی',
+                  style: TextStyle(
+                      fontFamily: 'Vazirmatn', color: AppColors.error)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatBox extends StatelessWidget {
+  final String value;
+  final String label;
+  final String emoji;
+  const _StatBox(this.value, this.label, this.emoji);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Theme.of(context).dividerColor),
+        ),
+        child: Column(
+          children: [
+            AnimatedSymbolIcon(symbol: emoji, size: 25, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 11,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoSection extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+  const _InfoSection({required this.title, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontFamily: 'Vazirmatn',
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Theme.of(context).dividerColor),
+          ),
+          child: Column(children: children),
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final String emoji;
+  const _InfoRow(this.label, this.value, this.emoji);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          AnimatedSymbolIcon(symbol: emoji, size: 21, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 14,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScoreRow extends StatelessWidget {
+  final String label;
+  final int score;
+  final Color color;
+  const _ScoreRow(this.label, this.score, this.color);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 60,
+            child: Text(
+              label,
+              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13),
+            ),
+          ),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: LinearProgressIndicator(
+                value: score / 100,
+                minHeight: 8,
+                backgroundColor: Theme.of(context).colorScheme.outlineVariant,
+                valueColor: AlwaysStoppedAnimation(color),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            toPersianDigits('$score٪'),
+            style: TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingRow extends StatelessWidget {
+  final PouyanlyIconType icon;
+  final String label;
+  final Widget trailing;
+  final VoidCallback? onTap;
+  const _SettingRow({
+    required this.icon,
+    required this.label,
+    required this.trailing,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            PouyanlyIcon(type: icon, size: 20, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 14),
+              ),
+            ),
+            trailing,
+          ],
+        ),
+      ),
+    );
+  }
+}
+).hasMatch(value);
+                    final phone = RegExp(r'^\+?[0-9\s()\-]{7,20}
+    final provider = context.watch<UserProvider>();
+    final user = provider.user;
+    if (user == null) {
+      final theme = Theme.of(context);
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  provider.isInitialized
+                      ? Icons.person_off_outlined
+                      : Icons.person_outline_rounded,
+                  size: 54,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  provider.isInitialized
+                      ? 'هنوز حسابی برای نمایش وجود ندارد'
+                      : 'در حال بارگذاری پروفایل…',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  provider.isInitialized
+                      ? 'برای ساخت حساب و شروع یادگیری، به صفحهٔ شروع برو.'
+                      : 'اطلاعات حساب در حال آماده‌سازی است.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (!provider.isInitialized)
+                  const CircularProgressIndicator()
+                else
+                  FilledButton(
+                    onPressed: () => context.go('/welcome'),
+                    child: const Text('رفتن به صفحهٔ شروع'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    _maybePromptAvatarShop();
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 220,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+                child: Stack(children: [
+                  Positioned.fill(child: Center(child: Opacity(opacity: .16, child: FittedBox(fit: BoxFit.contain, child: Text(user.avatarEmoji, style: const TextStyle(fontSize: 190)))))),
+                  SafeArea(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: _showAvatarShop,
+                        customBorder: const CircleBorder(),
+                        child: Container(
+                        width: 88,
+                        height: 88,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: user.xp >= _avatarShopXpThreshold ? AppColors.error : Colors.white, width: user.xp >= _avatarShopXpThreshold ? 5 : 3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 15,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(user.avatarEmoji, style: const TextStyle(fontSize: 48)),
+                        ),
+                      )),
+                      const SizedBox(height: 10),
+                      Text(
+                        user.name ?? 'زبان‌آموز',
+                        style: const TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'ردهٔ مهارت: ${_skillBandLabel(user.cefrLevel)}',
+                          style: const TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ]),
+              ),
+            ),
+          ),
+
+          SliverPadding(
+            padding: const EdgeInsets.all(20),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // Stats row
+                Row(
+                  children: [
+                    _StatBox(toPersianDigits(user.xp), 'امتیاز XP', '⭐'),
+                    const SizedBox(width: 10),
+                    _StatBox(toPersianDigits(user.streak), 'روز پیاپی', '🔥'),
+                    const SizedBox(width: 10),
+                    _StatBox(toPersianDigits(user.completedLessonIds.length), 'درس', '✅'),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Learning info
+                _InfoSection(
+                  title: 'اطلاعات یادگیری',
+                  children: [
+                    _InfoRow('هدف', user.goal?.farsiLabel ?? 'تنظیم نشده', '🎯'),
+                    _InfoRow('زمان روزانه',
+                        user.dailyStudyTime?.farsiLabel ?? 'تنظیم نشده', '⏱️'),
+                    _InfoRow('ردهٔ مهارت', _skillBandLabel(user.cefrLevel), '📊'),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Skill scores
+                if (user.skillScores.isNotEmpty) ...[
+                  _InfoSection(
+                    title: 'نتایج آزمون',
+                    children: [
+                      if (user.skillScores.containsKey('vocabulary'))
+                        _ScoreRow('لغت', user.skillScores['vocabulary']!,
+                            AppColors.primary),
+                      if (user.skillScores.containsKey('grammar'))
+                        _ScoreRow('گرامر', user.skillScores['grammar']!,
+                            AppColors.secondary),
+                      if (user.skillScores.containsKey('reading'))
+                        _ScoreRow('خواندن', user.skillScores['reading']!,
+                            AppColors.accent),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                // Settings
+                _InfoSection(
+                  title: 'تنظیمات',
+                  children: [
+                    _SettingRow(
+                      icon: PouyanlyIconType.settings,
+                      label: 'حالت تاریک',
+                      trailing: Switch(
+                        value: user.isDarkMode,
+                        onChanged: (v) =>
+                            context.read<UserProvider>().toggleDarkMode(),
+                        activeThumbColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    _SettingRow(
+                      icon: PouyanlyIconType.timer,
+                      label: 'یادآور روزانه',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.go('/settings'),
+                    ),
+                    _SettingRow(
+                      icon: PouyanlyIconType.school,
+                      label: 'دربارهٔ POUYANLY',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.push('/about'),
+                    ),
+                    _SettingRow(
+                      icon: PouyanlyIconType.learningPath,
+                      label: 'انجام دوباره آزمون سطح',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.go('/placement-test'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                PButton(
+                  label: 'بازنشانی پیشرفت',
+                  outlined: true,
+                  color: AppColors.error,
+                  onPressed: () => _showResetDialog(context),
+                ),
+                const SizedBox(height: 40),
+              ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _skillBandLabel(dynamic level) {
+    final name = level.name.toString();
+    if (name == 'a1' || name == 'a2') return 'مبتدی';
+    if (name == 'b1') return 'متوسط';
+    if (name == 'b2') return 'متوسط رو به بالا';
+    if (name == 'c1' || name == 'c2') return 'پیشرفته';
+    return 'هنوز ارزیابی نشده';
+  }
+
+  void _showResetDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text(
+            'بازنشانی پیشرفت؟',
+            style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700),
+          ),
+          content: const Text(
+            'تمام پیشرفت شما حذف خواهد شد. این عمل قابل بازگشت نیست.',
+            style: TextStyle(fontFamily: 'Vazirmatn'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('لغو',
+                  style: TextStyle(fontFamily: 'Vazirmatn')),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(ctx);
+                await context.read<UserProvider>().reset();
+                if (context.mounted) context.go('/welcome');
+              },
+              child: const Text('بازنشانی',
+                  style: TextStyle(
+                      fontFamily: 'Vazirmatn', color: AppColors.error)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatBox extends StatelessWidget {
+  final String value;
+  final String label;
+  final String emoji;
+  const _StatBox(this.value, this.label, this.emoji);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Theme.of(context).dividerColor),
+        ),
+        child: Column(
+          children: [
+            AnimatedSymbolIcon(symbol: emoji, size: 25, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 11,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoSection extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+  const _InfoSection({required this.title, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontFamily: 'Vazirmatn',
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Theme.of(context).dividerColor),
+          ),
+          child: Column(children: children),
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final String emoji;
+  const _InfoRow(this.label, this.value, this.emoji);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          AnimatedSymbolIcon(symbol: emoji, size: 21, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 14,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScoreRow extends StatelessWidget {
+  final String label;
+  final int score;
+  final Color color;
+  const _ScoreRow(this.label, this.score, this.color);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 60,
+            child: Text(
+              label,
+              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13),
+            ),
+          ),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: LinearProgressIndicator(
+                value: score / 100,
+                minHeight: 8,
+                backgroundColor: Theme.of(context).colorScheme.outlineVariant,
+                valueColor: AlwaysStoppedAnimation(color),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            toPersianDigits('$score٪'),
+            style: TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingRow extends StatelessWidget {
+  final PouyanlyIconType icon;
+  final String label;
+  final Widget trailing;
+  final VoidCallback? onTap;
+  const _SettingRow({
+    required this.icon,
+    required this.label,
+    required this.trailing,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            PouyanlyIcon(type: icon, size: 20, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 14),
+              ),
+            ),
+            trailing,
+          ],
+        ),
+      ),
+    );
+  }
+}
+).hasMatch(value);
+                    return email || phone ? null : 'ایمیل یا شمارهٔ معتبر وارد کن.';
+                  },
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'اطلاعات در حال حاضر فقط روی همین دستگاه ذخیره می‌شوند و این بخش احراز هویت آنلاین انجام نمی‌دهد.',
+                  style: Theme.of(dialogContext).textTheme.bodySmall,
+                ),
+              ]),
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('انصراف')),
+            FilledButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() == true) {
+                  Navigator.pop(dialogContext, true);
+                }
+              },
+              child: const Text('ذخیره'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (saved == true && mounted) {
+      final firstValue = first.text.trim();
+      final lastValue = last.text.trim();
+      final contactValue = contact.text.trim();
+      final isEmail = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+
+    final provider = context.watch<UserProvider>();
+    final user = provider.user;
+    if (user == null) {
+      final theme = Theme.of(context);
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  provider.isInitialized
+                      ? Icons.person_off_outlined
+                      : Icons.person_outline_rounded,
+                  size: 54,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  provider.isInitialized
+                      ? 'هنوز حسابی برای نمایش وجود ندارد'
+                      : 'در حال بارگذاری پروفایل…',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  provider.isInitialized
+                      ? 'برای ساخت حساب و شروع یادگیری، به صفحهٔ شروع برو.'
+                      : 'اطلاعات حساب در حال آماده‌سازی است.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (!provider.isInitialized)
+                  const CircularProgressIndicator()
+                else
+                  FilledButton(
+                    onPressed: () => context.go('/welcome'),
+                    child: const Text('رفتن به صفحهٔ شروع'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    _maybePromptAvatarShop();
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 220,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+                child: Stack(children: [
+                  Positioned.fill(child: Center(child: Opacity(opacity: .16, child: FittedBox(fit: BoxFit.contain, child: Text(user.avatarEmoji, style: const TextStyle(fontSize: 190)))))),
+                  SafeArea(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: _showAvatarShop,
+                        customBorder: const CircleBorder(),
+                        child: Container(
+                        width: 88,
+                        height: 88,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: user.xp >= _avatarShopXpThreshold ? AppColors.error : Colors.white, width: user.xp >= _avatarShopXpThreshold ? 5 : 3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 15,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(user.avatarEmoji, style: const TextStyle(fontSize: 48)),
+                        ),
+                      )),
+                      const SizedBox(height: 10),
+                      Text(
+                        user.name ?? 'زبان‌آموز',
+                        style: const TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'ردهٔ مهارت: ${_skillBandLabel(user.cefrLevel)}',
+                          style: const TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ]),
+              ),
+            ),
+          ),
+
+          SliverPadding(
+            padding: const EdgeInsets.all(20),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // Stats row
+                Row(
+                  children: [
+                    _StatBox(toPersianDigits(user.xp), 'امتیاز XP', '⭐'),
+                    const SizedBox(width: 10),
+                    _StatBox(toPersianDigits(user.streak), 'روز پیاپی', '🔥'),
+                    const SizedBox(width: 10),
+                    _StatBox(toPersianDigits(user.completedLessonIds.length), 'درس', '✅'),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Learning info
+                _InfoSection(
+                  title: 'اطلاعات یادگیری',
+                  children: [
+                    _InfoRow('هدف', user.goal?.farsiLabel ?? 'تنظیم نشده', '🎯'),
+                    _InfoRow('زمان روزانه',
+                        user.dailyStudyTime?.farsiLabel ?? 'تنظیم نشده', '⏱️'),
+                    _InfoRow('ردهٔ مهارت', _skillBandLabel(user.cefrLevel), '📊'),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Skill scores
+                if (user.skillScores.isNotEmpty) ...[
+                  _InfoSection(
+                    title: 'نتایج آزمون',
+                    children: [
+                      if (user.skillScores.containsKey('vocabulary'))
+                        _ScoreRow('لغت', user.skillScores['vocabulary']!,
+                            AppColors.primary),
+                      if (user.skillScores.containsKey('grammar'))
+                        _ScoreRow('گرامر', user.skillScores['grammar']!,
+                            AppColors.secondary),
+                      if (user.skillScores.containsKey('reading'))
+                        _ScoreRow('خواندن', user.skillScores['reading']!,
+                            AppColors.accent),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                // Settings
+                _InfoSection(
+                  title: 'تنظیمات',
+                  children: [
+                    _SettingRow(
+                      icon: PouyanlyIconType.settings,
+                      label: 'حالت تاریک',
+                      trailing: Switch(
+                        value: user.isDarkMode,
+                        onChanged: (v) =>
+                            context.read<UserProvider>().toggleDarkMode(),
+                        activeThumbColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    _SettingRow(
+                      icon: PouyanlyIconType.timer,
+                      label: 'یادآور روزانه',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.go('/settings'),
+                    ),
+                    _SettingRow(
+                      icon: PouyanlyIconType.school,
+                      label: 'دربارهٔ POUYANLY',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.push('/about'),
+                    ),
+                    _SettingRow(
+                      icon: PouyanlyIconType.learningPath,
+                      label: 'انجام دوباره آزمون سطح',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.go('/placement-test'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                PButton(
+                  label: 'بازنشانی پیشرفت',
+                  outlined: true,
+                  color: AppColors.error,
+                  onPressed: () => _showResetDialog(context),
+                ),
+                const SizedBox(height: 40),
+              ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _skillBandLabel(dynamic level) {
+    final name = level.name.toString();
+    if (name == 'a1' || name == 'a2') return 'مبتدی';
+    if (name == 'b1') return 'متوسط';
+    if (name == 'b2') return 'متوسط رو به بالا';
+    if (name == 'c1' || name == 'c2') return 'پیشرفته';
+    return 'هنوز ارزیابی نشده';
+  }
+
+  void _showResetDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text(
+            'بازنشانی پیشرفت؟',
+            style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700),
+          ),
+          content: const Text(
+            'تمام پیشرفت شما حذف خواهد شد. این عمل قابل بازگشت نیست.',
+            style: TextStyle(fontFamily: 'Vazirmatn'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('لغو',
+                  style: TextStyle(fontFamily: 'Vazirmatn')),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(ctx);
+                await context.read<UserProvider>().reset();
+                if (context.mounted) context.go('/welcome');
+              },
+              child: const Text('بازنشانی',
+                  style: TextStyle(
+                      fontFamily: 'Vazirmatn', color: AppColors.error)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatBox extends StatelessWidget {
+  final String value;
+  final String label;
+  final String emoji;
+  const _StatBox(this.value, this.label, this.emoji);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Theme.of(context).dividerColor),
+        ),
+        child: Column(
+          children: [
+            AnimatedSymbolIcon(symbol: emoji, size: 25, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 11,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoSection extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+  const _InfoSection({required this.title, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontFamily: 'Vazirmatn',
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Theme.of(context).dividerColor),
+          ),
+          child: Column(children: children),
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final String emoji;
+  const _InfoRow(this.label, this.value, this.emoji);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          AnimatedSymbolIcon(symbol: emoji, size: 21, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 14,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScoreRow extends StatelessWidget {
+  final String label;
+  final int score;
+  final Color color;
+  const _ScoreRow(this.label, this.score, this.color);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 60,
+            child: Text(
+              label,
+              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13),
+            ),
+          ),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: LinearProgressIndicator(
+                value: score / 100,
+                minHeight: 8,
+                backgroundColor: Theme.of(context).colorScheme.outlineVariant,
+                valueColor: AlwaysStoppedAnimation(color),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            toPersianDigits('$score٪'),
+            style: TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingRow extends StatelessWidget {
+  final PouyanlyIconType icon;
+  final String label;
+  final Widget trailing;
+  final VoidCallback? onTap;
+  const _SettingRow({
+    required this.icon,
+    required this.label,
+    required this.trailing,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            PouyanlyIcon(type: icon, size: 20, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 14),
+              ),
+            ),
+            trailing,
+          ],
+        ),
+      ),
+    );
+  }
+}
+).hasMatch(contactValue);
+      await context.read<UserProvider>().updateUser(user.copyWith(
+        firstName: firstValue,
+        lastName: lastValue,
+        name: '$firstValue $lastValue',
+        contact: contactValue,
+        contactType: isEmail ? 'email' : 'phone',
+      ));
+    }
+    first.dispose();
+    last.dispose();
+    contact.dispose();
   }
 
   @override
