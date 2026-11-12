@@ -65,7 +65,7 @@ class RewardsScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.dividerLight),
+                    border: Border.all(color: Theme.of(context).dividerColor),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +80,7 @@ class RewardsScreen extends StatelessWidget {
                               fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w800)),
                             Text('${toPersianDigits(user.xpInCurrentLevel)} از ۵۰۰ XP تا سطح بعدی',
                               style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11,
-                                color: AppColors.textSecondaryLight)),
+                                color: Theme.of(context).colorScheme.onSurfaceVariant)),
                           ],
                         )),
                       ]),
@@ -309,7 +309,7 @@ class _MissionCard extends StatelessWidget {
         color: done ? AppColors.success.withValues(alpha: 0.08) : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: done ? AppColors.success.withValues(alpha: 0.4) : AppColors.dividerLight,
+          color: done ? AppColors.success.withValues(alpha: 0.4) : Theme.of(context).dividerColor,
         ),
       ),
       child: Row(
@@ -357,7 +357,7 @@ class _MissionCard extends StatelessWidget {
                         child: LinearProgressIndicator(
                           value: progress.clamp(0.0, 1.0),
                           minHeight: 6,
-                          backgroundColor: AppColors.dividerLight,
+                          backgroundColor: Theme.of(context).dividerColor,
                           valueColor: AlwaysStoppedAnimation(
                               done ? AppColors.success : AppColors.primary),
                         ),
@@ -368,7 +368,7 @@ class _MissionCard extends StatelessWidget {
                         style: const TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 11,
-                            color: AppColors.textSecondaryLight)),
+                            color: Theme.of(context).colorScheme.onSurfaceVariant)),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -414,7 +414,7 @@ class _AchievementBadge extends StatelessWidget {
             : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: unlocked ? AppColors.primary.withValues(alpha: 0.3) : AppColors.dividerLight,
+          color: unlocked ? AppColors.primary.withValues(alpha: 0.3) : Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
@@ -423,7 +423,7 @@ class _AchievementBadge extends StatelessWidget {
           AnimatedSymbolIcon(
             symbol: unlocked ? emoji : '🔒',
             size: unlocked ? 31 : 25,
-            color: unlocked ? AppColors.primary : AppColors.textSecondaryLight,
+            color: unlocked ? AppColors.primary : Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           const SizedBox(height: 6),
           Text(title,
@@ -431,12 +431,12 @@ class _AchievementBadge extends StatelessWidget {
                 fontFamily: 'Vazirmatn',
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: unlocked ? AppColors.primary : AppColors.textSecondaryLight,
+                color: unlocked ? AppColors.primary : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center),
           Text(subtitle,
               style: const TextStyle(
-                  fontFamily: 'Vazirmatn', fontSize: 10, color: AppColors.textSecondaryLight),
+                  fontFamily: 'Vazirmatn', fontSize: 10, color: Theme.of(context).colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center),
         ],
       ),
@@ -458,7 +458,7 @@ class _StreakCalendar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.dividerLight),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -471,7 +471,7 @@ class _StreakCalendar extends StatelessWidget {
                   style: TextStyle(
                       fontFamily: 'Vazirmatn',
                       fontSize: 11,
-                      color: isToday ? AppColors.primary : AppColors.textSecondaryLight)),
+                      color: isToday ? AppColors.primary : Theme.of(context).colorScheme.onSurfaceVariant)),
               const SizedBox(height: 6),
               Container(
                 width: 36,
