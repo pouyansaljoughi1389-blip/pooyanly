@@ -38,6 +38,7 @@ class LiquidGlass extends StatelessWidget {
     final dark = scheme.brightness == Brightness.dark;
     final baseTint = tint ?? scheme.surfaceContainerHighest;
     final border = scheme.outline.withValues(alpha: dark ? .62 : .72);
+    final shape = RoundedRectangleBorder(borderRadius: borderRadius);
     final decoration = BoxDecoration(
       borderRadius: borderRadius,
       gradient: LinearGradient(
@@ -72,25 +73,23 @@ class LiquidGlass extends StatelessWidget {
         child: content,
       );
     }
-    Widget surface = Ink(
-      decoration: decoration,
-      child: content,
-    );
 
+    Widget surface = Ink(decoration: decoration, child: content);
     if (enableBlur && blurSigma > 0) {
-      surface = ClipRRect(
-        borderRadius: borderRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-          child: surface,
-        ),
+      surface = BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+        child: surface,
       );
-    } else {
-      surface = ClipRRect(borderRadius: borderRadius, child: surface);
     }
 
+    // Material itself owns the same rounded clip as the glass surface. A
+    // descendant-only ClipRRect does not constrain ink features painted by
+    // the ancestor Material, which can leave rectangular interaction patches
+    // around otherwise capsule-shaped controls.
     return Material(
       color: Colors.transparent,
+      shape: shape,
+      clipBehavior: Clip.antiAlias,
       child: surface,
     );
   }
@@ -136,6 +135,7 @@ class LiquidGlassNavigationBar extends StatelessWidget {
               children: List.generate(_items.length, (index) {
                 final item = _items[index];
                 final active = safeIndex == index;
+                final itemRadius = BorderRadius.circular(22);
                 return Expanded(
                   child: Semantics(
                     button: true,
@@ -143,8 +143,12 @@ class LiquidGlassNavigationBar extends StatelessWidget {
                     label: item.label,
                     child: Material(
                       color: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: itemRadius,
+                      ),
+                      clipBehavior: Clip.antiAlias,
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(22),
+                        borderRadius: itemRadius,
                         onTap: () => onTap(index),
                         child: AnimatedContainer(
                           duration: AppDesignTokens.motionStandard,
@@ -154,7 +158,7 @@ class LiquidGlassNavigationBar extends StatelessWidget {
                             color: active
                                 ? color.withValues(alpha: .13)
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(22),
+                            borderRadius: itemRadius,
                             border: Border.all(
                               color: active
                                   ? color.withValues(alpha: .18)

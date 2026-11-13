@@ -30,7 +30,10 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+
+    // Animated game icons intentionally repeat; pump a bounded frame instead
+    // of pumpAndSettle, which waits forever for repeating tickers to stop.
+    await tester.pump(const Duration(milliseconds: 350));
 
     expect(find.text('پیشرفت سطح'), findsOneWidget);
     expect(find.text('انتخاب آواتار'), findsNothing);
