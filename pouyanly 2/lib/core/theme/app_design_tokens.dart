@@ -26,6 +26,16 @@ class AppDesignTokens {
   static const double radiusXLarge = 28;
   static const double radiusPill = 999;
 
+  // Typography: one Persian-first scale shared by all screens.
+  static const String fontFamily = 'Vazirmatn';
+  static const double fontDisplay = 32;
+  static const double fontHeadline = 24;
+  static const double fontTitle = 20;
+  static const double fontSubtitle = 16;
+  static const double fontBody = 14;
+  static const double fontCaption = 12;
+  static const double fontMicro = 11;
+
   // Interactive and icon sizing.
   static const double minTouchTarget = 48;
   static const double iconSmall = 16;
