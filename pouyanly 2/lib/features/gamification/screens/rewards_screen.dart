@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/pouyanly_icon.dart';
+import '../../../core/theme/app_design_tokens.dart';
+import '../../../core/widgets/app_surface.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/persian_digits.dart';
@@ -58,73 +60,56 @@ class RewardsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                // ── Level and avatar ──
-                _SectionTitle('سطح و آواتار'),
+                // ── Level progress (avatar management lives in Profile) ──
+                _SectionTitle('پیشرفت سطح'),
                 const SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Theme.of(context).dividerColor),
-                  ),
+                AppSurface(
+                  padding: const EdgeInsets.all(AppDesignTokens.space4),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(children: [
-                        Text(user.avatarEmoji, style: const TextStyle(fontSize: 34)),
-                        const SizedBox(width: 12),
-                        Expanded(child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('سطح ${toPersianDigits(user.level)}', style: const TextStyle(
-                              fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w800)),
-                            Text('${toPersianDigits(user.xpInCurrentLevel)} از ۵۰۰ XP تا سطح بعدی',
-                              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 11,
-                                color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                          ],
-                        )),
-                      ]),
-                      const SizedBox(height: 10),
-                      ClipRRect(borderRadius: BorderRadius.circular(20),
-                        child: LinearProgressIndicator(value: user.levelProgress, minHeight: 9)),
-                      const SizedBox(height: 14),
-                      const Text('انتخاب آواتار', style: TextStyle(
-                        fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 8),
-                      Wrap(spacing: 8, runSpacing: 6,
-                        children: ['🦊', '🐼', '🐯', '🐸', '🐧', '🦉', '🐙', '🐨']
-                          .map((emoji) {
-                            final unlocked = user.unlockedAvatarEmojis.contains(emoji);
-                            final cost = UserProvider.avatarUnlockCosts[emoji] ?? 0;
-                            return ChoiceChip(
-                              label: Row(mainAxisSize: MainAxisSize.min, children: [
-                                Text(emoji, style: const TextStyle(fontSize: 16)),
-                                if (!unlocked) ...[
-                                  const SizedBox(width: 4),
-                                  Text(toPersianDigits(cost), style: const TextStyle(fontSize: 11)),
-                                  const SizedBox(width: 3),
-                                  const AnimatedCoinIcon(size: 14),
-                                ],
-                              ]),
-                              selected: user.avatarEmoji == emoji,
-                              onSelected: (_) async {
-                                final provider = context.read<UserProvider>();
-                                if (unlocked) {
-                                  await provider.setAvatarEmoji(emoji);
-                                } else {
-                                  final success = await provider.unlockAvatarEmoji(emoji);
-                                  if (!context.mounted) return;
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text(success
-                                      ? 'آواتار باز شد؛ دوباره انتخابش کن.'
-                                      : 'سکهٔ کافی برای بازکردن این آواتار نداری.',
-                                      style: const TextStyle(fontFamily: 'Vazirmatn')),
-                                  ));
-                                }
-                              },
-                            );
-                          }).toList()),
+                      Row(
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
+                            ),
+                            child: Icon(
+                              Icons.workspace_premium_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: AppDesignTokens.iconDisplay,
+                            ),
+                          ),
+                          const SizedBox(width: AppDesignTokens.space3),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'سطح ${toPersianDigits(user.level)}',
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                                const SizedBox(height: AppDesignTokens.space1),
+                                Text(
+                                  '${toPersianDigits(user.xpInCurrentLevel)} از ۵۰۰ XP تا سطح بعدی',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            '${toPersianDigits((user.levelProgress * 100).round())}٪',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppDesignTokens.space4),
+                      AppProgressBar(value: user.levelProgress, height: 10),
                     ],
                   ),
                 ),
@@ -249,9 +234,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(title,
-        style: const TextStyle(
-            fontFamily: 'Vazirmatn', fontSize: 16, fontWeight: FontWeight.w700));
+    return Text(title, style: Theme.of(context).textTheme.titleMedium);
   }
 }
 
