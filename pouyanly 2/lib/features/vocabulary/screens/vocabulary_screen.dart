@@ -5,6 +5,7 @@ import '../../../core/utils/persian_digits.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../lessons/models/lesson_data.dart';
 import '../services/vocabulary_audio_service.dart';
+import '../services/vocabulary_fsrs_service.dart';
 
 class VocabularyScreen extends StatefulWidget {
   const VocabularyScreen({super.key});
@@ -317,6 +318,7 @@ class _ReviewTabState extends State<_ReviewTab> {
   int _reviewIndex = 0;
   bool _revealed = false;
   bool _sessionInitialized = false;
+  bool _isSubmitting = false;
   List<VocabularyItem> _sessionItems = [];
 
   @override
@@ -337,10 +339,36 @@ class _ReviewTabState extends State<_ReviewTab> {
 
   List<VocabularyItem> get _allReviewItems => CourseData.getAllVocabulary();
 
+  Future<void> _submitReview(
+    VocabularyItem item,
+    VocabularyReviewRating rating,
+  ) async {
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+    try {
+      await context.read<UserProvider>().reviewVocabulary(
+        item.english,
+        rating: rating,
+      );
+      if (!mounted) return;
+      setState(() {
+        _reviewIndex++;
+        _revealed = false;
+        _isSubmitting = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ذخیره مرور انجام نشد؛ دوباره تلاش کن.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    context.watch<UserProvider>();
+    final reviewProvider = context.watch<UserProvider>();
     final items = _sessionItems;
 
     if (items.isEmpty) {
@@ -351,12 +379,18 @@ class _ReviewTabState extends State<_ReviewTab> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text('🎉', style: TextStyle(fontSize: 56)),
-              SizedBox(height: 16),
-              Text('همه‌چیز مرتبه!', style: TextStyle(
-                fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
-              SizedBox(height: 8),
-              Text(
-                'فعلاً لغت عقب‌افتاده‌ای نداری. فردا دوباره سر بزن.',
+              const SizedBox(height: 16),
+              const Text(
+                'همه‌چیز مرتبه!',
+                style: TextStyle(
+                  fontFamily: 'Vazirmatn',
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'فعلاً لغت موعدداری نداری. بعداً دوباره سر بزن.',
                 textAlign: TextAlign.center,
               ),
             ],
@@ -372,15 +406,30 @@ class _ReviewTabState extends State<_ReviewTab> {
           children: [
             const Text('🏆', style: TextStyle(fontSize: 58)),
             const SizedBox(height: 16),
-            const Text('مرور امروز تمام شد!',
-              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w700)),
+            const Text(
+              'مرور امروز تمام شد!',
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text('${toPersianDigits(items.length)} لغت را مرور کردی.',
-              style: const TextStyle(fontFamily: 'Vazirmatn')),
+            Text(
+              '${toPersianDigits(items.length)} لغت را مرور کردی.',
+              style: const TextStyle(fontFamily: 'Vazirmatn'),
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => setState(() { _refreshSession(); _reviewIndex = 0; _revealed = false; }),
-              child: const Text('بررسی دوباره', style: TextStyle(fontFamily: 'Vazirmatn')),
+              onPressed: () => setState(() {
+                _refreshSession();
+                _reviewIndex = 0;
+                _revealed = false;
+              }),
+              child: const Text(
+                'بررسی دوباره',
+                style: TextStyle(fontFamily: 'Vazirmatn'),
+              ),
             ),
           ],
         ),
@@ -388,43 +437,42 @@ class _ReviewTabState extends State<_ReviewTab> {
     }
 
     final item = items[_reviewIndex];
-    Future<void> submitReview(bool remembered) async {
-      await context.read<UserProvider>().reviewVocabulary(
-        item.english,
-        remembered: remembered,
-      );
-      if (!mounted) return;
-      setState(() { _reviewIndex++; _revealed = false; });
-    }
-
-    final reviewProvider = context.watch<UserProvider>();
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           Row(
             children: [
-              Expanded(child: _ReviewStat(
-                title: 'تسلط واژه‌های مرورشده',
-                value: '${toPersianDigits(reviewProvider.vocabularyMasteryPercent.toStringAsFixed(0))}٪',
-                icon: Icons.auto_graph_rounded,
-              )),
+              Expanded(
+                child: _ReviewStat(
+                  title: 'احتمال یادآوری',
+                  value: '${toPersianDigits(reviewProvider.vocabularyPredictedRetentionPercent.toStringAsFixed(0))}٪',
+                  icon: Icons.auto_graph_rounded,
+                ),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: _ReviewStat(
-                title: 'خطاهای ثبت‌شده',
-                value: '${toPersianDigits(reviewProvider.vocabularyMistakeCount)}',
-                icon: Icons.refresh_rounded,
-              )),
+              Expanded(
+                child: _ReviewStat(
+                  title: 'دفعات فراموشی',
+                  value: toPersianDigits(reviewProvider.vocabularyMistakeCount),
+                  icon: Icons.refresh_rounded,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 14),
-          Text('${toPersianDigits(_reviewIndex + 1)} از ${toPersianDigits(items.length)} لغتِ موعددار',
-            style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
-              color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          Text(
+            '${toPersianDigits(_reviewIndex + 1)} از ${toPersianDigits(items.length)} لغت موعددار',
+            style: TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 13,
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: 16),
           Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _revealed = true),
+              onTap: _revealed ? null : () => setState(() => _revealed = true),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(28),
@@ -447,41 +495,82 @@ class _ReviewTabState extends State<_ReviewTab> {
                           end: Alignment.bottomRight,
                         ),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: scheme.outline.withValues(alpha: .7), width: 1.5),
+                  border: Border.all(
+                    color: scheme.outline.withValues(alpha: .7),
+                    width: 1.5,
+                  ),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(item.english, textDirection: TextDirection.ltr,
-                      style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 38,
+                    Text(
+                      item.english,
+                      textDirection: TextDirection.ltr,
+                      style: TextStyle(
+                        fontFamily: 'Vazirmatn',
+                        fontSize: 38,
                         fontWeight: FontWeight.w800,
-                        color: _revealed ? scheme.onPrimary : scheme.primary)),
+                        color: _revealed ? scheme.onPrimary : scheme.primary,
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    Text(item.pronunciation, textDirection: TextDirection.ltr,
-                      style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15,
-                        color: _revealed ? scheme.onPrimary.withValues(alpha: .78) : scheme.onSurfaceVariant)),
+                    Text(
+                      item.pronunciation,
+                      textDirection: TextDirection.ltr,
+                      style: TextStyle(
+                        fontFamily: 'Vazirmatn',
+                        fontSize: 15,
+                        color: _revealed
+                            ? scheme.onPrimary.withValues(alpha: .78)
+                            : scheme.onSurfaceVariant,
+                      ),
+                    ),
                     if (_revealed) ...[
                       const SizedBox(height: 24),
                       Divider(color: scheme.onPrimary.withValues(alpha: .3)),
                       const SizedBox(height: 16),
-                      Text(item.farsi, textAlign: TextAlign.center,
-                        style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 30,
-                          fontWeight: FontWeight.w700, color: scheme.onPrimary)),
-                      const SizedBox(height: 12),
-                      Text(item.exampleEn, textDirection: TextDirection.ltr,
+                      Text(
+                        item.farsi,
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 14,
-                          color: scheme.onPrimary)),
+                        style: TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 30,
+                          fontWeight: FontWeight.w700,
+                          color: scheme.onPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        item.exampleEn,
+                        textDirection: TextDirection.ltr,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 14,
+                          color: scheme.onPrimary,
+                        ),
+                      ),
                       const SizedBox(height: 8),
-                      Text(item.exampleFa, textAlign: TextAlign.center,
-                        style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
-                          color: scheme.onPrimary.withValues(alpha: .78))),
+                      Text(
+                        item.exampleFa,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 13,
+                          color: scheme.onPrimary.withValues(alpha: .78),
+                        ),
+                      ),
                     ] else ...[
                       const SizedBox(height: 24),
-                      Text('معنی را در ذهنت حدس بزن؛ سپس کارت را لمس کن.',
+                      Text(
+                        'معنی را در ذهنت حدس بزن؛ سپس کارت را لمس کن.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                        style: TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 13,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -489,30 +578,106 @@ class _ReviewTabState extends State<_ReviewTab> {
             ),
           ),
           if (_revealed) ...[
-            const SizedBox(height: 18),
-            Row(children: [
-              Expanded(child: OutlinedButton.icon(
-                onPressed: () => submitReview(false),
-                icon: const Icon(Icons.refresh_rounded, color: AppColors.error),
-                label: const Text('هنوز یاد نگرفتم',
-                  style: TextStyle(fontFamily: 'Vazirmatn', color: AppColors.error)),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.error),
-                  padding: const EdgeInsets.symmetric(vertical: 14)),
-              )),
-              const SizedBox(width: 12),
-              Expanded(child: ElevatedButton.icon(
-                onPressed: () => submitReview(true),
-                icon: const Icon(Icons.check_rounded),
-                label: const Text('بلدم', style: TextStyle(fontFamily: 'Vazirmatn')),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.success,
-                  padding: const EdgeInsets.symmetric(vertical: 14)),
-              )),
-            ]),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: _RatingButton(
+                    label: 'دوباره',
+                    icon: Icons.replay_rounded,
+                    color: scheme.error,
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => _submitReview(item, VocabularyReviewRating.again),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _RatingButton(
+                    label: 'سخت',
+                    icon: Icons.trending_down_rounded,
+                    color: scheme.tertiary,
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => _submitReview(item, VocabularyReviewRating.hard),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: _RatingButton(
+                    label: 'خوب',
+                    icon: Icons.check_rounded,
+                    color: scheme.primary,
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => _submitReview(item, VocabularyReviewRating.good),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _RatingButton(
+                    label: 'آسان',
+                    icon: Icons.bolt_rounded,
+                    color: scheme.secondary,
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => _submitReview(item, VocabularyReviewRating.easy),
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            const SizedBox(height: 14),
+            Text(
+              'پس از دیدن معنی، میزان دشواری یادآوری را صادقانه انتخاب کن.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 12,
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
           ],
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
         ],
+      ),
+    );
+  }
+}
+
+class _RatingButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback? onPressed;
+
+  const _RatingButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18, color: color),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontFamily: 'Vazirmatn',
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: color.withValues(alpha: .65)),
+        padding: const EdgeInsets.symmetric(vertical: 12),
       ),
     );
   }

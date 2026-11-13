@@ -132,6 +132,10 @@ class UserModel {
   final Map<String, int> vocabularyReviewIntervals;
   final Map<String, int> vocabularyReviewRepetitions;
   final Map<String, int> vocabularyReviewMistakes;
+  /// Serialized FSRS-6 card state, keyed by normalized vocabulary term.
+  final Map<String, Map<String, dynamic>> vocabularyFsrsCards;
+  /// Append-only review evidence, capped by the provider to protect local storage.
+  final List<Map<String, dynamic>> vocabularyReviewHistory;
   final String avatarEmoji;
   final List<String> unlockedAvatarEmojis;
   final bool avatarShopPromptShown;
@@ -166,6 +170,8 @@ class UserModel {
     this.vocabularyReviewIntervals = const {},
     this.vocabularyReviewRepetitions = const {},
     this.vocabularyReviewMistakes = const {},
+    this.vocabularyFsrsCards = const {},
+    this.vocabularyReviewHistory = const [],
     this.avatarEmoji = '🦊',
     this.unlockedAvatarEmojis = const ['🦊'],
     this.avatarShopPromptShown = false,
@@ -208,6 +214,8 @@ class UserModel {
     Map<String, int>? vocabularyReviewIntervals,
     Map<String, int>? vocabularyReviewRepetitions,
     Map<String, int>? vocabularyReviewMistakes,
+    Map<String, Map<String, dynamic>>? vocabularyFsrsCards,
+    List<Map<String, dynamic>>? vocabularyReviewHistory,
     String? avatarEmoji,
     List<String>? unlockedAvatarEmojis,
     bool? avatarShopPromptShown,
@@ -242,6 +250,8 @@ class UserModel {
       vocabularyReviewIntervals: vocabularyReviewIntervals ?? this.vocabularyReviewIntervals,
       vocabularyReviewRepetitions: vocabularyReviewRepetitions ?? this.vocabularyReviewRepetitions,
       vocabularyReviewMistakes: vocabularyReviewMistakes ?? this.vocabularyReviewMistakes,
+      vocabularyFsrsCards: vocabularyFsrsCards ?? this.vocabularyFsrsCards,
+      vocabularyReviewHistory: vocabularyReviewHistory ?? this.vocabularyReviewHistory,
       avatarEmoji: avatarEmoji ?? this.avatarEmoji,
       unlockedAvatarEmojis: unlockedAvatarEmojis ?? this.unlockedAvatarEmojis,
       avatarShopPromptShown: avatarShopPromptShown ?? this.avatarShopPromptShown,
@@ -279,6 +289,8 @@ class UserModel {
     'vocabularyReviewIntervals': vocabularyReviewIntervals,
     'vocabularyReviewRepetitions': vocabularyReviewRepetitions,
     'vocabularyReviewMistakes': vocabularyReviewMistakes,
+    'vocabularyFsrsCards': vocabularyFsrsCards,
+    'vocabularyReviewHistory': vocabularyReviewHistory,
     'avatarEmoji': avatarEmoji,
     'unlockedAvatarEmojis': unlockedAvatarEmojis,
     'avatarShopPromptShown': avatarShopPromptShown,
@@ -328,6 +340,15 @@ class UserModel {
     vocabularyReviewIntervals: Map<String, int>.from(j['vocabularyReviewIntervals'] ?? {}),
     vocabularyReviewRepetitions: Map<String, int>.from(j['vocabularyReviewRepetitions'] ?? {}),
     vocabularyReviewMistakes: Map<String, int>.from(j['vocabularyReviewMistakes'] ?? {}),
+    vocabularyFsrsCards: Map<String, Map<String, dynamic>>.from(
+      (j['vocabularyFsrsCards'] as Map? ?? {}).map((key, value) => MapEntry(
+        key.toString(), Map<String, dynamic>.from(value as Map),
+      )),
+    ),
+    vocabularyReviewHistory: (j['vocabularyReviewHistory'] as List? ?? const [])
+        .whereType<Map>()
+        .map((entry) => Map<String, dynamic>.from(entry))
+        .toList(),
     avatarEmoji: j['avatarEmoji'] ?? '🦊',
     unlockedAvatarEmojis: List<String>.from(j['unlockedAvatarEmojis'] ?? ['🦊']),
     avatarShopPromptShown: j['avatarShopPromptShown'] ?? false,

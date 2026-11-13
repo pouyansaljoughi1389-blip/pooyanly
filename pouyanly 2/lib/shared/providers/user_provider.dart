@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/models/user_model.dart';
 import '../../data/local/storage_service.dart';
 import '../../features/lessons/models/lesson_data.dart';
+import '../../features/vocabulary/services/vocabulary_fsrs_service.dart';
 import '../../core/services/daily_progress_widget_service.dart';
 import '../../core/services/learning_reminder_service.dart';
 
@@ -65,12 +66,22 @@ class UserProvider extends ChangeNotifier {
     return mistakes.values.fold<int>(0, (sum, count) => sum + count);
   }
 
-  double get vocabularyMasteryPercent {
-    final repetitions = _user?.vocabularyReviewRepetitions.values ?? const <int>[];
-    if (repetitions.isEmpty) return 0;
-    final score = repetitions.fold<int>(0, (sum, count) => sum + count.clamp(0, 5).toInt());
-    return (score / (repetitions.length * 5) * 100).roundToDouble();
+  /// Mean FSRS-predicted recall probability for cards with a learned state.
+  /// New/unreviewed cards are excluded rather than assigned fabricated scores.
+  double get vocabularyPredictedRetentionPercent {
+    final cards = _user?.vocabularyFsrsCards.values ?? const <Map<String, dynamic>>[];
+    final estimates = cards
+        .map(VocabularyFsrsService.predictedRetrievability)
+        .whereType<double>()
+        .where((value) => value.isFinite);
+    final values = estimates.toList();
+    if (values.isEmpty) return 0;
+    final mean = values.reduce((a, b) => a + b) / values.length;
+    return (mean * 100).clamp(0, 100).roundToDouble();
   }
+
+  /// Kept as a compatibility alias for any older UI call sites.
+  double get vocabularyMasteryPercent => vocabularyPredictedRetentionPercent;
 
   Set<String> get claimedDailyMissions =>
       _dailyMissionState['date'] == _todayKey
@@ -401,7 +412,21 @@ class UserProvider extends ChangeNotifier {
   String _vocabularyKey(String word) => word.trim().toLowerCase();
 
   bool isVocabularyDue(String word, {DateTime? at}) {
-    final dueValue = _user?.vocabularyReviewDueDates[_vocabularyKey(word)];
+    final current = _user;
+    if (current == null || word.trim().isEmpty) return false;
+    final key = _vocabularyKey(word);
+    final savedCard = current.vocabularyFsrsCards[key];
+    if (savedCard != null) {
+      try {
+        return VocabularyFsrsService.isDue(savedCard, at: at);
+      } catch (_) {
+        // Corrupt per-card state must not hide a word from review.
+        return true;
+      }
+    }
+
+    // Backward-compatible fallback for users who have not migrated this word.
+    final dueValue = current.vocabularyReviewDueDates[key];
     if (dueValue == null) return true;
     final due = DateTime.tryParse(dueValue);
     if (due == null) return true;
@@ -411,41 +436,77 @@ class UserProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> reviewVocabulary(String word, {required bool remembered}) async {
+  Future<void> reviewVocabulary(
+    String word, {
+    VocabularyReviewRating? rating,
+    bool? remembered,
+    DateTime? reviewedAt,
+  }) async {
     final current = _user;
     if (current == null || word.trim().isEmpty) return;
     final key = _vocabularyKey(word);
-    final repetitions = Map<String, int>.from(current.vocabularyReviewRepetitions);
-    final intervals = Map<String, int>.from(current.vocabularyReviewIntervals);
-    final dueDates = Map<String, String>.from(current.vocabularyReviewDueDates);
+    final resolvedRating = rating ??
+        (remembered == false
+            ? VocabularyReviewRating.again
+            : VocabularyReviewRating.good);
+    final now = (reviewedAt ?? DateTime.now()).toUtc();
 
-    final nextRepetition = remembered ? (repetitions[key] ?? 0) + 1 : 0;
-    final previousInterval = intervals[key] ?? 0;
-    final nextInterval = !remembered
-        ? 1
-        : nextRepetition == 1
-            ? 1
-            : nextRepetition == 2
-                ? 3
-                : (previousInterval * 2).clamp(1, 180).toInt();
+    final fsrsCards = Map<String, Map<String, dynamic>>.from(
+      current.vocabularyFsrsCards,
+    );
+    final legacyDueAt = DateTime.tryParse(
+      current.vocabularyReviewDueDates[key] ?? '',
+    );
+    final result = VocabularyFsrsService.review(
+      normalizedWord: key,
+      rating: resolvedRating,
+      savedCard: fsrsCards[key],
+      legacyDueAt: legacyDueAt,
+      reviewedAt: now,
+    );
+    fsrsCards[key] = result.card;
 
-    final now = DateTime.now();
-    final due = DateTime(now.year, now.month, now.day)
-        .add(Duration(days: nextInterval));
-    repetitions[key] = nextRepetition;
-    intervals[key] = nextInterval;
-    dueDates[key] = due.toIso8601String();
+    // Keep legacy fields synchronized for older dashboard code and installs.
+    final repetitions = Map<String, int>.from(
+      current.vocabularyReviewRepetitions,
+    );
+    final intervals = Map<String, int>.from(
+      current.vocabularyReviewIntervals,
+    );
+    final dueDates = Map<String, String>.from(
+      current.vocabularyReviewDueDates,
+    );
+    final isForgotten = resolvedRating == VocabularyReviewRating.again;
+    repetitions[key] = isForgotten ? 0 : (repetitions[key] ?? 0) + 1;
+    intervals[key] = result.due.difference(now).inDays.clamp(0, 36500);
+    dueDates[key] = result.due.toIso8601String();
+
+    final history = current.vocabularyReviewHistory
+        .map((entry) => Map<String, dynamic>.from(entry))
+        .toList();
+    history.add({
+      'wordKey': key,
+      ...result.reviewLog,
+    });
+    if (history.length > 2000) {
+      history.removeRange(0, history.length - 2000);
+    }
+
+    final mistakes = Map<String, int>.from(
+      current.vocabularyReviewMistakes,
+    );
+    if (isForgotten) {
+      mistakes[key] = (mistakes[key] ?? 0) + 1;
+    }
 
     _user = current.copyWith(
-      vocabularyReviewRepetitions: repetitions,
-      vocabularyReviewIntervals: intervals,
+      vocabularyFsrsCards: fsrsCards,
+      vocabularyReviewHistory: history,
       vocabularyReviewDueDates: dueDates,
+      vocabularyReviewIntervals: intervals,
+      vocabularyReviewRepetitions: repetitions,
+      vocabularyReviewMistakes: mistakes,
     );
-    if (!remembered) {
-      final mistakes = Map<String, int>.from(current.vocabularyReviewMistakes);
-      mistakes[key] = (mistakes[key] ?? 0) + 1;
-      _user = _user!.copyWith(vocabularyReviewMistakes: mistakes);
-    }
     await _recordVocabularyMissionProgress();
     await _recordWeeklyVocabularyReview();
     await _save();
@@ -511,6 +572,8 @@ class UserProvider extends ChangeNotifier {
       vocabularyReviewIntervals: const <String, int>{},
       vocabularyReviewRepetitions: const <String, int>{},
       vocabularyReviewMistakes: const <String, int>{},
+      vocabularyFsrsCards: const <String, Map<String, dynamic>>{},
+      vocabularyReviewHistory: const <Map<String, dynamic>>[],
       avatarShopPromptShown: false,
     );
     _dailyMissionState = <String, dynamic>{};
