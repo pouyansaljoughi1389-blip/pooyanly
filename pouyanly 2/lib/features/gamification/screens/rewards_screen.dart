@@ -222,7 +222,7 @@ class _TopStat extends StatelessWidget {
             style: const TextStyle(
                 fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
         Text(label,
-            style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Colors.white.withValues(alpha: .92))),
+            style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: const Color(0xEBFFFFFF))),
       ],
     );
   }
@@ -499,7 +499,7 @@ class _OfflineLeagueCard extends StatelessWidget {
             Text('لیگ $tier', style: const TextStyle(fontFamily: 'Vazirmatn',
               color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17)),
             Text(xp >= 3500 ? 'بالاترین لیگ فعلی را باز کردی' : 'برای لیگ بعدی به ${toPersianDigits(next)} XP برس',
-              style: const TextStyle(fontFamily: 'Vazirmatn', color: Colors.white.withValues(alpha: .92), fontSize: 11)),
+              style: const TextStyle(fontFamily: 'Vazirmatn', color: const Color(0xEBFFFFFF), fontSize: 11)),
             const SizedBox(height: 8),
             LinearProgressIndicator(value: progress, backgroundColor: Colors.white24,
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.white)),

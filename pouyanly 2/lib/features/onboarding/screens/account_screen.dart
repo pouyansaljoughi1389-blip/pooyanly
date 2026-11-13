@@ -87,7 +87,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   style: TextStyle(fontFamily: 'Vazirmatn', color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900)),
                 SizedBox(height: 7),
                 Text('اطلاعاتت را وارد کن تا پروفایل یادگیری ساخته شود.', textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'Vazirmatn', color: Colors.white.withValues(alpha: .92), fontSize: 12)),
+                  style: TextStyle(fontFamily: 'Vazirmatn', color: const Color(0xEBFFFFFF), fontSize: 12)),
               ]),
             ),
             const SizedBox(height: 24),

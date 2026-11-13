@@ -8,8 +8,8 @@ void main() {
     test('light and dark themes share Material 3 and Persian typography', () {
       expect(AppTheme.light.useMaterial3, isTrue);
       expect(AppTheme.dark.useMaterial3, isTrue);
-      expect(AppTheme.light.fontFamily, 'Vazirmatn');
-      expect(AppTheme.dark.fontFamily, 'Vazirmatn');
+      expect(AppTheme.light.textTheme.bodyMedium?.fontFamily, 'Vazirmatn');
+      expect(AppTheme.dark.textTheme.bodyMedium?.fontFamily, 'Vazirmatn');
       expect(AppTheme.light.brightness, Brightness.light);
       expect(AppTheme.dark.brightness, Brightness.dark);
     });

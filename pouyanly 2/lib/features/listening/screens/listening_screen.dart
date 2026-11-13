@@ -110,7 +110,7 @@ class _ListeningScreenState extends State<ListeningScreen> {
           child: Column(
             children: [
               Text(item.level, style: const TextStyle(
-                color: Colors.white.withValues(alpha: .92), fontFamily: 'Vazirmatn')),
+                color: const Color(0xEBFFFFFF), fontFamily: 'Vazirmatn')),
               const SizedBox(height: 8),
               Text(item.title, textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white, fontSize: 22,
@@ -129,7 +129,7 @@ class _ListeningScreenState extends State<ListeningScreen> {
               const SizedBox(height: 8),
               const Text('به مکالمه گوش کن؛ متن آن نمایش داده نمی‌شود.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white.withValues(alpha: .92), fontFamily: 'Vazirmatn',
+                style: TextStyle(color: const Color(0xEBFFFFFF), fontFamily: 'Vazirmatn',
                   fontSize: 12)),
             ],
           ),

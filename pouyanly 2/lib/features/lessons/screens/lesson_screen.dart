@@ -422,7 +422,7 @@ class _CardFront extends StatelessWidget {
             ),
             child: Text(
               vocab.cefrLevel,
-              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Colors.white.withValues(alpha: .92)),
+              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: const Color(0xEBFFFFFF)),
             ),
           ),
           const SizedBox(height: 20),
@@ -442,7 +442,7 @@ class _CardFront extends StatelessWidget {
             style: const TextStyle(
               fontFamily: 'Vazirmatn',
               fontSize: 16,
-              color: Colors.white.withValues(alpha: .92),
+              color: const Color(0xEBFFFFFF),
             ),
             textDirection: TextDirection.ltr,
           ),
@@ -456,11 +456,11 @@ class _CardFront extends StatelessWidget {
           const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.touch_app_rounded, color: Colors.white.withValues(alpha: .92), size: 18),
+              Icon(Icons.touch_app_rounded, color: const Color(0xEBFFFFFF), size: 18),
               SizedBox(width: 6),
               Text(
                 'برای دیدن معنی ضربه بزنید',
-                style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Colors.white.withValues(alpha: .92)),
+                style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: const Color(0xEBFFFFFF)),
               ),
             ],
           ),

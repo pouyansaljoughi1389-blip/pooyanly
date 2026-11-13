@@ -38,7 +38,7 @@ void main() {
       for (final style in styles) {
         expect(style?.fontFamily, AppDesignTokens.fontFamily);
       }
-      expect(theme.fontFamily, AppDesignTokens.fontFamily);
+      expect(theme.textTheme.bodyMedium?.fontFamily, AppDesignTokens.fontFamily);
     });
 
     test('semantic normal-text pairs meet WCAG 2.2 AA on actual light surfaces', () {
@@ -73,7 +73,7 @@ void main() {
           AppDesignTokens.fontFamily);
       expect(theme.textButtonTheme.style?.textStyle?.resolve({})?.fontFamily,
           AppDesignTokens.fontFamily);
-      expect(theme.chipTheme.labelStyle.fontFamily, AppDesignTokens.fontFamily);
+      expect(theme.chipTheme.labelStyle?.fontFamily, AppDesignTokens.fontFamily);
       expect(theme.inputDecorationTheme.hintStyle?.fontFamily,
           AppDesignTokens.fontFamily);
       expect(theme.dialogTheme.titleTextStyle?.fontFamily,
