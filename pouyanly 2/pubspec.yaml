@@ -48,6 +48,12 @@ flutter:
   fonts:
     - family: Vazirmatn
       fonts:
+        - asset: assets/fonts/Vazirmatn-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Vazirmatn-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Vazirmatn-Light.ttf
+          weight: 300
         - asset: assets/fonts/Vazirmatn-Regular.ttf
         - asset: assets/fonts/Vazirmatn-Medium.ttf
           weight: 500
@@ -57,6 +63,8 @@ flutter:
           weight: 700
         - asset: assets/fonts/Vazirmatn-ExtraBold.ttf
           weight: 800
+        - asset: assets/fonts/Vazirmatn-Black.ttf
+          weight: 900
 
 flutter_launcher_icons:
   android: true

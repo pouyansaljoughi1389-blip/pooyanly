@@ -117,7 +117,7 @@ class _SplashScreenState extends State<SplashScreen>
                       style: TextStyle(
                         fontFamily: 'Vazirmatn',
                         fontSize: 14,
-                        color: Colors.white70,
+                        color: Colors.white.withValues(alpha: .92),
                       ),
                     ),
                   ],
@@ -132,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 32,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    valueColor: AlwaysStoppedAnimation(Colors.white54),
+                    valueColor: AlwaysStoppedAnimation(Colors.white.withValues(alpha: .92)),
                   ),
                 ),
               ),

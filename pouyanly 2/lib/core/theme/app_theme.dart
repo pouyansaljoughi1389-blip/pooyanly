@@ -152,6 +152,9 @@ class AppTheme {
       brightness: brightness,
       colorScheme: scheme,
       scaffoldBackgroundColor: background,
+      // Disabled labels retain AA-readable contrast instead of inheriting
+      // Material's low-opacity disabled foreground on pale surfaces.
+      disabledColor: secondaryText,
       fontFamily: AppDesignTokens.fontFamily,
       textTheme: textTheme,
       visualDensity: VisualDensity.standard,
