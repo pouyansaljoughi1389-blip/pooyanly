@@ -28,7 +28,9 @@ void main() {
         value: provider,
         child: MaterialApp(
           theme: AppTheme.light,
-          home: const ProfileScreen(),
+          // In the real app the profile tab is hosted inside the app shell's
+          // Scaffold. Recreate that Material ancestor in this widget test.
+          home: const Scaffold(body: ProfileScreen()),
         ),
       ),
     );
@@ -107,7 +109,9 @@ void main() {
         value: provider,
         child: MaterialApp(
           theme: AppTheme.light,
-          home: const ProfileScreen(),
+          // In the real app the profile tab is hosted inside the app shell's
+          // Scaffold. Recreate that Material ancestor in this widget test.
+          home: const Scaffold(body: ProfileScreen()),
         ),
       ),
     );
