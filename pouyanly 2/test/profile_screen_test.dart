@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -14,15 +13,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
-    // The Android launcher-widget plugin has no host implementation in unit
-    // tests. Use a non-Android test platform so provider hydration stays local.
-    debugDefaultTargetPlatformOverride = TargetPlatform.linux;
     SharedPreferences.setMockInitialValues({});
     await StorageService.instance.init();
-  });
-
-  tearDown(() {
-    debugDefaultTargetPlatformOverride = null;
   });
 
   testWidgets('profile never renders a blank screen without a user',

@@ -436,13 +436,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  String _skillBandLabel(dynamic level) {
-    final name = level.name.toString();
-    if (name == 'a1' || name == 'a2') return 'مبتدی';
-    if (name == 'b1') return 'متوسط';
-    if (name == 'b2') return 'متوسط رو به بالا';
-    if (name == 'c1' || name == 'c2') return 'پیشرفته';
-    return 'هنوز ارزیابی نشده';
+  String _skillBandLabel(CefrLevel level) {
+    switch (level) {
+      case CefrLevel.a1:
+      case CefrLevel.a2:
+        return 'مبتدی';
+      case CefrLevel.b1:
+        return 'متوسط';
+      case CefrLevel.b2:
+        return 'متوسط رو به بالا';
+      case CefrLevel.c1:
+      case CefrLevel.c2:
+        return 'پیشرفته';
+      case CefrLevel.unknown:
+        return 'هنوز ارزیابی نشده';
+    }
   }
 
   void _showResetDialog(BuildContext context) {
