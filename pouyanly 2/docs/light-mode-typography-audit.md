@@ -69,4 +69,4 @@ These values are mathematical palette checks against pure white, not proof of ev
 
 ## Visual QA still required
 
-The repository workflow currently provides analyzer, tests and APK build/upload. It does not run Android emulators, capture screenshots, or perform pixel-based review. Therefore screenshots at small/standard/large device sizes and normal/increased text scale remain an explicit release gate. Do not describe the typography audit as fully complete until that visual QA is performed.
+The repository workflow includes an Android emulator smoke job after a successful build. It launches the app on one Pixel 2 / API 35 emulator and captures only the startup screen. It does not navigate through and capture all 18 screens, nor does it test multiple device widths or increased accessibility text scales. Therefore per-screen screenshots at small/standard/large widths and normal/increased text scale remain an explicit release gate. Do not describe the typography audit as fully complete until that visual QA is performed.
