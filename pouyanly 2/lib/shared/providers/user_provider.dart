@@ -478,7 +478,7 @@ class UserProvider extends ChangeNotifier {
     );
     final isForgotten = resolvedRating == VocabularyReviewRating.again;
     repetitions[key] = isForgotten ? 0 : (repetitions[key] ?? 0) + 1;
-    intervals[key] = result.due.difference(now).inDays.clamp(0, 36500);
+    intervals[key] = result.due.difference(now).inDays.clamp(0, 36500).toInt();
     dueDates[key] = result.due.toIso8601String();
 
     final history = current.vocabularyReviewHistory
