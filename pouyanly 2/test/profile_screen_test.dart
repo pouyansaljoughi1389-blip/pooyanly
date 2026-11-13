@@ -20,7 +20,7 @@ void main() {
   testWidgets('profile never renders a blank screen without a user',
       (tester) async {
     final provider = UserProvider();
-    await provider.init();
+    await tester.runAsync(() => provider.init());
     expect(provider.isInitialized, isTrue);
 
     await tester.pumpWidget(
@@ -92,13 +92,15 @@ void main() {
   testWidgets('profile editor updates persisted local account details',
       (tester) async {
     final provider = UserProvider();
-    await provider.init();
-    await provider.createUser(
-      firstName: 'Old',
-      lastName: 'Name',
-      contact: 'old@example.com',
-      contactType: 'email',
-    );
+    await tester.runAsync(() async {
+      await provider.init();
+      await provider.createUser(
+        firstName: 'Old',
+        lastName: 'Name',
+        contact: 'old@example.com',
+        contactType: 'email',
+      );
+    });
 
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
