@@ -18,8 +18,14 @@ void main() {
   testWidgets('rewards screen shows level progress without avatar selection',
       (tester) async {
     final provider = UserProvider();
-    await provider.init();
-    await provider.createUser();
+
+    // UserProvider initialization and persistence can cross platform
+    // channels (daily home-screen widget sync). Run that real async work
+    // outside the widget-test fake-async zone to avoid a pending Future.
+    await tester.runAsync(() async {
+      await provider.init();
+      await provider.createUser();
+    });
 
     await tester.pumpWidget(
       ChangeNotifierProvider<UserProvider>.value(
