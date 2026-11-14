@@ -99,6 +99,10 @@ jobs:
         working-directory: "pouyanly 2"
         run: flutter pub get
 
+      - name: Generate App Icons
+        working-directory: "pouyanly 2"
+        run: dart run flutter_launcher_icons
+
       - name: Build debug APK for emulator
         working-directory: "pouyanly 2"
         run: flutter build apk --debug
