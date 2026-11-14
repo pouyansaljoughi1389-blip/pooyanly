@@ -1,22 +1,135 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import '../../data/models/user_model.dart';
 import '../../data/local/storage_service.dart';
+import '../../features/lessons/models/lesson_data.dart';
+import '../../features/vocabulary/services/vocabulary_fsrs_service.dart';
+import '../../core/services/daily_progress_widget_service.dart';
+import '../../core/services/learning_reminder_service.dart';
 
 class UserProvider extends ChangeNotifier {
   UserModel? _user;
   UserModel? get user => _user;
+  bool _isInitialized = false;
+  bool get isInitialized => _isInitialized;
+  Future<void>? _initFuture;
+  List<Map<String, dynamic>> _assessmentHistory = [];
+  Map<String, dynamic> _dailyMissionState = {};
+  Map<String, dynamic> _weeklyMissionState = {};
+
+  String get _todayKey {
+    final now = DateTime.now();
+    return '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
+
+  String get _weekKey {
+    final now = DateTime.now();
+    final monday = DateTime(now.year, now.month, now.day)
+        .subtract(Duration(days: now.weekday - DateTime.monday));
+    return '${monday.year.toString().padLeft(4, '0')}-${monday.month.toString().padLeft(2, '0')}-${monday.day.toString().padLeft(2, '0')}';
+  }
+
+  bool _studiedToday(UserModel? value) {
+    final date = value?.lastStudyDate;
+    if (date == null) return false;
+    return date.year == DateTime.now().year &&
+        date.month == DateTime.now().month &&
+        date.day == DateTime.now().day;
+  }
+
+  int get dailyLessonsCompleted => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['lessons'] as int? ?? 0) : 0;
+  int get dailyXpEarned => _dailyMissionState['date'] == _todayKey ? (_dailyMissionState['xp'] as int? ?? 0) : 0;
+  int get dailyProgressPercent => ((dailyXpEarned / 50) * 100).round().clamp(0, 100).toInt();
+
+  Map<String, int> get dailyMissionProgress => {
+    'lesson': _studiedToday(_user) ? 1 : 0,
+    'vocabulary': _dailyMissionState['date'] == _todayKey
+        ? (_dailyMissionState['vocabularyReviews'] as int? ?? 0)
+        : 0,
+    'streak': _studiedToday(_user) && (_user?.streak ?? 0) >= 2 ? 1 : 0,
+  };
+
+  Map<String, int> get weeklyMissionProgress {
+    if (_weeklyMissionState['week'] != _weekKey) return {'lessons': 0, 'vocabulary': 0, 'studyDays': 0};
+    return {
+      'lessons': (_weeklyMissionState['lessons'] as List<dynamic>? ?? const []).length,
+      'vocabulary': _weeklyMissionState['vocabularyReviews'] as int? ?? 0,
+      'studyDays': (_weeklyMissionState['studyDays'] as List<dynamic>? ?? const []).length,
+    };
+  }
+
+  Set<String> get claimedWeeklyMissions => _weeklyMissionState['week'] == _weekKey
+      ? Set<String>.from(_weeklyMissionState['claimed'] ?? const <String>[])
+      : <String>{};
+
+  int get vocabularyMistakeCount {
+    final mistakes = _user?.vocabularyReviewMistakes ?? const <String, int>{};
+    return mistakes.values.fold<int>(0, (sum, count) => sum + count);
+  }
+
+  /// Mean FSRS-predicted recall probability for cards with a learned state.
+  /// New/unreviewed cards are excluded rather than assigned fabricated scores.
+  double get vocabularyPredictedRetentionPercent {
+    final cards = _user?.vocabularyFsrsCards.values ?? const <Map<String, dynamic>>[];
+    final estimates = cards
+        .map(VocabularyFsrsService.predictedRetrievability)
+        .whereType<double>()
+        .where((value) => value.isFinite);
+    final values = estimates.toList();
+    if (values.isEmpty) return 0;
+    final mean = values.reduce((a, b) => a + b) / values.length;
+    return (mean * 100).clamp(0, 100).roundToDouble();
+  }
+
+  /// Kept as a compatibility alias for any older UI call sites.
+  double get vocabularyMasteryPercent => vocabularyPredictedRetentionPercent;
+
+  Set<String> get claimedDailyMissions =>
+      _dailyMissionState['date'] == _todayKey
+          ? Set<String>.from(_dailyMissionState['claimed'] ?? const <String>[])
+          : <String>{};
+  List<Map<String, dynamic>> get assessmentHistory => List.unmodifiable(_assessmentHistory);
 
   // ── Init ──────────────────────────────────────────────────────────
-  Future<void> init() async {
+  Future<void> init() => _initFuture ??= _initialize();
+
+  Future<void> _initialize() async {
     _user = StorageService.instance.loadUser();
+    _assessmentHistory = StorageService.instance.loadAssessmentHistory();
+    _dailyMissionState = StorageService.instance.loadDailyMissionState();
+    _weeklyMissionState = StorageService.instance.loadWeeklyMissionState();
+    _ensureDailyMissionDay();
+    _ensureWeeklyMissionWeek();
+    _isInitialized = true;
     notifyListeners();
+    try {
+      await DailyProgressWidgetService.sync(
+        lessons: dailyLessonsCompleted,
+        xp: dailyXpEarned,
+        percent: dailyProgressPercent,
+      );
+    } catch (_) {}
   }
 
   // ── Create ────────────────────────────────────────────────────────
-  Future<void> createUser({String? name}) async {
+  Future<void> createUser({
+    String? name,
+    String? firstName,
+    String? lastName,
+    String? contact,
+    String? contactType,
+  }) async {
+    final cleanFirst = firstName?.trim();
+    final cleanLast = lastName?.trim();
+    final fullName = [cleanFirst, cleanLast]
+        .where((part) => part != null && part.isNotEmpty)
+        .join(' ');
     _user = UserModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: name,
+      name: fullName.isNotEmpty ? fullName : (name ?? 'زبان‌آموز'),
+      firstName: cleanFirst?.isEmpty == true ? null : cleanFirst,
+      lastName: cleanLast?.isEmpty == true ? null : cleanLast,
+      contact: contact?.trim().isEmpty == true ? null : contact?.trim(),
+      contactType: contactType,
       createdAt: DateTime.now(),
     );
     await _save();
@@ -46,13 +159,35 @@ class UserProvider extends ChangeNotifier {
           onboardingComplete: true,
         );
     await _save();
+    final reminderHour = switch (period) {
+      StudyPeriod.earlyMorning => 7,
+      StudyPeriod.morning => 9,
+      StudyPeriod.afternoon => 15,
+      StudyPeriod.evening => 19,
+      StudyPeriod.night => 21,
+    };
+    try {
+      await LearningReminderService.scheduleWeekly(
+        time: TimeOfDay(hour: reminderHour, minute: 0),
+        activeDays: {0, 1, 2, 3, 4, 5, 6},
+      );
+    } catch (_) {}
   }
 
   // ── Placement Test ────────────────────────────────────────────────
   Future<void> completePlacementTest({
     required CefrLevel cefrLevel,
     required Map<String, int> skillScores,
+    Map<String, double> levelScores = const {},
   }) async {
+    final snapshot = <String, dynamic>{
+      'takenAt': DateTime.now().toIso8601String(),
+      'cefrLevel': cefrLevel.name,
+      'skillScores': skillScores,
+      'levelScores': levelScores,
+    };
+    _assessmentHistory = [..._assessmentHistory, snapshot];
+    await StorageService.instance.appendAssessment(snapshot);
     _user = _user?.copyWith(
       cefrLevel: cefrLevel,
       skillScores: skillScores,
@@ -61,50 +196,351 @@ class UserProvider extends ChangeNotifier {
     await _save();
   }
 
+  // ── Daily missions ────────────────────────────────────────────────
+  void _ensureDailyMissionDay() {
+    if (_dailyMissionState['date'] != _todayKey) {
+      _dailyMissionState = {
+        'date': _todayKey,
+        'vocabularyReviews': 0,
+        'lessons': 0,
+        'xp': 0,
+        'claimed': <String>[],
+      };
+    }
+  }
+
+  void _ensureWeeklyMissionWeek() {
+    if (_weeklyMissionState['week'] != _weekKey) {
+      _weeklyMissionState = {
+        'week': _weekKey,
+        'lessons': <String>[],
+        'vocabularyReviews': 0,
+        'studyDays': <String>[],
+        'claimed': <String>[],
+      };
+    }
+  }
+
+  Future<void> _recordWeeklyLesson(String lessonId, DateTime at) async {
+    _ensureWeeklyMissionWeek();
+    final lessons = List<String>.from(_weeklyMissionState['lessons'] ?? const <String>[]);
+    if (!lessons.contains(lessonId)) lessons.add(lessonId);
+    _weeklyMissionState['lessons'] = lessons;
+    final day = '${at.year}-${at.month.toString().padLeft(2, '0')}-${at.day.toString().padLeft(2, '0')}';
+    final studyDays = List<String>.from(_weeklyMissionState['studyDays'] ?? const <String>[]);
+    if (!studyDays.contains(day)) studyDays.add(day);
+    _weeklyMissionState['studyDays'] = studyDays;
+    await StorageService.instance.saveWeeklyMissionState(_weeklyMissionState);
+  }
+
+  Future<void> _recordWeeklyVocabularyReview() async {
+    _ensureWeeklyMissionWeek();
+    _weeklyMissionState['vocabularyReviews'] =
+        (_weeklyMissionState['vocabularyReviews'] as int? ?? 0) + 1;
+    await StorageService.instance.saveWeeklyMissionState(_weeklyMissionState);
+  }
+
+  Future<bool> claimWeeklyMission(String missionId) async {
+    if (_user == null) return false;
+    _ensureWeeklyMissionWeek();
+    const rewards = <String, ({int target, int xp, int coins})>{
+      'lessons': (target: 3, xp: 60, coins: 15),
+      'vocabulary': (target: 20, xp: 50, coins: 12),
+      'studyDays': (target: 4, xp: 75, coins: 20),
+    };
+    final reward = rewards[missionId];
+    if (reward == null || claimedWeeklyMissions.contains(missionId)) return false;
+    if ((weeklyMissionProgress[missionId] ?? 0) < reward.target) return false;
+    final claimed = List<String>.from(_weeklyMissionState['claimed'] ?? const <String>[])..add(missionId);
+    _weeklyMissionState['claimed'] = claimed;
+    _user = _user!.copyWith(xp: _user!.xp + reward.xp, coins: _user!.coins + reward.coins);
+    await StorageService.instance.saveWeeklyMissionState(_weeklyMissionState);
+    await _save();
+    return true;
+  }
+
+  Future<void> _recordVocabularyMissionProgress() async {
+    _ensureDailyMissionDay();
+    final count = (_dailyMissionState['vocabularyReviews'] as int? ?? 0) + 1;
+    _dailyMissionState['vocabularyReviews'] = count;
+    await StorageService.instance.saveDailyMissionState(_dailyMissionState);
+  }
+
+  Future<bool> claimDailyMission(String missionId) async {
+    if (_user == null) return false;
+    _ensureDailyMissionDay();
+    const rewards = <String, ({int target, int xp, int coins})>{
+      'lesson': (target: 1, xp: 20, coins: 5),
+      'vocabulary': (target: 5, xp: 15, coins: 3),
+      'streak': (target: 1, xp: 10, coins: 2),
+    };
+    final reward = rewards[missionId];
+    if (reward == null || claimedDailyMissions.contains(missionId)) return false;
+    final progress = dailyMissionProgress[missionId] ?? 0;
+    if (progress < reward.target) return false;
+
+    final claimed = List<String>.from(_dailyMissionState['claimed'] ?? const <String>[])
+      ..add(missionId);
+    _dailyMissionState['claimed'] = claimed;
+    _user = _user!.copyWith(
+      xp: _user!.xp + reward.xp,
+      coins: _user!.coins + reward.coins,
+    );
+    await StorageService.instance.saveDailyMissionState(_dailyMissionState);
+    await _save();
+    return true;
+  }
+
   // ── XP & Coins ────────────────────────────────────────────────────
   Future<void> addXP(int amount) async {
-    if (_user == null) return;
+    if (_user == null || amount <= 0) return;
     _user = _user!.copyWith(xp: _user!.xp + amount);
     await _save();
   }
 
   Future<void> addCoins(int amount) async {
-    if (_user == null) return;
+    if (_user == null || amount <= 0) return;
     _user = _user!.copyWith(coins: _user!.coins + amount);
     await _save();
   }
 
+  // Skip only the next sequential lesson; skipping costs XP and grants no lesson reward.
+  Future<bool> skipLesson(String lessonId, {int xpCost = 100, required List<String> previousLessonIds}) async {
+    final current = _user;
+    if (current == null || xpCost <= 0 || current.xp < xpCost || current.completedLessonIds.contains(lessonId)) return false;
+    final units = CourseData.getAllUnits();
+    final completedIds = current.completedLessonIds.toSet();
+    final nextLessonId = LearningPathPolicy.nextLessonId(units: units, completedIds: completedIds);
+    final unitIndex = units.indexWhere((unit) => unit.lessons.any((lesson) => lesson.id == lessonId));
+    if (unitIndex < 0 || nextLessonId != lessonId) return false;
+    if (!LearningPathPolicy.isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIds)) return false;
+    if (previousLessonIds.any((id) => !completedIds.contains(id))) return false;
+    final completed = List<String>.from(current.completedLessonIds)..add(lessonId);
+    _user = current.copyWith(xp: current.xp - xpCost, completedLessonIds: completed);
+    await _save();
+    return true;
+  }
+
+  Future<bool> completeCheckpoint(String unitId) async {
+    final current = _user;
+    if (current == null || unitId.trim().isEmpty) return false;
+    final units = CourseData.getAllUnits();
+    final unitIndex = units.indexWhere((unit) => unit.id == unitId);
+    if (unitIndex < 0) return false;
+    final checkpointId = 'checkpoint_$unitId';
+    if (current.completedLessonIds.contains(checkpointId)) return true;
+    final completedIds = current.completedLessonIds.toSet();
+    if (!LearningPathPolicy.isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIds)) return false;
+    final targetUnit = units[unitIndex];
+    if (!targetUnit.lessons.every((lesson) => completedIds.contains(lesson.id))) return false;
+    _user = current.copyWith(completedLessonIds: [...current.completedLessonIds, checkpointId], xp: current.xp + 50, coins: current.coins + 10);
+    await _save();
+    return true;
+  }
+
   // ── Lesson Completion ─────────────────────────────────────────────
-  Future<void> completeLesson(String lessonId, {int xpGain = 20, int coinGain = 5}) async {
-    if (_user == null) return;
-    final ids = List<String>.from(_user!.completedLessonIds);
-    if (!ids.contains(lessonId)) ids.add(lessonId);
+  Future<bool> completeLesson(String lessonId, {int xpGain = 20, int coinGain = 5}) async {
+    final currentUser = _user;
+    if (currentUser == null || lessonId.trim().isEmpty) return false;
 
+    // Completion is idempotent and must respect the canonical sequential path.
+    if (currentUser.completedLessonIds.contains(lessonId)) return true;
+    final units = CourseData.getAllUnits();
+    final completedIds = currentUser.completedLessonIds.toSet();
+    final unitIndex = units.indexWhere((unit) => unit.lessons.any((lesson) => lesson.id == lessonId));
+    if (unitIndex < 0 || LearningPathPolicy.nextLessonId(units: units, completedIds: completedIds) != lessonId ||
+        !LearningPathPolicy.isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIds)) return false;
+
+    final ids = List<String>.from(currentUser.completedLessonIds)..add(lessonId);
     final now = DateTime.now();
-    final last = _user!.lastStudyDate;
-    int newStreak = _user!.streak;
+    final today = DateTime(now.year, now.month, now.day);
+    final last = currentUser.lastStudyDate;
+    final lastDay = last == null ? null : DateTime(last.year, last.month, last.day);
 
-    if (last == null) {
+    var newStreak = currentUser.streak;
+    var newLastStudyDate = now;
+
+    if (lastDay == null) {
       newStreak = 1;
     } else {
-      final diff = now.difference(last).inDays;
-      if (diff == 0) {
-        // Same day — no change
-      } else if (diff == 1) {
+      final dayDifference = today.difference(lastDay).inDays;
+      if (dayDifference == 1) {
         newStreak += 1;
-      } else {
-        newStreak = 1; // Streak broken
+      } else if (dayDifference > 1) {
+        newStreak = 1;
+      } else if (dayDifference < 0) {
+        // Device date moved backwards: do not rewind the saved study date.
+        newLastStudyDate = last!;
+      }
+      // dayDifference == 0 means another lesson on the same calendar day.
+    }
+
+    final safeXpGain = xpGain < 0 ? 0 : xpGain;
+    final safeCoinGain = coinGain < 0 ? 0 : coinGain;
+    final studyDateKey = '${today.year.toString().padLeft(4, '0')}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final studyDateKeys = List<String>.from(currentUser.studyDateKeys);
+    if (!studyDateKeys.contains(studyDateKey)) studyDateKeys.add(studyDateKey);
+    _ensureDailyMissionDay();
+    _user = currentUser.copyWith(
+      completedLessonIds: ids,
+      studyDateKeys: studyDateKeys,
+      xp: currentUser.xp + safeXpGain,
+      coins: currentUser.coins + safeCoinGain,
+      streak: newStreak,
+      longestStreak: newStreak > currentUser.longestStreak
+          ? newStreak
+          : currentUser.longestStreak,
+      lastStudyDate: newLastStudyDate,
+    );
+    _ensureDailyMissionDay();
+    _dailyMissionState['lessons'] = (_dailyMissionState['lessons'] as int? ?? 0) + 1;
+    _dailyMissionState['xp'] = (_dailyMissionState['xp'] as int? ?? 0) + safeXpGain;
+    await StorageService.instance.saveDailyMissionState(_dailyMissionState);
+    await _recordWeeklyLesson(lessonId, now);
+    await _save();
+    try {
+      await DailyProgressWidgetService.sync(
+        lessons: dailyLessonsCompleted,
+        xp: dailyXpEarned,
+        percent: dailyProgressPercent,
+      );
+    } catch (_) {}
+    return true;
+  }
+
+  // ── Spaced vocabulary review ───────────────────────────────────────
+  String _vocabularyKey(String word) => word.trim().toLowerCase();
+
+  bool isVocabularyDue(String word, {DateTime? at}) {
+    final current = _user;
+    if (current == null || word.trim().isEmpty) return false;
+    final key = _vocabularyKey(word);
+    final savedCard = current.vocabularyFsrsCards[key];
+    if (savedCard != null) {
+      try {
+        return VocabularyFsrsService.isDue(savedCard, at: at);
+      } catch (_) {
+        // Corrupt per-card state must not hide a word from review.
+        return true;
       }
     }
 
-    _user = _user!.copyWith(
-      completedLessonIds: ids,
-      xp: _user!.xp + xpGain,
-      coins: _user!.coins + coinGain,
-      streak: newStreak,
-      longestStreak: newStreak > _user!.longestStreak ? newStreak : _user!.longestStreak,
-      lastStudyDate: now,
+    // Backward-compatible fallback for users who have not migrated this word.
+    final dueValue = current.vocabularyReviewDueDates[key];
+    if (dueValue == null) return true;
+    final due = DateTime.tryParse(dueValue);
+    if (due == null) return true;
+    final now = at ?? DateTime.now();
+    return !DateTime(due.year, due.month, due.day).isAfter(
+      DateTime(now.year, now.month, now.day),
     );
+  }
+
+  Future<void> reviewVocabulary(
+    String word, {
+    VocabularyReviewRating? rating,
+    bool? remembered,
+    DateTime? reviewedAt,
+  }) async {
+    final current = _user;
+    if (current == null || word.trim().isEmpty) return;
+    final key = _vocabularyKey(word);
+    final resolvedRating = rating ??
+        (remembered == false
+            ? VocabularyReviewRating.again
+            : VocabularyReviewRating.good);
+    final now = (reviewedAt ?? DateTime.now()).toUtc();
+
+    final fsrsCards = Map<String, Map<String, dynamic>>.from(
+      current.vocabularyFsrsCards,
+    );
+    final legacyDueAt = DateTime.tryParse(
+      current.vocabularyReviewDueDates[key] ?? '',
+    );
+    final result = VocabularyFsrsService.review(
+      normalizedWord: key,
+      rating: resolvedRating,
+      savedCard: fsrsCards[key],
+      legacyDueAt: legacyDueAt,
+      reviewedAt: now,
+    );
+    fsrsCards[key] = result.card;
+
+    // Keep legacy fields synchronized for older dashboard code and installs.
+    final repetitions = Map<String, int>.from(
+      current.vocabularyReviewRepetitions,
+    );
+    final intervals = Map<String, int>.from(
+      current.vocabularyReviewIntervals,
+    );
+    final dueDates = Map<String, String>.from(
+      current.vocabularyReviewDueDates,
+    );
+    final isForgotten = resolvedRating == VocabularyReviewRating.again;
+    repetitions[key] = isForgotten ? 0 : (repetitions[key] ?? 0) + 1;
+    intervals[key] = result.due.difference(now).inDays.clamp(0, 36500).toInt();
+    dueDates[key] = result.due.toIso8601String();
+
+    final history = current.vocabularyReviewHistory
+        .map((entry) => Map<String, dynamic>.from(entry))
+        .toList();
+    history.add({
+      'wordKey': key,
+      ...result.reviewLog,
+    });
+    if (history.length > 2000) {
+      history.removeRange(0, history.length - 2000);
+    }
+
+    final mistakes = Map<String, int>.from(
+      current.vocabularyReviewMistakes,
+    );
+    if (isForgotten) {
+      mistakes[key] = (mistakes[key] ?? 0) + 1;
+    }
+
+    _user = current.copyWith(
+      vocabularyFsrsCards: fsrsCards,
+      vocabularyReviewHistory: history,
+      vocabularyReviewDueDates: dueDates,
+      vocabularyReviewIntervals: intervals,
+      vocabularyReviewRepetitions: repetitions,
+      vocabularyReviewMistakes: mistakes,
+    );
+    await _recordVocabularyMissionProgress();
+    await _recordWeeklyVocabularyReview();
+    await _save();
+  }
+
+  // ── Avatar ─────────────────────────────────────────────────────────
+  static const Map<String, int> avatarUnlockCosts = {
+    '🐼': 30, '🐯': 40, '🐸': 40, '🐧': 50,
+    '🦉': 60, '🐙': 70, '🐨': 60,
+  };
+
+  Future<bool> unlockAvatarEmoji(String emoji) async {
+    final current = _user;
+    final cost = avatarUnlockCosts[emoji];
+    if (current == null || cost == null) return false;
+    if (current.unlockedAvatarEmojis.contains(emoji)) return true;
+    if (current.coins < cost) return false;
+    _user = current.copyWith(
+      coins: current.coins - cost,
+      unlockedAvatarEmojis: [...current.unlockedAvatarEmojis, emoji],
+    );
+    await _save();
+    return true;
+  }
+
+  Future<void> setAvatarEmoji(String emoji) async {
+    if (_user == null || !_user!.unlockedAvatarEmojis.contains(emoji)) return;
+    _user = _user!.copyWith(avatarEmoji: emoji);
+    await _save();
+  }
+
+  Future<void> markAvatarShopPromptShown() async {
+    if (_user == null || _user!.avatarShopPromptShown) return;
+    _user = _user!.copyWith(avatarShopPromptShown: true);
     await _save();
   }
 
@@ -116,6 +552,39 @@ class UserProvider extends ChangeNotifier {
   }
 
   // ── Reset ─────────────────────────────────────────────────────────
+  /// Clears learning progress while preserving the local account and preferences.
+  Future<void> resetProgress() async {
+    final current = _user;
+    if (current == null) return;
+    _user = current.copyWith(
+      cefrLevel: CefrLevel.unknown,
+      xp: 0,
+      coins: 0,
+      streak: 0,
+      longestStreak: 0,
+      clearLastStudyDate: true,
+      onboardingComplete: true,
+      placementTestComplete: false,
+      skillScores: const <String, int>{},
+      completedLessonIds: const <String>[],
+      studyDateKeys: const <String>[],
+      vocabularyReviewDueDates: const <String, String>{},
+      vocabularyReviewIntervals: const <String, int>{},
+      vocabularyReviewRepetitions: const <String, int>{},
+      vocabularyReviewMistakes: const <String, int>{},
+      vocabularyFsrsCards: const <String, Map<String, dynamic>>{},
+      vocabularyReviewHistory: const <Map<String, dynamic>>[],
+      avatarShopPromptShown: false,
+    );
+    _dailyMissionState = <String, dynamic>{};
+    _weeklyMissionState = <String, dynamic>{};
+    _assessmentHistory.clear();
+    await StorageService.instance.saveDailyMissionState(_dailyMissionState);
+    await StorageService.instance.saveWeeklyMissionState(_weeklyMissionState);
+    await StorageService.instance.clearAssessmentHistory();
+    await _save();
+  }
+
   Future<void> reset() async {
     await StorageService.instance.clearUser();
     _user = null;
@@ -124,7 +593,14 @@ class UserProvider extends ChangeNotifier {
 
   // ── Private ───────────────────────────────────────────────────────
   Future<void> _save() async {
-    if (_user != null) await StorageService.instance.saveUser(_user!);
+    if (_user != null) {
+      await StorageService.instance.saveUser(_user!);
+      await DailyProgressWidgetService.sync(
+        lessons: dailyLessonsCompleted,
+        xp: dailyXpEarned,
+        percent: dailyProgressPercent,
+      );
+    }
     notifyListeners();
   }
 }

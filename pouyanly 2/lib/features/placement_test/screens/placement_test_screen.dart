@@ -20,6 +20,18 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
   String? _selectedAnswer;
   bool _showFeedback = false;
 
+  String _skillBandLabel(String level) {
+    switch (level.toUpperCase()) {
+      case 'A1':
+      case 'A2': return 'مبتدی';
+      case 'B1': return 'متوسط';
+      case 'B2': return 'متوسط رو به بالا';
+      case 'C1':
+      case 'C2': return 'پیشرفته';
+      default: return 'ارزیابی';
+    }
+  }
+
   void _select(String ans) {
     if (_showFeedback) return;
     setState(() {
@@ -46,6 +58,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
     await context.read<UserProvider>().completePlacementTest(
           cefrLevel: result['cefrLevel'],
           skillScores: Map<String, int>.from(result['skillScores']),
+          levelScores: Map<String, double>.from(result['levelScores']),
         );
     if (mounted) context.go('/placement-result');
   }
@@ -74,7 +87,7 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
             LinearProgressIndicator(
               value: progress,
               minHeight: 4,
-              backgroundColor: AppColors.dividerLight,
+              backgroundColor: Theme.of(context).dividerColor,
               valueColor: const AlwaysStoppedAnimation(AppColors.primary),
             ),
             Padding(
@@ -85,11 +98,11 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.cefrColor(q.cefrLevel).withOpacity(0.15),
+                      color: AppColors.cefrColor(q.cefrLevel).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      q.cefrLevel,
+                      _skillBandLabel(q.cefrLevel),
                       style: TextStyle(
                         fontFamily: 'Vazirmatn',
                         fontSize: 12,
@@ -100,10 +113,10 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                   ),
                   Text(
                     'سوال ${_current + 1} از ${_questions.length}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Vazirmatn',
                       fontSize: 12,
-                      color: AppColors.textSecondaryLight,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -123,28 +136,28 @@ class _PlacementTestScreenState extends State<PlacementTestScreen> {
                       decoration: BoxDecoration(
                         color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.dividerLight),
+                        border: Border.all(color: Theme.of(context).dividerColor),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             q.question,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Vazirmatn',
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimaryLight,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             textDirection: TextDirection.ltr,
                           ),
                           const SizedBox(height: 8),
                           Text(
                             q.questionFarsi,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Vazirmatn',
                               fontSize: 13,
-                              color: AppColors.textSecondaryLight,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -209,19 +222,19 @@ class _OptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color? bgColor;
-    Color borderColor = AppColors.dividerLight;
+    Color borderColor = Theme.of(context).dividerColor;
     Color? textColor;
 
     if (correct) {
-      bgColor = AppColors.success.withOpacity(0.12);
+      bgColor = AppColors.success.withValues(alpha: 0.12);
       borderColor = AppColors.success;
       textColor = AppColors.success;
     } else if (wrong) {
-      bgColor = AppColors.error.withOpacity(0.12);
+      bgColor = AppColors.error.withValues(alpha: 0.12);
       borderColor = AppColors.error;
       textColor = AppColors.error;
     } else if (selected) {
-      bgColor = AppColors.primary.withOpacity(0.08);
+      bgColor = AppColors.primary.withValues(alpha: 0.08);
       borderColor = AppColors.primary;
       textColor = AppColors.primary;
     }
@@ -270,9 +283,9 @@ class _FeedbackPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,10 +308,10 @@ class _FeedbackPanel extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             explanation,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Vazirmatn',
               fontSize: 13,
-              color: AppColors.textSecondaryLight,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],

@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/pouyanly_icon.dart';
+import '../../../core/theme/app_design_tokens.dart';
+import '../../../core/widgets/app_surface.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/persian_digits.dart';
+import '../../../core/widgets/animated_game_icons.dart';
 import '../../../shared/providers/user_provider.dart';
+import '../../../core/widgets/user_required_state.dart';
+import 'package:go_router/go_router.dart';
 
 class RewardsScreen extends StatelessWidget {
   const RewardsScreen({super.key});
@@ -9,7 +16,18 @@ class RewardsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
-    if (user == null) return const SizedBox.shrink();
+    if (user == null) {
+      return UserRequiredState(
+        title: 'جوایز در دسترس نیست',
+        message: 'برای نمایش XP، سکه‌ها و مأموریت‌ها ابتدا حساب کاربری را بارگذاری کن.',
+        actionLabel: 'رفتن به شروع',
+        onPressed: () => context.go('/welcome'),
+      );
+    }
+    final missionProgress = context.watch<UserProvider>().dailyMissionProgress;
+    final claimedMissions = context.watch<UserProvider>().claimedDailyMissions;
+    final weeklyProgress = context.watch<UserProvider>().weeklyMissionProgress;
+    final claimedWeekly = context.watch<UserProvider>().claimedWeeklyMissions;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -26,10 +44,10 @@ class RewardsScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _TopStat('${user.xp}', 'XP', '⭐'),
-                    _TopStat('${user.coins}', 'سکه', '🪙'),
-                    _TopStat('${user.streak}', 'Streak', '🔥'),
-                    _TopStat('${user.longestStreak}', 'رکورد', '🏆'),
+                    _TopStat(toPersianDigits(user.xp), 'XP', '⭐'),
+                    _TopStat(toPersianDigits(user.coins), 'سکه', '🪙'),
+                    _TopStat(toPersianDigits(user.streak), 'Streak', '🔥'),
+                    _TopStat(toPersianDigits(user.longestStreak), 'رکورد', '🏆'),
                   ],
                 ),
               ),
@@ -42,30 +60,115 @@ class RewardsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
+                // ── Level progress (avatar management lives in Profile) ──
+                _SectionTitle('پیشرفت سطح'),
+                const SizedBox(height: 10),
+                AppSurface(
+                  padding: const EdgeInsets.all(AppDesignTokens.space4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(AppDesignTokens.radiusMedium),
+                            ),
+                            child: Icon(
+                              Icons.workspace_premium_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: AppDesignTokens.iconDisplay,
+                            ),
+                          ),
+                          const SizedBox(width: AppDesignTokens.space3),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'سطح ${toPersianDigits(user.level)}',
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                                const SizedBox(height: AppDesignTokens.space1),
+                                Text(
+                                  '${toPersianDigits(user.xpInCurrentLevel)} از ۵۰۰ XP تا سطح بعدی',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            '${toPersianDigits((user.levelProgress * 100).round())}٪',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppDesignTokens.space4),
+                      AppProgressBar(value: user.levelProgress, height: 10),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _SectionTitle('لیگ شخصی آفلاین'),
+                const SizedBox(height: 8),
+                _OfflineLeagueCard(xp: user.xp),
+                const SizedBox(height: 24),
+
                 // ── Daily Missions ──
                 _SectionTitle('ماموریت‌های امروز'),
                 const SizedBox(height: 10),
                 _MissionCard(
                   title: 'تکمیل یک درس',
                   emoji: '📚',
-                  current: user.completedLessonIds.isNotEmpty ? 1 : 0,
+                  current: missionProgress['lesson'] ?? 0,
                   total: 1,
                   reward: 20,
+                  coinReward: 5,
+                  claimed: claimedMissions.contains('lesson'),
+                  onClaim: () => _claimMission(context, 'lesson'),
                 ),
                 _MissionCard(
                   title: 'مرور ۵ کلمه',
                   emoji: '🔁',
-                  current: 0,
+                  current: missionProgress['vocabulary'] ?? 0,
                   total: 5,
                   reward: 15,
+                  coinReward: 3,
+                  claimed: claimedMissions.contains('vocabulary'),
+                  onClaim: () => _claimMission(context, 'vocabulary'),
                 ),
                 _MissionCard(
-                  title: 'ثبت Streak امروز',
+                  title: 'حفظ روند مطالعهٔ دو روزه',
                   emoji: '🔥',
-                  current: user.streak > 0 ? 1 : 0,
+                  current: missionProgress['streak'] ?? 0,
                   total: 1,
                   reward: 10,
+                  coinReward: 2,
+                  claimed: claimedMissions.contains('streak'),
+                  onClaim: () => _claimMission(context, 'streak'),
                 ),
+                const SizedBox(height: 24),
+
+                // ── Weekly Missions ──
+                _SectionTitle('ماموریت‌های هفتگی'),
+                const SizedBox(height: 10),
+                _MissionCard(title: 'تکمیل ۳ درس', emoji: '📖',
+                  current: weeklyProgress['lessons'] ?? 0, total: 3, reward: 60, coinReward: 15,
+                  claimed: claimedWeekly.contains('lessons'),
+                  onClaim: () => _claimWeeklyMission(context, 'lessons')),
+                _MissionCard(title: 'مرور ۲۰ واژه', emoji: '🧠',
+                  current: weeklyProgress['vocabulary'] ?? 0, total: 20, reward: 50, coinReward: 12,
+                  claimed: claimedWeekly.contains('vocabulary'),
+                  onClaim: () => _claimWeeklyMission(context, 'vocabulary')),
+                _MissionCard(title: 'مطالعه در ۴ روز متفاوت', emoji: '📅',
+                  current: weeklyProgress['studyDays'] ?? 0, total: 4, reward: 75, coinReward: 20,
+                  claimed: claimedWeekly.contains('studyDays'),
+                  onClaim: () => _claimWeeklyMission(context, 'studyDays')),
                 const SizedBox(height: 24),
 
                 // ── Achievements ──
@@ -92,7 +195,7 @@ class RewardsScreen extends StatelessWidget {
                 // ── Streak Calendar ──
                 _SectionTitle('تقویم هفتگی'),
                 const SizedBox(height: 10),
-                _StreakCalendar(streak: user.streak),
+                _StreakCalendar(studyDateKeys: user.studyDateKeys),
                 const SizedBox(height: 30),
               ]),
             ),
@@ -113,13 +216,13 @@ class _TopStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 22)),
+        AnimatedSymbolIcon(symbol: emoji, size: 25, color: Colors.white),
         const SizedBox(height: 4),
         Text(value,
             style: const TextStyle(
                 fontFamily: 'Vazirmatn', fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
         Text(label,
-            style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: Colors.white70)),
+            style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11, color: const Color(0xEBFFFFFF))),
       ],
     );
   }
@@ -131,10 +234,30 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(title,
-        style: const TextStyle(
-            fontFamily: 'Vazirmatn', fontSize: 16, fontWeight: FontWeight.w700));
+    return AppSectionHeader(title: title);
   }
+}
+
+void _claimWeeklyMission(BuildContext context, String missionId) async {
+  final claimed = await context.read<UserProvider>().claimWeeklyMission(missionId);
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+    claimed ? 'پاداش هفتگی دریافت شد!' : 'ماموریت هنوز کامل نشده یا قبلاً دریافت شده است.',
+    style: const TextStyle(fontFamily: 'Vazirmatn'),
+  )));
+}
+
+void _claimMission(BuildContext context, String missionId) async {
+  final claimed = await context.read<UserProvider>().claimDailyMission(missionId);
+  if (!context.mounted) return;
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        claimed ? 'جایزه به حساب تو اضافه شد!' : 'این مأموریت هنوز کامل نشده یا جایزه‌اش دریافت شده است.',
+        style: const TextStyle(fontFamily: 'Vazirmatn'),
+      ),
+    ),
+  );
 }
 
 class _MissionCard extends StatelessWidget {
@@ -143,6 +266,9 @@ class _MissionCard extends StatelessWidget {
   final int current;
   final int total;
   final int reward;
+  final int coinReward;
+  final bool claimed;
+  final VoidCallback onClaim;
 
   const _MissionCard({
     required this.title,
@@ -150,6 +276,9 @@ class _MissionCard extends StatelessWidget {
     required this.current,
     required this.total,
     required this.reward,
+    this.coinReward = 0,
+    required this.claimed,
+    required this.onClaim,
   });
 
   @override
@@ -161,15 +290,15 @@ class _MissionCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: done ? AppColors.success.withOpacity(0.08) : Theme.of(context).cardColor,
+        color: done ? AppColors.success.withValues(alpha: 0.08) : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: done ? AppColors.success.withOpacity(0.4) : AppColors.dividerLight,
+          color: done ? AppColors.success.withValues(alpha: 0.4) : Theme.of(context).dividerColor,
         ),
       ),
       child: Row(
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 26)),
+          AnimatedSymbolIcon(symbol: emoji, size: 31, color: AppColors.primary),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -184,15 +313,22 @@ class _MissionCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.xpColor.withOpacity(0.15),
+                        color: AppColors.xpColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text('+$reward XP',
-                          style: const TextStyle(
-                              fontFamily: 'Vazirmatn',
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.warning)),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text('+${toPersianDigits(reward)} XP', style: const TextStyle(
+                          fontFamily: 'Vazirmatn', fontSize: 11,
+                          fontWeight: FontWeight.w700, color: AppColors.warning)),
+                        if (coinReward > 0) ...[
+                          const SizedBox(width: 5),
+                          Text('+${toPersianDigits(coinReward)}', style: const TextStyle(
+                            fontFamily: 'Vazirmatn', fontSize: 11,
+                            fontWeight: FontWeight.w700, color: AppColors.warning)),
+                          const SizedBox(width: 3),
+                          const AnimatedCoinIcon(size: 15),
+                        ],
+                      ]),
                     ),
                   ],
                 ),
@@ -205,26 +341,38 @@ class _MissionCard extends StatelessWidget {
                         child: LinearProgressIndicator(
                           value: progress.clamp(0.0, 1.0),
                           minHeight: 6,
-                          backgroundColor: AppColors.dividerLight,
+                          backgroundColor: Theme.of(context).dividerColor,
                           valueColor: AlwaysStoppedAnimation(
                               done ? AppColors.success : AppColors.primary),
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text('$current/$total',
-                        style: const TextStyle(
+                    Text('${toPersianDigits(current)}/${toPersianDigits(total)}',
+                        style: TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 11,
-                            color: AppColors.textSecondaryLight)),
+                            color: Theme.of(context).colorScheme.onSurfaceVariant)),
                   ],
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: claimed
+                      ? const Text('جایزه دریافت شد ✓',
+                          style: TextStyle(fontFamily: 'Vazirmatn', color: AppColors.success, fontSize: 11))
+                      : TextButton(
+                          onPressed: done ? onClaim : null,
+                          child: Text(done ? 'دریافت جایزه' : 'پس از تکمیل فعال می‌شود',
+                              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 11)),
+                        ),
                 ),
               ],
             ),
           ),
-          if (done) ...[
+          if (done && !claimed) ...[
             const SizedBox(width: 8),
-            const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 24),
+            const PouyanlyIcon(type: PouyanlyIconType.completed, color: AppColors.success, size: 24),
           ],
         ],
       ),
@@ -246,19 +394,20 @@ class _AchievementBadge extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: unlocked
-            ? AppColors.primary.withOpacity(0.08)
+            ? AppColors.primary.withValues(alpha: 0.08)
             : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: unlocked ? AppColors.primary.withOpacity(0.3) : AppColors.dividerLight,
+          color: unlocked ? AppColors.primary.withValues(alpha: 0.3) : Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            unlocked ? emoji : '🔒',
-            style: TextStyle(fontSize: unlocked ? 28 : 22),
+          AnimatedSymbolIcon(
+            symbol: unlocked ? emoji : '🔒',
+            size: unlocked ? 31 : 25,
+            color: unlocked ? AppColors.primary : Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           const SizedBox(height: 6),
           Text(title,
@@ -266,12 +415,12 @@ class _AchievementBadge extends StatelessWidget {
                 fontFamily: 'Vazirmatn',
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: unlocked ? AppColors.primary : AppColors.textSecondaryLight,
+                color: unlocked ? AppColors.primary : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center),
           Text(subtitle,
-              style: const TextStyle(
-                  fontFamily: 'Vazirmatn', fontSize: 10, color: AppColors.textSecondaryLight),
+              style: TextStyle(
+                  fontFamily: 'Vazirmatn', fontSize: 10, color: Theme.of(context).colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center),
         ],
       ),
@@ -280,58 +429,83 @@ class _AchievementBadge extends StatelessWidget {
 }
 
 class _StreakCalendar extends StatelessWidget {
-  final int streak;
-  const _StreakCalendar({required this.streak});
-
+  final List<String> studyDateKeys;
+  const _StreakCalendar({required this.studyDateKeys});
   @override
   Widget build(BuildContext context) {
-    final days = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
-    final today = DateTime.now().weekday % 7; // 0=Sun … 6=Sat
-
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final activeDates = studyDateKeys.toSet();
+    const labels = ['د', 'س', 'چ', 'پ', 'ج', 'ش', 'ی'];
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.dividerLight),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(7, (i) {
-          final isToday = i == today;
-          final inStreak = i <= today && i >= (today - streak + 1).clamp(0, 6);
-          return Column(
-            children: [
-              Text(days[i],
-                  style: TextStyle(
-                      fontFamily: 'Vazirmatn',
-                      fontSize: 11,
-                      color: isToday ? AppColors.primary : AppColors.textSecondaryLight)),
-              const SizedBox(height: 6),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: inStreak
-                      ? AppColors.streakColor.withOpacity(0.15)
-                      : Colors.transparent,
-                  border: Border.all(
-                    color: isToday ? AppColors.primary : Colors.transparent,
-                    width: 2,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    inStreak ? '🔥' : '○',
-                    style: TextStyle(fontSize: inStreak ? 18 : 14),
-                  ),
-                ),
-              ),
-            ],
-          );
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: List.generate(7, (index) {
+          final date = today.subtract(Duration(days: 6 - index));
+          final key = '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+          final isToday = index == 6;
+          final studied = activeDates.contains(key);
+          return Expanded(child: Column(children: [
+            Text(labels[date.weekday - 1], style: TextStyle(
+              fontFamily: 'Vazirmatn', fontSize: 11,
+              color: isToday ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant)),
+            const SizedBox(height: 6),
+            Container(width: 34, height: 34, decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: studied ? AppColors.streakColor.withValues(alpha: 0.16) : Colors.transparent,
+              border: Border.all(
+                color: isToday ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor,
+                width: isToday ? 2 : 1)),
+              child: Center(child: studied
+                ? const AnimatedFlameIcon(size: 20)
+                : Text(toPersianDigits(date.day), style: TextStyle(
+                    fontFamily: 'Vazirmatn', fontSize: 11,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant))),
+            ),
+          ]));
         }),
       ),
     );
   }
 }
+class _OfflineLeagueCard extends StatelessWidget {
+  final int xp;
+  const _OfflineLeagueCard({required this.xp});
+
+  @override
+  Widget build(BuildContext context) {
+    final String tier;
+    final int next;
+    if (xp < 500) { tier = 'برنز'; next = 500; }
+    else if (xp < 1500) { tier = 'نقره‌ای'; next = 1500; }
+    else if (xp < 3500) { tier = 'طلایی'; next = 3500; }
+    else { tier = 'الماسی'; next = 3500; }
+    final progress = xp >= 3500 ? 1.0 : (xp / next).clamp(0.0, 1.0).toDouble();
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(16)),
+      child: Row(children: [
+        const AnimatedSymbolIcon(symbol: '🏅', size: 36, color: Colors.white),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('لیگ $tier', style: const TextStyle(fontFamily: 'Vazirmatn',
+              color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17)),
+            Text(xp >= 3500 ? 'بالاترین لیگ فعلی را باز کردی' : 'برای لیگ بعدی به ${toPersianDigits(next)} XP برس',
+              style: const TextStyle(fontFamily: 'Vazirmatn', color: const Color(0xEBFFFFFF), fontSize: 11)),
+            const SizedBox(height: 8),
+            LinearProgressIndicator(value: progress, backgroundColor: Colors.white24,
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white)),
+          ])),
+      ]),
+    );
+  }
+}
+

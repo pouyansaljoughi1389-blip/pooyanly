@@ -8,6 +8,9 @@ class StorageService {
 
   static const _keyUser    = 'pouyanly_user';
   static const _keyDark    = 'pouyanly_dark';
+  static const _keyAssessmentHistory = 'pouyanly_assessment_history';
+  static const _keyDailyMissions = 'pouyanly_daily_missions';
+  static const _keyWeeklyMissions = 'pouyanly_weekly_missions';
 
   late SharedPreferences _prefs;
 
@@ -34,7 +37,63 @@ class StorageService {
     await _prefs.remove(_keyUser);
   }
 
+  // ── Placement assessment history ────────────────────────────────
+  List<Map<String, dynamic>> loadAssessmentHistory() {
+    final raw = _prefs.getString(_keyAssessmentHistory);
+    if (raw == null) return [];
+    try {
+      final decoded = jsonDecode(raw) as List<dynamic>;
+      return decoded.whereType<Map>()
+          .map((item) => Map<String, dynamic>.from(item)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> appendAssessment(Map<String, dynamic> snapshot) async {
+    final history = loadAssessmentHistory()..add(snapshot);
+    await _prefs.setString(_keyAssessmentHistory, jsonEncode(history));
+  }
+
+  Future<void> clearAssessmentHistory() async {
+    await _prefs.remove(_keyAssessmentHistory);
+  }
+
+
+  // ── Daily mission state ──────────────────────────────────────────
+  Map<String, dynamic> loadDailyMissionState() {
+    final raw = _prefs.getString(_keyDailyMissions);
+    if (raw == null) return <String, dynamic>{};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map<String, dynamic>) return decoded;
+      return <String, dynamic>{};
+    } catch (_) {
+      return <String, dynamic>{};
+    }
+  }
+
+  Future<void> saveDailyMissionState(Map<String, dynamic> state) async {
+    await _prefs.setString(_keyDailyMissions, jsonEncode(state));
+  }
+
   // ── Dark Mode ────────────────────────────────────────────────────
+  Map<String, dynamic> loadWeeklyMissionState() {
+    final raw = _prefs.getString(_keyWeeklyMissions);
+    if (raw == null) return <String, dynamic>{};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map<String, dynamic>) return decoded;
+      return <String, dynamic>{};
+    } catch (_) {
+      return <String, dynamic>{};
+    }
+  }
+
+  Future<void> saveWeeklyMissionState(Map<String, dynamic> state) async {
+    await _prefs.setString(_keyWeeklyMissions, jsonEncode(state));
+  }
+
   bool get isDarkMode => _prefs.getBool(_keyDark) ?? false;
 
   Future<void> setDarkMode(bool value) async {

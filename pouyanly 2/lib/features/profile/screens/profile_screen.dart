@@ -1,18 +1,248 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/pouyanly_icon.dart';
+import '../../../data/models/user_model.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/persian_digits.dart';
+import '../../../core/widgets/animated_game_icons.dart';
 import '../../../core/widgets/p_button.dart';
-import '../../../data/models/user_model.dart';
 import '../../../shared/providers/user_provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  static const int _avatarShopXpThreshold = 1000;
+  bool _promptScheduled = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _maybePromptAvatarShop();
+  }
+
+  void _maybePromptAvatarShop() {
+    final user = context.read<UserProvider>().user;
+    if (_promptScheduled || user == null || user.xp < _avatarShopXpThreshold || user.avatarShopPromptShown) return;
+    _promptScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await context.read<UserProvider>().markAvatarShopPromptShown();
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        builder: (dialogContext) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: const Text('وقتشه آواتارت رو ارتقا بدی!', style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w800)),
+            content: const Text('امتیاز XP خوبی جمع کردی. به فروشگاه پروفایل سر بزن و یک آواتار تازه انتخاب کن.', style: TextStyle(fontFamily: 'Vazirmatn')),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('بعداً')),
+              FilledButton(onPressed: () { Navigator.pop(dialogContext); _showAvatarShop(); }, child: const Text('فروشگاه آواتار')),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  Future<void> _showAvatarShop() async {
+    final provider = context.read<UserProvider>();
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Consumer<UserProvider>(builder: (context, currentProvider, _) {
+          final user = currentProvider.user;
+          if (user == null) return const SizedBox.shrink();
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('فروشگاه آواتار', style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 20, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 4),
+                Text('سکهٔ در دسترس: ${toPersianDigits(user.coins)}', style: TextStyle(fontFamily: 'Vazirmatn', color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                const SizedBox(height: 16),
+                Wrap(spacing: 10, runSpacing: 10, children: ['🦊', '🐼', '🐯', '🐸', '🐧', '🦉', '🐙', '🐨'].map((emoji) {
+                  final unlocked = user.unlockedAvatarEmojis.contains(emoji);
+                  final cost = UserProvider.avatarUnlockCosts[emoji] ?? 0;
+                  final selected = user.avatarEmoji == emoji;
+                  return InkWell(
+                    onTap: () async {
+                      if (unlocked) {
+                        await provider.setAvatarEmoji(emoji);
+                        if (sheetContext.mounted) Navigator.pop(sheetContext);
+                        return;
+                      }
+                      final success = await provider.unlockAvatarEmoji(emoji);
+                      if (success) await provider.setAvatarEmoji(emoji);
+                      if (!sheetContext.mounted) return;
+                      if (success) {
+                        Navigator.pop(sheetContext);
+                      } else {
+                        ScaffoldMessenger.of(sheetContext).showSnackBar(const SnackBar(content: Text('سکهٔ کافی نداری.')));
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(width: 76, height: 82, decoration: BoxDecoration(
+                      color: selected ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outlineVariant, width: selected ? 2 : 1),
+                    ), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Text(emoji, style: const TextStyle(fontSize: 30)),
+                      const SizedBox(height: 3),
+                      if (!unlocked) Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(toPersianDigits(cost), style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 10)), const SizedBox(width: 3), const AnimatedCoinIcon(size: 12)])
+                      else Text(selected ? 'انتخاب‌شده' : 'رایگان', style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 9)),
+                    ])),
+                  );
+                }).toList()),
+              ]),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Future<void> _editAccount(UserModel user) async {
+    final first = TextEditingController(text: user.firstName ?? '');
+    final last = TextEditingController(text: user.lastName ?? '');
+    final contact = TextEditingController(text: user.contact ?? '');
+    final formKey = GlobalKey<FormState>();
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text('ویرایش اطلاعات حساب'),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                TextFormField(
+                  controller: first,
+                  decoration: const InputDecoration(labelText: 'نام'),
+                  validator: (v) => v == null || v.trim().isEmpty ? 'نام را وارد کن.' : null,
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: last,
+                  decoration: const InputDecoration(labelText: 'نام خانوادگی'),
+                  validator: (v) => v == null || v.trim().isEmpty ? 'نام خانوادگی را وارد کن.' : null,
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: contact,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(labelText: 'ایمیل یا شماره تلفن'),
+                  validator: (v) {
+                    final value = v?.trim() ?? '';
+                    final email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(value);
+                    final phone = RegExp(r'^\+?[0-9\s()\-]{7,20}$').hasMatch(value);
+                    return email || phone ? null : 'ایمیل یا شمارهٔ معتبر وارد کن.';
+                  },
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'اطلاعات در حال حاضر فقط روی همین دستگاه ذخیره می‌شوند و این بخش احراز هویت آنلاین انجام نمی‌دهد.',
+                  style: Theme.of(dialogContext).textTheme.bodySmall,
+                ),
+              ]),
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('انصراف')),
+            FilledButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() == true) {
+                  Navigator.pop(dialogContext, true);
+                }
+              },
+              child: const Text('ذخیره'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (saved == true && mounted) {
+      final firstValue = first.text.trim();
+      final lastValue = last.text.trim();
+      final contactValue = contact.text.trim();
+      final isEmail = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(contactValue);
+      await context.read<UserProvider>().updateUser(user.copyWith(
+        firstName: firstValue,
+        lastName: lastValue,
+        name: '$firstValue $lastValue',
+        contact: contactValue,
+        contactType: isEmail ? 'email' : 'phone',
+      ));
+    }
+    first.dispose();
+    last.dispose();
+    contact.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final user = context.watch<UserProvider>().user;
-    if (user == null) return const SizedBox.shrink();
+    final provider = context.watch<UserProvider>();
+    final user = provider.user;
+    if (user == null) {
+      final theme = Theme.of(context);
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  provider.isInitialized
+                      ? Icons.person_off_outlined
+                      : Icons.person_outline_rounded,
+                  size: 54,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  provider.isInitialized
+                      ? 'هنوز حسابی برای نمایش وجود ندارد'
+                      : 'در حال بارگذاری پروفایل…',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  provider.isInitialized
+                      ? 'برای ساخت حساب و شروع یادگیری، به صفحهٔ شروع برو.'
+                      : 'اطلاعات حساب در حال آماده‌سازی است.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (!provider.isInitialized)
+                  const CircularProgressIndicator()
+                else
+                  FilledButton(
+                    onPressed: () => context.go('/welcome'),
+                    child: const Text('رفتن به صفحهٔ شروع'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    _maybePromptAvatarShop();
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -20,37 +250,50 @@ class ProfileScreen extends StatelessWidget {
         slivers: [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 200,
+            actions: [
+              IconButton(
+                tooltip: 'ویرایش اطلاعات حساب',
+                onPressed: () => _editAccount(user),
+                icon: const Icon(Icons.edit_outlined),
+              ),
+            ],
+            expandedHeight: 220,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(gradient: AppColors.heroGradient),
-                child: SafeArea(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
+                  ),
+                ),
+                child: Stack(children: [
+                  Positioned.fill(child: Center(child: Opacity(opacity: .16, child: FittedBox(fit: BoxFit.contain, child: Text(user.avatarEmoji, style: const TextStyle(fontSize: 190)))))),
+                  SafeArea(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 72,
-                        height: 72,
+                      InkWell(
+                        onTap: _showAvatarShop,
+                        customBorder: const CircleBorder(),
+                        child: Container(
+                        width: 88,
+                        height: 88,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 3),
+                          border: Border.all(color: user.xp >= _avatarShopXpThreshold ? Theme.of(context).colorScheme.error : Colors.white, width: user.xp >= _avatarShopXpThreshold ? 5 : 3),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
+                              color: Colors.black.withValues(alpha: 0.15),
                               blurRadius: 15,
                             ),
                           ],
                         ),
                         child: Center(
-                          child: Text(
-                            user.name?.isNotEmpty == true
-                                ? user.name![0].toUpperCase()
-                                : '🦁',
-                            style: const TextStyle(fontSize: 32),
-                          ),
+                          child: Text(user.avatarEmoji, style: const TextStyle(fontSize: 48)),
                         ),
-                      ),
+                      )),
                       const SizedBox(height: 10),
                       Text(
                         user.name ?? 'زبان‌آموز',
@@ -69,7 +312,7 @@ class ProfileScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          'سطح ${user.cefrLevel.label} — ${user.cefrLevel.farsiDescription}',
+                          'ردهٔ مهارت: ${_skillBandLabel(user.cefrLevel)}',
                           style: const TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 12,
@@ -80,6 +323,7 @@ class ProfileScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+                ]),
               ),
             ),
           ),
@@ -91,14 +335,24 @@ class ProfileScreen extends StatelessWidget {
                 // Stats row
                 Row(
                   children: [
-                    _StatBox('${user.xp}', 'امتیاز XP', '⭐'),
+                    _StatBox(toPersianDigits(user.xp), 'امتیاز XP', '⭐'),
                     const SizedBox(width: 10),
-                    _StatBox('${user.streak}', 'روز پیاپی', '🔥'),
+                    _StatBox(toPersianDigits(user.streak), 'روز پیاپی', '🔥'),
                     const SizedBox(width: 10),
-                    _StatBox('${user.completedLessonIds.length}', 'درس', '✅'),
+                    _StatBox(toPersianDigits(user.completedLessonIds.length), 'درس', '✅'),
                   ],
                 ),
                 const SizedBox(height: 24),
+
+                _InfoSection(
+                  title: 'اطلاعات حساب',
+                  children: [
+                    _InfoRow('نام و نام خانوادگی', user.name ?? 'زبان‌آموز', '👤'),
+                    _InfoRow(user.contactType == 'phone' ? 'شماره تلفن' : 'ایمیل', user.contact ?? 'ثبت نشده', '✉️'),
+                    _InfoRow('نوع حساب', 'محلی · ذخیره‌شده روی دستگاه', '📱'),
+                  ],
+                ),
+                const SizedBox(height: 16),
 
                 // Learning info
                 _InfoSection(
@@ -107,7 +361,7 @@ class ProfileScreen extends StatelessWidget {
                     _InfoRow('هدف', user.goal?.farsiLabel ?? 'تنظیم نشده', '🎯'),
                     _InfoRow('زمان روزانه',
                         user.dailyStudyTime?.farsiLabel ?? 'تنظیم نشده', '⏱️'),
-                    _InfoRow('سطح CEFR', user.cefrLevel.label, '📊'),
+                    _InfoRow('ردهٔ مهارت', _skillBandLabel(user.cefrLevel), '📊'),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -136,23 +390,29 @@ class ProfileScreen extends StatelessWidget {
                   title: 'تنظیمات',
                   children: [
                     _SettingRow(
-                      icon: Icons.dark_mode_rounded,
+                      icon: PouyanlyIconType.settings,
                       label: 'حالت تاریک',
                       trailing: Switch(
                         value: user.isDarkMode,
                         onChanged: (v) =>
                             context.read<UserProvider>().toggleDarkMode(),
-                        activeColor: AppColors.primary,
+                        activeThumbColor: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     _SettingRow(
-                      icon: Icons.notifications_rounded,
+                      icon: PouyanlyIconType.timer,
                       label: 'یادآور روزانه',
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => context.go('/settings'),
                     ),
                     _SettingRow(
-                      icon: Icons.map_rounded,
+                      icon: PouyanlyIconType.school,
+                      label: 'دربارهٔ POUYANLY',
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.push('/about'),
+                    ),
+                    _SettingRow(
+                      icon: PouyanlyIconType.learningPath,
                       label: 'انجام دوباره آزمون سطح',
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => context.go('/placement-test'),
@@ -176,6 +436,23 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  String _skillBandLabel(CefrLevel level) {
+    switch (level) {
+      case CefrLevel.a1:
+      case CefrLevel.a2:
+        return 'مبتدی';
+      case CefrLevel.b1:
+        return 'متوسط';
+      case CefrLevel.b2:
+        return 'متوسط رو به بالا';
+      case CefrLevel.c1:
+      case CefrLevel.c2:
+        return 'پیشرفته';
+      case CefrLevel.unknown:
+        return 'هنوز ارزیابی نشده';
+    }
+  }
+
   void _showResetDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -187,7 +464,7 @@ class ProfileScreen extends StatelessWidget {
             style: TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w700),
           ),
           content: const Text(
-            'تمام پیشرفت شما حذف خواهد شد. این عمل قابل بازگشت نیست.',
+            'درس‌های تکمیل‌شده، XP، سکه‌ها، زنجیرهٔ روزانه، مرور واژگان و نتایج آزمون پاک می‌شوند؛ اما اطلاعات حساب و آواتار باقی می‌مانند. این عمل قابل بازگشت نیست.',
             style: TextStyle(fontFamily: 'Vazirmatn'),
           ),
           actions: [
@@ -199,12 +476,12 @@ class ProfileScreen extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 Navigator.pop(ctx);
-                await context.read<UserProvider>().reset();
-                if (context.mounted) context.go('/welcome');
+                await context.read<UserProvider>().resetProgress();
+                if (context.mounted) context.go('/placement-test');
               },
-              child: const Text('بازنشانی',
+              child: Text('بازنشانی',
                   style: TextStyle(
-                      fontFamily: 'Vazirmatn', color: AppColors.error)),
+                      fontFamily: 'Vazirmatn', color: Theme.of(context).colorScheme.error)),
             ),
           ],
         ),
@@ -227,27 +504,27 @@ class _StatBox extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.dividerLight),
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Column(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 22)),
+            AnimatedSymbolIcon(symbol: emoji, size: 25, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 4),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Vazirmatn',
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Vazirmatn',
                 fontSize: 11,
-                color: AppColors.textSecondaryLight,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -269,11 +546,11 @@ class _InfoSection extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Vazirmatn',
             fontSize: 15,
             fontWeight: FontWeight.w700,
-            color: AppColors.textSecondaryLight,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 8),
@@ -281,7 +558,7 @@ class _InfoSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.dividerLight),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
           child: Column(children: children),
         ),
@@ -302,7 +579,7 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 18)),
+          AnimatedSymbolIcon(symbol: emoji, size: 21, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 12),
           Text(
             label,
@@ -314,11 +591,11 @@ class _InfoRow extends StatelessWidget {
           const Spacer(),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Vazirmatn',
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ],
@@ -352,14 +629,14 @@ class _ScoreRow extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: score / 100,
                 minHeight: 8,
-                backgroundColor: AppColors.dividerLight,
+                backgroundColor: Theme.of(context).colorScheme.outlineVariant,
                 valueColor: AlwaysStoppedAnimation(color),
               ),
             ),
           ),
           const SizedBox(width: 8),
           Text(
-            '$score%',
+            toPersianDigits('$score٪'),
             style: TextStyle(
               fontFamily: 'Vazirmatn',
               fontSize: 13,
@@ -374,7 +651,7 @@ class _ScoreRow extends StatelessWidget {
 }
 
 class _SettingRow extends StatelessWidget {
-  final IconData icon;
+  final PouyanlyIconType icon;
   final String label;
   final Widget trailing;
   final VoidCallback? onTap;
@@ -393,7 +670,7 @@ class _SettingRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.primary),
+            PouyanlyIcon(type: icon, size: 20, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 12),
             Expanded(
               child: Text(

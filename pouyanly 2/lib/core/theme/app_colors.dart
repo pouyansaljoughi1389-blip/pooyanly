@@ -4,31 +4,31 @@ class AppColors {
   AppColors._();
 
   // ── Primary Palette ──────────────────────────────────────────────
-  static const Color primary        = Color(0xFF6C63FF);
-  static const Color primaryLight   = Color(0xFF9D97FF);
-  static const Color primaryDark    = Color(0xFF4A42D6);
+  static const Color primary        = Color(0xFF5B5FEF);
+  static const Color primaryLight   = Color(0xFF898DFF);
+  static const Color primaryDark    = Color(0xFF4145C8);
 
-  static const Color secondary      = Color(0xFF00C896);
-  static const Color secondaryLight = Color(0xFF4DDBAF);
-  static const Color secondaryDark  = Color(0xFF009E76);
+  static const Color secondary      = Color(0xFF08745D);
+  static const Color secondaryLight = Color(0xFF55D9C0);
+  static const Color secondaryDark  = Color(0xFF065C4B);
 
-  static const Color accent         = Color(0xFFFF6B6B);
+  static const Color accent         = Color(0xFFC43F4A);
   static const Color accentLight    = Color(0xFFFF9E9E);
-  static const Color accentDark     = Color(0xFFD94040);
+  static const Color accentDark     = Color(0xFF9F2838);
 
   // ── Semantic Colors ──────────────────────────────────────────────
-  static const Color success  = Color(0xFF2ECC71);
-  static const Color warning  = Color(0xFFF39C12);
-  static const Color error    = Color(0xFFE74C3C);
-  static const Color info     = Color(0xFF3498DB);
+  static const Color success  = Color(0xFF16834A);
+  static const Color warning  = Color(0xFF9A5B00);
+  static const Color error    = Color(0xFFB42318);
+  static const Color info     = Color(0xFF1D5FA7);
 
   // ── CEFR Level Colors ────────────────────────────────────────────
-  static const Color cefrA1   = Color(0xFF4CAF50);
-  static const Color cefrA2   = Color(0xFF8BC34A);
-  static const Color cefrB1   = Color(0xFF2196F3);
+  static const Color cefrA1   = Color(0xFF2E7D32);
+  static const Color cefrA2   = Color(0xFF4D7C0F);
+  static const Color cefrB1   = Color(0xFF1565C0);
   static const Color cefrB2   = Color(0xFF9C27B0);
-  static const Color cefrC1   = Color(0xFFFF9800);
-  static const Color cefrC2   = Color(0xFFF44336);
+  static const Color cefrC1   = Color(0xFFA64B00);
+  static const Color cefrC2   = Color(0xFFC62828);
 
   // ── Gamification Colors ──────────────────────────────────────────
   static const Color xpColor     = Color(0xFFFFD700);
@@ -36,42 +36,61 @@ class AppColors {
   static const Color streakColor = Color(0xFFFF6B35);
 
   // ── Light Theme Neutrals ─────────────────────────────────────────
-  static const Color backgroundLight     = Color(0xFFF8F7FF);
+  static const Color backgroundLight     = Color(0xFFF5F6FC);
   static const Color surfaceLight        = Color(0xFFFFFFFF);
   static const Color cardLight           = Color(0xFFFFFFFF);
-  static const Color textPrimaryLight    = Color(0xFF1A1A2E);
+  static const Color textPrimaryLight    = Color(0xFF171B30);
   static const Color textSecondaryLight  = Color(0xFF6B7280);
   static const Color dividerLight        = Color(0xFFE5E7EB);
 
   // ── Dark Theme Neutrals ──────────────────────────────────────────
-  static const Color backgroundDark     = Color(0xFF0F0F1A);
+  static const Color backgroundDark     = Color(0xFF0D1020);
   static const Color surfaceDark        = Color(0xFF1A1A2E);
-  static const Color cardDark           = Color(0xFF252538);
+  static const Color cardDark           = Color(0xFF202640);
   static const Color textPrimaryDark    = Color(0xFFF1F1FF);
   static const Color textSecondaryDark  = Color(0xFF9CA3AF);
-  static const Color dividerDark        = Color(0xFF374151);
+  static const Color dividerDark        = Color(0xFF39374B);
+
+  // ── Theme surface roles ─────────────────────────────────────────
+  // Keep these roles as the single source of truth for AppTheme.
+  static const Color backgroundLightRole = Color(0xFFF6F5FA);
+  static const Color surfaceLightRole = Color(0xFFFFFFFF);
+  static const Color cardLightRole = Color(0xFFFFFFFF);
+  static const Color foregroundLightRole = Color(0xFF211D32);
+  static const Color secondaryTextLightRole = Color(0xFF6D687C);
+  static const Color outlineLightRole = Color(0xFFE7E3EF);
+
+  static const Color backgroundDarkRole = Color(0xFF10111B);
+  static const Color surfaceDarkRole = Color(0xFF191A27);
+  static const Color cardDarkRole = Color(0xFF202131);
+  static const Color foregroundDarkRole = Color(0xFFF4F2FC);
+  static const Color secondaryTextDarkRole = Color(0xFFB5B1C5);
+  static const Color outlineDarkRole = Color(0xFF39374B);
 
   // ── Gradients ────────────────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF6C63FF), Color(0xFF9D97FF)],
+    // Both stops maintain readable white foreground text in light mode.
+    colors: [Color(0xFF5057E8), Color(0xFF4145C8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient successGradient = LinearGradient(
-    colors: [Color(0xFF00C896), Color(0xFF4DDBAF)],
+    // Darker teal stops preserve contrast for white labels and icons.
+    colors: [Color(0xFF087F68), Color(0xFF08745D)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient heroGradient = LinearGradient(
-    colors: [Color(0xFF6C63FF), Color(0xFF00C896)],
+    // Avoid the low-contrast mint endpoint used behind white hero text.
+    colors: [Color(0xFF5057E8), Color(0xFF087A6B)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient warmGradient = LinearGradient(
-    colors: [Color(0xFFFF6B6B), Color(0xFFFF9E9E)],
+    colors: [Color(0xFFB53A4B), Color(0xFF8F2E47)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

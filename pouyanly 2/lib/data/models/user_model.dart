@@ -108,6 +108,10 @@ enum CefrLevel {
 class UserModel {
   final String id;
   final String? name;
+  final String? firstName;
+  final String? lastName;
+  final String? contact;
+  final String? contactType;
   final LearningGoal? goal;
   final EngLevel? selfAssessedLevel;
   final StudyTime? dailyStudyTime;
@@ -122,6 +126,20 @@ class UserModel {
   final bool placementTestComplete;
   final Map<String, int> skillScores;
   final List<String> completedLessonIds;
+  /// Local calendar dates (yyyy-MM-dd) on which the learner completed a lesson.
+  final List<String> studyDateKeys;
+  final Map<String, String> vocabularyReviewDueDates;
+  final Map<String, int> vocabularyReviewIntervals;
+  final Map<String, int> vocabularyReviewRepetitions;
+  final Map<String, int> vocabularyReviewMistakes;
+  /// Serialized FSRS-6 card state, keyed by normalized vocabulary term.
+  final Map<String, Map<String, dynamic>> vocabularyFsrsCards;
+  /// Append-only review evidence, capped by the provider to protect local storage.
+  final List<Map<String, dynamic>> vocabularyReviewHistory;
+  final String avatarEmoji;
+  final List<String> unlockedAvatarEmojis;
+  final bool avatarShopPromptShown;
+  final int curriculumVersion;
   final bool notificationsEnabled;
   final bool isDarkMode;
   final DateTime createdAt;
@@ -129,6 +147,10 @@ class UserModel {
   const UserModel({
     required this.id,
     this.name,
+    this.firstName,
+    this.lastName,
+    this.contact,
+    this.contactType,
     this.goal,
     this.selfAssessedLevel,
     this.dailyStudyTime,
@@ -143,6 +165,17 @@ class UserModel {
     this.placementTestComplete = false,
     this.skillScores = const {},
     this.completedLessonIds = const [],
+    this.studyDateKeys = const [],
+    this.vocabularyReviewDueDates = const {},
+    this.vocabularyReviewIntervals = const {},
+    this.vocabularyReviewRepetitions = const {},
+    this.vocabularyReviewMistakes = const {},
+    this.vocabularyFsrsCards = const {},
+    this.vocabularyReviewHistory = const [],
+    this.avatarEmoji = '🦊',
+    this.unlockedAvatarEmojis = const ['🦊'],
+    this.avatarShopPromptShown = false,
+    this.curriculumVersion = 2,
     this.notificationsEnabled = true,
     this.isDarkMode = false,
     required this.createdAt,
@@ -157,6 +190,10 @@ class UserModel {
   UserModel copyWith({
     String? id,
     String? name,
+    String? firstName,
+    String? lastName,
+    String? contact,
+    String? contactType,
     LearningGoal? goal,
     EngLevel? selfAssessedLevel,
     StudyTime? dailyStudyTime,
@@ -167,10 +204,22 @@ class UserModel {
     int? streak,
     int? longestStreak,
     DateTime? lastStudyDate,
+    bool clearLastStudyDate = false,
     bool? onboardingComplete,
     bool? placementTestComplete,
     Map<String, int>? skillScores,
     List<String>? completedLessonIds,
+    List<String>? studyDateKeys,
+    Map<String, String>? vocabularyReviewDueDates,
+    Map<String, int>? vocabularyReviewIntervals,
+    Map<String, int>? vocabularyReviewRepetitions,
+    Map<String, int>? vocabularyReviewMistakes,
+    Map<String, Map<String, dynamic>>? vocabularyFsrsCards,
+    List<Map<String, dynamic>>? vocabularyReviewHistory,
+    String? avatarEmoji,
+    List<String>? unlockedAvatarEmojis,
+    bool? avatarShopPromptShown,
+    int? curriculumVersion,
     bool? notificationsEnabled,
     bool? isDarkMode,
     DateTime? createdAt,
@@ -178,6 +227,10 @@ class UserModel {
     return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      contact: contact ?? this.contact,
+      contactType: contactType ?? this.contactType,
       goal: goal ?? this.goal,
       selfAssessedLevel: selfAssessedLevel ?? this.selfAssessedLevel,
       dailyStudyTime: dailyStudyTime ?? this.dailyStudyTime,
@@ -187,11 +240,22 @@ class UserModel {
       coins: coins ?? this.coins,
       streak: streak ?? this.streak,
       longestStreak: longestStreak ?? this.longestStreak,
-      lastStudyDate: lastStudyDate ?? this.lastStudyDate,
+      lastStudyDate: clearLastStudyDate ? null : (lastStudyDate ?? this.lastStudyDate),
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       placementTestComplete: placementTestComplete ?? this.placementTestComplete,
       skillScores: skillScores ?? this.skillScores,
       completedLessonIds: completedLessonIds ?? this.completedLessonIds,
+      studyDateKeys: studyDateKeys ?? this.studyDateKeys,
+      vocabularyReviewDueDates: vocabularyReviewDueDates ?? this.vocabularyReviewDueDates,
+      vocabularyReviewIntervals: vocabularyReviewIntervals ?? this.vocabularyReviewIntervals,
+      vocabularyReviewRepetitions: vocabularyReviewRepetitions ?? this.vocabularyReviewRepetitions,
+      vocabularyReviewMistakes: vocabularyReviewMistakes ?? this.vocabularyReviewMistakes,
+      vocabularyFsrsCards: vocabularyFsrsCards ?? this.vocabularyFsrsCards,
+      vocabularyReviewHistory: vocabularyReviewHistory ?? this.vocabularyReviewHistory,
+      avatarEmoji: avatarEmoji ?? this.avatarEmoji,
+      unlockedAvatarEmojis: unlockedAvatarEmojis ?? this.unlockedAvatarEmojis,
+      avatarShopPromptShown: avatarShopPromptShown ?? this.avatarShopPromptShown,
+      curriculumVersion: curriculumVersion ?? this.curriculumVersion,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       isDarkMode: isDarkMode ?? this.isDarkMode,
       createdAt: createdAt ?? this.createdAt,
@@ -202,6 +266,10 @@ class UserModel {
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
+    'firstName': firstName,
+    'lastName': lastName,
+    'contact': contact,
+    'contactType': contactType,
     'goal': goal?.name,
     'selfAssessedLevel': selfAssessedLevel?.name,
     'dailyStudyTime': dailyStudyTime?.name,
@@ -216,6 +284,17 @@ class UserModel {
     'placementTestComplete': placementTestComplete,
     'skillScores': skillScores,
     'completedLessonIds': completedLessonIds,
+    'studyDateKeys': studyDateKeys,
+    'vocabularyReviewDueDates': vocabularyReviewDueDates,
+    'vocabularyReviewIntervals': vocabularyReviewIntervals,
+    'vocabularyReviewRepetitions': vocabularyReviewRepetitions,
+    'vocabularyReviewMistakes': vocabularyReviewMistakes,
+    'vocabularyFsrsCards': vocabularyFsrsCards,
+    'vocabularyReviewHistory': vocabularyReviewHistory,
+    'avatarEmoji': avatarEmoji,
+    'unlockedAvatarEmojis': unlockedAvatarEmojis,
+    'avatarShopPromptShown': avatarShopPromptShown,
+    'curriculumVersion': curriculumVersion,
     'notificationsEnabled': notificationsEnabled,
     'isDarkMode': isDarkMode,
     'createdAt': createdAt.toIso8601String(),
@@ -224,6 +303,10 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> j) => UserModel(
     id: j['id'] ?? '',
     name: j['name'],
+    firstName: j['firstName'],
+    lastName: j['lastName'],
+    contact: j['contact'],
+    contactType: j['contactType'],
     goal: j['goal'] != null
         ? LearningGoal.values.firstWhere((e) => e.name == j['goal'],
             orElse: () => LearningGoal.general)
@@ -252,6 +335,24 @@ class UserModel {
     placementTestComplete: j['placementTestComplete'] ?? false,
     skillScores: Map<String, int>.from(j['skillScores'] ?? {}),
     completedLessonIds: List<String>.from(j['completedLessonIds'] ?? []),
+    studyDateKeys: List<String>.from(j['studyDateKeys'] ?? []),
+    vocabularyReviewDueDates: Map<String, String>.from(j['vocabularyReviewDueDates'] ?? {}),
+    vocabularyReviewIntervals: Map<String, int>.from(j['vocabularyReviewIntervals'] ?? {}),
+    vocabularyReviewRepetitions: Map<String, int>.from(j['vocabularyReviewRepetitions'] ?? {}),
+    vocabularyReviewMistakes: Map<String, int>.from(j['vocabularyReviewMistakes'] ?? {}),
+    vocabularyFsrsCards: Map<String, Map<String, dynamic>>.from(
+      (j['vocabularyFsrsCards'] as Map? ?? {}).map((key, value) => MapEntry(
+        key.toString(), Map<String, dynamic>.from(value as Map),
+      )),
+    ),
+    vocabularyReviewHistory: (j['vocabularyReviewHistory'] as List? ?? const [])
+        .whereType<Map>()
+        .map((entry) => Map<String, dynamic>.from(entry))
+        .toList(),
+    avatarEmoji: j['avatarEmoji'] ?? '🦊',
+    unlockedAvatarEmojis: List<String>.from(j['unlockedAvatarEmojis'] ?? ['🦊']),
+    avatarShopPromptShown: j['avatarShopPromptShown'] ?? false,
+    curriculumVersion: j['curriculumVersion'] is int ? j['curriculumVersion'] as int : 0,
     notificationsEnabled: j['notificationsEnabled'] ?? true,
     isDarkMode: j['isDarkMode'] ?? false,
     createdAt: DateTime.tryParse(j['createdAt'] ?? '') ?? DateTime.now(),

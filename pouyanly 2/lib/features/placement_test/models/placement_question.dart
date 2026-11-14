@@ -1,4 +1,3 @@
-import '../../lessons/models/lesson_data.dart';
 import '../../../data/models/user_model.dart';
 
 class PlacementQuestion {
@@ -189,56 +188,148 @@ class PlacementTestData {
       correctAnswer: 'با وجود',
       explanationFarsi: '"Despite" یعنی "با وجود" یا "علیرغم". این کلمه برای بیان تضاد به کار می‌رود.',
     ),
+
+    // ── Extended B2, C1 and C2 screening ──
+    const PlacementQuestion(
+      id: 'pt_14', skill: 'grammar', cefrLevel: 'B2', difficulty: 4,
+      question: 'Rarely ___ such a convincing explanation.',
+      questionFarsi: 'کدام گزینه ساختار وارونهٔ درست را کامل می‌کند؟',
+      options: ['I have heard', 'have I heard', 'I heard', 'heard I'],
+      correctAnswer: 'have I heard',
+      explanationFarsi: 'پس از قید منفی Rarely در ابتدای جمله، وارونگی فعل کمکی و فاعل رخ می‌دهد.',
+    ),
+    const PlacementQuestion(
+      id: 'pt_15', skill: 'reading', cefrLevel: 'B2', difficulty: 4,
+      question: 'The proposal was viable, albeit costly. What does albeit mean?',
+      questionFarsi: 'در جمله، albeit چه معنایی دارد؟',
+      options: ['زیرا', 'اگرچه', 'بنابراین', 'مگر اینکه'],
+      correctAnswer: 'اگرچه',
+      explanationFarsi: 'Albeit معادل رسمی although است و معنی «اگرچه» می‌دهد.',
+    ),
+    const PlacementQuestion(
+      id: 'pt_16', skill: 'vocabulary', cefrLevel: 'C1', difficulty: 5,
+      question: 'Which word means “to make something less severe”?',
+      questionFarsi: 'کدام واژه به معنی «از شدت چیزی کاستن» است؟',
+      options: ['Exacerbate', 'Mitigate', 'Disregard', 'Constitute'],
+      correctAnswer: 'Mitigate',
+      explanationFarsi: 'Mitigate یعنی شدت یا اثر منفی چیزی را کاهش دادن.',
+    ),
+    const PlacementQuestion(
+      id: 'pt_17', skill: 'grammar', cefrLevel: 'C1', difficulty: 5,
+      question: 'Had I known about the delay, I ___ earlier.',
+      questionFarsi: 'جملهٔ شرطی وارونه را کامل کنید.',
+      options: ['would leave', 'will have left', 'would have left', 'had left'],
+      correctAnswer: 'would have left',
+      explanationFarsi: 'در شرطی نوع سوم وارونه، Had + subject + past participle با would have + past participle می‌آید.',
+    ),
+    const PlacementQuestion(
+      id: 'pt_18', skill: 'reading', cefrLevel: 'C1', difficulty: 5,
+      question: 'The findings are tentative and should not be extrapolated. What is the warning?',
+      questionFarsi: 'مفهوم جمله چیست؟',
+      options: ['نتایج قطعی‌اند', 'نباید نتیجه را فراتر از داده‌ها تعمیم داد', 'پژوهش تکرار شده', 'داده‌ای وجود ندارد'],
+      correctAnswer: 'نباید نتیجه را فراتر از داده‌ها تعمیم داد',
+      explanationFarsi: 'Tentative یعنی موقت و محتاطانه؛ extrapolate یعنی برون‌یابی یا تعمیم فراتر از داده‌های موجود.',
+    ),
+    const PlacementQuestion(
+      id: 'pt_19', skill: 'vocabulary', cefrLevel: 'C2', difficulty: 6,
+      question: 'A “perfunctory” response is best described as:',
+      questionFarsi: 'پاسخ perfunctory چه ویژگی‌ای دارد؟',
+      options: ['دقیق و موشکافانه', 'سرسری و از روی رفع تکلیف', 'صمیمانه و طولانی', 'مبهم و شاعرانه'],
+      correctAnswer: 'سرسری و از روی رفع تکلیف',
+      explanationFarsi: 'Perfunctory برای کاری به کار می‌رود که بدون توجه و صرفاً برای انجام وظیفه انجام شده است.',
+    ),
+    const PlacementQuestion(
+      id: 'pt_20', skill: 'grammar', cefrLevel: 'C2', difficulty: 6,
+      question: 'No sooner ___ the announcement than the audience applauded.',
+      questionFarsi: 'ساختار وارونهٔ No sooner را کامل کنید.',
+      options: ['had she made', 'she had made', 'did she made', 'has she make'],
+      correctAnswer: 'had she made',
+      explanationFarsi: 'ساختار No sooner ... than با وارونگی و Past Perfect ساخته می‌شود.',
+    ),
+    const PlacementQuestion(
+      id: 'pt_21', skill: 'reading', cefrLevel: 'C2', difficulty: 6,
+      question: 'His account was equivocal, leaving the central issue unresolved. What does equivocal imply?',
+      questionFarsi: 'equivocal در این جمله چه معنایی دارد؟',
+      options: ['کاملاً روشن', 'دوپهلو و قابل تفسیر به چند شکل', 'مستند و قطعی', 'نامرتبط'],
+      correctAnswer: 'دوپهلو و قابل تفسیر به چند شکل',
+      explanationFarsi: 'Equivocal یعنی مبهم یا دوپهلو؛ به‌گونه‌ای که یک برداشت قطعی ارائه نمی‌کند.',
+    ),
+
   ];
 
-  // ── Calculate CEFR result from answers ───────────────────────────
+  // ── Calculate a conservative, skill-aware placement result ─────────
+  // Unanswered questions are excluded rather than counted as incorrect.
+  // A learner must demonstrate the prerequisite level before a higher
+  // level can be recommended.
   static Map<String, dynamic> calculateResult(Map<String, String> answers) {
-    final Map<String, List<bool>> skillResults = {
+    final skillResults = <String, List<bool>>{
       'vocabulary': [],
       'grammar': [],
       'reading': [],
     };
-
-    final Map<String, List<bool>> levelResults = {
-      'A1': [], 'A2': [], 'B1': [], 'B2': [],
+    final levelResults = <String, List<bool>>{
+      'A1': [], 'A2': [], 'B1': [], 'B2': [], 'C1': [], 'C2': [],
     };
 
     for (final q in questions) {
       final answer = answers[q.id];
+      if (answer == null) continue;
       final correct = answer == q.correctAnswer;
       skillResults[q.skill]?.add(correct);
       levelResults[q.cefrLevel]?.add(correct);
     }
 
-    // Skill percentages
     final skillScores = <String, int>{};
     for (final entry in skillResults.entries) {
       if (entry.value.isEmpty) continue;
-      final correct = entry.value.where((b) => b).length;
-      skillScores[entry.key] = ((correct / entry.value.length) * 100).round();
+      final correct = entry.value.where((value) => value).length;
+      skillScores[entry.key] = (correct * 100 / entry.value.length).round();
     }
 
-    // Level accuracy
-    double a1Score = _levelScore(levelResults['A1']!);
-    double a2Score = _levelScore(levelResults['A2']!);
-    double b1Score = _levelScore(levelResults['B1']!);
-    double b2Score = _levelScore(levelResults['B2']!);
+    final levelScores = <String, double>{
+      for (final entry in levelResults.entries)
+        entry.key: _levelScore(entry.value),
+    };
 
-    // Determine CEFR level
-    CefrLevel cefrLevel;
-    if (b2Score >= 0.7) {
-      cefrLevel = CefrLevel.b2;
-    } else if (b1Score >= 0.6) {
-      cefrLevel = CefrLevel.b1;
-    } else if (a2Score >= 0.6) {
-      cefrLevel = CefrLevel.a2;
-    } else {
-      cefrLevel = CefrLevel.a1;
+    // No submitted answers means no defensible level estimate.
+    if (answers.isEmpty) {
+      return {
+        'cefrLevel': CefrLevel.unknown,
+        'skillScores': skillScores,
+        'levelScores': levelScores,
+        'answeredCount': 0,
+        'totalCount': questions.length,
+      };
+    }
+
+    // The current question bank is a short screening tool, not a certified
+    // CEFR exam. Use conservative progression and never skip prerequisites.
+    var estimatedLevel = CefrLevel.a1;
+    if (levelScores['A1']! >= 0.67) {
+      estimatedLevel = CefrLevel.a1;
+      if (levelScores['A2']! >= 0.60) {
+        estimatedLevel = CefrLevel.a2;
+        if (levelScores['B1']! >= 0.60) {
+          estimatedLevel = CefrLevel.b1;
+          if (levelScores['B2']! >= 0.60) {
+            estimatedLevel = CefrLevel.b2;
+            if (levelScores['C1']! >= 0.60) {
+              estimatedLevel = CefrLevel.c1;
+              if (levelScores['C2']! >= 0.60) {
+                estimatedLevel = CefrLevel.c2;
+              }
+            }
+          }
+        }
+      }
     }
 
     return {
-      'cefrLevel': cefrLevel,
+      'cefrLevel': estimatedLevel,
       'skillScores': skillScores,
+      'levelScores': levelScores,
+      'answeredCount': answers.length,
+      'totalCount': questions.length,
     };
   }
 

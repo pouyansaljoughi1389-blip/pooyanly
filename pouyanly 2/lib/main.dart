@@ -6,20 +6,31 @@ import 'shared/providers/user_provider.dart';
 import 'data/local/storage_service.dart';
 import 'features/onboarding/screens/splash_screen.dart';
 import 'features/onboarding/screens/welcome_screen.dart';
+import 'features/onboarding/screens/account_screen.dart';
 import 'features/onboarding/screens/onboarding_screen.dart';
 import 'features/placement_test/screens/placement_test_screen.dart';
 import 'features/placement_test/screens/placement_result_screen.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/lessons/screens/lesson_screen.dart';
 import 'features/learning_path/screens/learning_path_screen.dart';
+import 'features/learning_path/screens/checkpoint_screen.dart';
 import 'features/settings/screens/settings_screen.dart';
+import 'features/tutor/screens/tutor_screen.dart';
+import 'features/community/screens/community_screen.dart';
+import 'features/listening/screens/listening_screen.dart';
+import 'features/about/screens/about_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StorageService.instance.init();
+  final userProvider = UserProvider();
+  // Hydrate the persisted account before the router can build any screen.
+  // Otherwise an existing session appears as a null user and profile/dashboard
+  // tabs can render as empty widgets on a cold launch.
+  await userProvider.init();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => UserProvider(),
+    ChangeNotifierProvider.value(
+      value: userProvider,
       child: const PouyanlyApp(),
     ),
   );
@@ -30,6 +41,7 @@ final _router = GoRouter(
   routes: [
     GoRoute(path: '/splash', builder: (ctx, _) => const SplashScreen()),
     GoRoute(path: '/welcome', builder: (ctx, _) => const WelcomeScreen()),
+    GoRoute(path: '/account', builder: (ctx, _) => const AccountScreen()),
     GoRoute(path: '/onboarding', builder: (ctx, _) => const OnboardingScreen()),
     GoRoute(
         path: '/placement-test',
@@ -42,9 +54,16 @@ final _router = GoRouter(
         path: '/learning-path',
         builder: (ctx, _) => const LearningPathScreen()),
     GoRoute(
+        path: '/checkpoint/:unitId',
+        builder: (ctx, state) => CheckpointScreen(unitId: state.pathParameters['unitId'] ?? '')),
+    GoRoute(
         path: '/lesson/:lessonId',
         builder: (ctx, state) => LessonScreen(
             lessonId: state.pathParameters['lessonId'] ?? '')),
+    GoRoute(path: '/tutor', builder: (ctx, _) => const TutorScreen()),
+    GoRoute(path: '/community', builder: (ctx, _) => const CommunityScreen()),
+    GoRoute(path: '/about', builder: (ctx, _) => const AboutScreen()),
+    GoRoute(path: '/listening', builder: (ctx, _) => const ListeningScreen()),
     GoRoute(
         path: '/settings',
         builder: (ctx, _) => const SettingsScreen()),

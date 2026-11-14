@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import '../models/lesson_option_order.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/p_button.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../models/lesson_data.dart';
+import '../../vocabulary/services/vocabulary_audio_service.dart';
 
 enum _LessonPhase { vocabulary, exercise, result }
 
@@ -23,6 +25,8 @@ class _LessonScreenState extends State<LessonScreen> {
   int _correct = 0;
   String? _selectedAnswer;
   bool _showFeedback = false;
+  bool _completionSaved = false;
+  int _xpEarned = 0;
 
   late Lesson? _lesson;
 
@@ -30,6 +34,7 @@ class _LessonScreenState extends State<LessonScreen> {
   void initState() {
     super.initState();
     _lesson = CourseData.getLessonById(widget.lessonId);
+    if (_lesson?.vocabulary.isEmpty == true) _phase = _LessonPhase.exercise;
   }
 
   void _nextVocab() {
@@ -66,13 +71,24 @@ class _LessonScreenState extends State<LessonScreen> {
 
   Future<void> _finishLesson() async {
     if (_lesson == null) return;
-    final xpGain = _lesson!.xpReward;
-    await context.read<UserProvider>().completeLesson(
-          _lesson!.id,
-          xpGain: xpGain,
-          coinGain: 5,
-        );
-    setState(() => _phase = _LessonPhase.result);
+    final total = _lesson!.exercises.length;
+    final scorePassed = LessonPassPolicy.isPassed(correct: _correct, total: total);
+    final provider = context.read<UserProvider>();
+    final wasAlreadyCompleted =
+        provider.user?.completedLessonIds.contains(_lesson!.id) ?? false;
+    final saved = scorePassed
+        ? await provider.completeLesson(
+            _lesson!.id,
+            xpGain: _lesson!.xpReward,
+            coinGain: 5,
+          )
+        : false;
+    if (!mounted) return;
+    setState(() {
+      _completionSaved = saved;
+      _xpEarned = saved && !wasAlreadyCompleted ? _lesson!.xpReward : 0;
+      _phase = _LessonPhase.result;
+    });
   }
 
   @override
@@ -84,6 +100,25 @@ class _LessonScreenState extends State<LessonScreen> {
       );
     }
 
+    final user = context.watch<UserProvider>().user;
+    final completedIds = user?.completedLessonIds.toSet() ?? <String>{};
+    final isAlreadyCompleted = completedIds.contains(_lesson!.id);
+    final units = CourseData.getAllUnits();
+    final canStart = user != null &&
+        (isAlreadyCompleted ||
+            LearningPathPolicy.isLessonUnlocked(
+              units: units,
+              lessonId: _lesson!.id,
+              completedIds: completedIds,
+            ));
+    if (!canStart) return const _LockedLessonView();
+    if (_lesson!.exercises.isEmpty ||
+        _lesson!.exercises.any((exercise) =>
+            exercise.options.length < 2 ||
+            !exercise.options.contains(exercise.correctAnswer))) {
+      return const _UnavailableLessonView();
+    }
+
     return Scaffold(
       body: Directionality(
         textDirection: TextDirection.rtl,
@@ -92,6 +127,7 @@ class _LessonScreenState extends State<LessonScreen> {
               lesson: _lesson!,
               index: _vocabIndex,
               onNext: _nextVocab,
+              onSkip: () => setState(() => _phase = _LessonPhase.exercise),
             ),
           _LessonPhase.exercise => _ExercisePhase(
               lesson: _lesson!,
@@ -105,8 +141,71 @@ class _LessonScreenState extends State<LessonScreen> {
               lesson: _lesson!,
               correct: _correct,
               total: _lesson!.exercises.length,
+              scorePassed: LessonPassPolicy.isPassed(correct: _correct, total: _lesson!.exercises.length),
+              progressSaved: _completionSaved,
+              xpEarned: _xpEarned,
             ),
         },
+      ),
+    );
+  }
+}
+
+
+class _LockedLessonView extends StatelessWidget {
+  const _LockedLessonView();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.lock_rounded, size: 52, color: scheme.onSurfaceVariant),
+                const SizedBox(height: 18),
+                const Text(
+                  'این درس هنوز باز نشده است',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 20, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'برای دسترسی به این درس، ابتدا درس‌های قبلی و آزمون مرحله را کامل کن.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Vazirmatn', color: scheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 24),
+                PButton(label: 'بازگشت به مسیر یادگیری', onPressed: () => context.go('/home')),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UnavailableLessonView extends StatelessWidget {
+  const _UnavailableLessonView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('محتوای درس')),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'این درس هنوز تمرین قابل ارزیابی ندارد؛ پیشرفتت ثبت نمی‌شود.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontFamily: 'Vazirmatn'),
+          ),
+        ),
       ),
     );
   }
@@ -118,8 +217,9 @@ class _VocabPhase extends StatelessWidget {
   final Lesson lesson;
   final int index;
   final VoidCallback onNext;
+  final VoidCallback onSkip;
 
-  const _VocabPhase({required this.lesson, required this.index, required this.onNext});
+  const _VocabPhase({required this.lesson, required this.index, required this.onNext, required this.onSkip});
 
   @override
   Widget build(BuildContext context) {
@@ -142,20 +242,62 @@ class _VocabPhase extends StatelessWidget {
                     value: (index + 1) / lesson.vocabulary.length,
                     minHeight: 6,
                     borderRadius: BorderRadius.circular(100),
-                    backgroundColor: AppColors.dividerLight,
+                    backgroundColor: Theme.of(context).dividerColor,
                     valueColor: const AlwaysStoppedAnimation(AppColors.primary),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   '${index + 1}/${lesson.vocabulary.length}',
-                  style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: AppColors.textSecondaryLight),
+                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 8),
 
+          if (lesson.objectivesFarsi.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.07),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'هدف این درس',
+                      style: TextStyle(
+                        fontFamily: 'Vazirmatn',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      lesson.objectivesFarsi.first,
+                      style: const TextStyle(
+                        fontFamily: 'Vazirmatn',
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${lesson.estimatedMinutes} دقیقه • ${lesson.skillFocus.join('، ')}',
+                      style: TextStyle(
+                        fontFamily: 'Vazirmatn',
+                        fontSize: 10,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           // Flashcard
           Expanded(child: _FlashCard(vocab: vocab)),
 
@@ -167,6 +309,11 @@ class _VocabPhase extends StatelessWidget {
               onPressed: onNext,
               icon: Icons.arrow_forward_rounded,
             ),
+          ),
+          TextButton.icon(
+            onPressed: onSkip,
+            icon: const Icon(Icons.fast_forward_rounded, size: 17),
+            label: const Text('مرور واژه‌ها را رد کن و به تمرین برو'),
           ),
         ],
       ),
@@ -258,7 +405,7 @@ class _CardFront extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.35),
+            color: AppColors.primary.withValues(alpha: 0.35),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -275,7 +422,7 @@ class _CardFront extends StatelessWidget {
             ),
             child: Text(
               vocab.cefrLevel,
-              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Colors.white70),
+              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: const Color(0xEBFFFFFF)),
             ),
           ),
           const SizedBox(height: 20),
@@ -295,19 +442,25 @@ class _CardFront extends StatelessWidget {
             style: const TextStyle(
               fontFamily: 'Vazirmatn',
               fontSize: 16,
-              color: Colors.white70,
+              color: const Color(0xEBFFFFFF),
             ),
             textDirection: TextDirection.ltr,
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 8),
+          IconButton(
+            tooltip: 'پخش تلفظ',
+            onPressed: () => VocabularyAudioService.instance.speak(vocab.english),
+            icon: const Icon(Icons.volume_up_rounded, color: Colors.white, size: 30),
+          ),
+          const SizedBox(height: 18),
           const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.touch_app_rounded, color: Colors.white54, size: 18),
+              Icon(Icons.touch_app_rounded, color: const Color(0xEBFFFFFF), size: 18),
               SizedBox(width: 6),
               Text(
                 'برای دیدن معنی ضربه بزنید',
-                style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Colors.white54),
+                style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: const Color(0xEBFFFFFF)),
               ),
             ],
           ),
@@ -334,7 +487,7 @@ class _CardBack extends StatelessWidget {
           border: Border.all(color: AppColors.primary, width: 2),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.15),
+              color: AppColors.primary.withValues(alpha: 0.15),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -361,21 +514,27 @@ class _CardBack extends StatelessWidget {
                     vocab.exampleEn,
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.ltr,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Vazirmatn',
                       fontSize: 14,
-                      color: AppColors.textSecondaryLight,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontStyle: FontStyle.italic,
                     ),
+                  ),
+                  IconButton(
+                    tooltip: 'پخش جمله نمونه',
+                    onPressed: () => VocabularyAudioService.instance.speak(
+                      vocab.exampleEn, rate: 0.38),
+                    icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     vocab.exampleFa,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Vazirmatn',
                       fontSize: 13,
-                      color: AppColors.textSecondaryLight,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -427,14 +586,14 @@ class _ExercisePhase extends StatelessWidget {
                     value: (index + 1) / lesson.exercises.length,
                     minHeight: 6,
                     borderRadius: BorderRadius.circular(100),
-                    backgroundColor: AppColors.dividerLight,
+                    backgroundColor: Theme.of(context).dividerColor,
                     valueColor: const AlwaysStoppedAnimation(AppColors.secondary),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   '${index + 1}/${lesson.exercises.length}',
-                  style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: AppColors.textSecondaryLight),
+                  style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -452,7 +611,7 @@ class _ExercisePhase extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.dividerLight),
+                      border: Border.all(color: Theme.of(context).dividerColor),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -466,16 +625,19 @@ class _ExercisePhase extends StatelessWidget {
                             textDirection: TextDirection.ltr),
                         const SizedBox(height: 6),
                         Text(exercise.questionFarsi,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Vazirmatn',
                               fontSize: 13,
-                              color: AppColors.textSecondaryLight,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             )),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ...exercise.options.map((opt) {
+                  ...LessonOptionOrder.forExercise(
+                    lessonId: lesson.id,
+                    exercise: exercise,
+                  ).map((opt) {
                     bool isCorrect = showFeedback && opt == exercise.correctAnswer;
                     bool isWrong = showFeedback && selected == opt && opt != exercise.correctAnswer;
                     return _OptionTile(
@@ -491,10 +653,10 @@ class _ExercisePhase extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: (selected == exercise.correctAnswer ? AppColors.success : AppColors.error).withOpacity(0.08),
+                        color: (selected == exercise.correctAnswer ? AppColors.success : AppColors.error).withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: (selected == exercise.correctAnswer ? AppColors.success : AppColors.error).withOpacity(0.3),
+                          color: (selected == exercise.correctAnswer ? AppColors.success : AppColors.error).withValues(alpha: 0.3),
                         ),
                       ),
                       child: Column(
@@ -511,7 +673,7 @@ class _ExercisePhase extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(exercise.explanationFarsi,
-                              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
+                              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
                           if (exercise.exampleEn != null) ...[
                             const SizedBox(height: 8),
                             Text(exercise.exampleEn!,
@@ -559,12 +721,12 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color border = AppColors.dividerLight;
+    Color border = Theme.of(context).dividerColor;
     Color? bg;
 
-    if (isCorrect) { border = AppColors.success; bg = AppColors.success.withOpacity(0.1); }
-    else if (isWrong) { border = AppColors.error; bg = AppColors.error.withOpacity(0.1); }
-    else if (isSelected) { border = AppColors.primary; bg = AppColors.primary.withOpacity(0.06); }
+    if (isCorrect) { border = AppColors.success; bg = AppColors.success.withValues(alpha: 0.1); }
+    else if (isWrong) { border = AppColors.error; bg = AppColors.error.withValues(alpha: 0.1); }
+    else if (isSelected) { border = AppColors.primary; bg = AppColors.primary.withValues(alpha: 0.06); }
 
     return GestureDetector(
       onTap: onTap,
@@ -598,13 +760,26 @@ class _ResultPhase extends StatelessWidget {
   final Lesson lesson;
   final int correct;
   final int total;
+  final bool scorePassed;
+  final bool progressSaved;
+  final int xpEarned;
 
-  const _ResultPhase({required this.lesson, required this.correct, required this.total});
+  const _ResultPhase({
+    required this.lesson,
+    required this.correct,
+    required this.total,
+    required this.scorePassed,
+    required this.progressSaved,
+    required this.xpEarned,
+  });
 
   @override
   Widget build(BuildContext context) {
     final accuracy = total > 0 ? (correct / total * 100).round() : 0;
-    final emoji = accuracy >= 80 ? '🎉' : accuracy >= 50 ? '👍' : '💪';
+    final passed = scorePassed && progressSaved;
+    final saveFailed = scorePassed && !progressSaved;
+    final alreadyCompleted = passed && xpEarned == 0;
+    final emoji = passed ? (accuracy >= 90 ? '🏆' : '🎉') : '💪';
 
     return SafeArea(
       child: Padding(
@@ -615,13 +790,23 @@ class _ResultPhase extends StatelessWidget {
             Text(emoji, style: const TextStyle(fontSize: 72)),
             const SizedBox(height: 20),
             Text(
-              accuracy >= 80 ? 'عالی بود!' : accuracy >= 50 ? 'خوب بود!' : 'ادامه بده!',
+              passed
+                  ? (alreadyCompleted ? 'مرور درس با موفقیت انجام شد' : 'آفرین! حدنصاب را گرفتی')
+                  : saveFailed
+                      ? 'پیشرفت ثبت نشد'
+                      : 'هنوز به حدنصاب نرسیدی',
               style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 28, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
             Text(
-              'درس "${lesson.titleFarsi}" تکمیل شد',
-              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 15, color: AppColors.textSecondaryLight),
+              passed
+                  ? (alreadyCompleted
+                      ? 'این درس قبلاً تکمیل شده است؛ امتیاز دوباره‌ای ثبت نمی‌شود.'
+                      : 'درس «${lesson.titleFarsi}» با موفقیت ثبت شد.')
+                  : saveFailed
+                      ? 'امتیاز کافی گرفتی، اما ذخیره‌سازی پیشرفت تأیید نشد. دوباره تلاش کن.'
+                      : 'برای باز شدن مرحلهٔ بعد باید حداقل ۷۰٪ پاسخ درست داشته باشی.',
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15, color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 32),
             Row(
@@ -631,14 +816,14 @@ class _ResultPhase extends StatelessWidget {
                 const SizedBox(width: 16),
                 _StatBadge('$accuracy%', 'دقت', AppColors.primary),
                 const SizedBox(width: 16),
-                _StatBadge('+${lesson.xpReward}', 'XP', AppColors.warning),
+                _StatBadge(xpEarned > 0 ? '+$xpEarned' : '۰', 'XP دریافتی', AppColors.warning),
               ],
             ),
             const SizedBox(height: 40),
             PButton(
-              label: 'ادامه',
-              onPressed: () => context.go('/home'),
-              icon: Icons.home_rounded,
+              label: passed ? 'ادامهٔ مسیر' : (saveFailed ? 'تلاش برای ثبت دوباره' : 'تلاش دوباره'),
+              onPressed: () => context.go(passed ? '/home' : '/lesson/${lesson.id}'),
+              icon: passed ? Icons.arrow_forward_rounded : Icons.refresh_rounded,
             ),
             const SizedBox(height: 12),
             PButton(
@@ -664,16 +849,16 @@ class _StatBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
           Text(value,
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 20, fontWeight: FontWeight.w800, color: color)),
           Text(label,
-              style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: AppColors.textSecondaryLight)),
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
         ],
       ),
     );

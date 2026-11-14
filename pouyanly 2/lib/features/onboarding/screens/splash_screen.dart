@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/providers/user_provider.dart';
+import '../../../core/services/learning_reminder_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -36,6 +37,11 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
     final user = prov.user;
+    if (user != null && user.notificationsEnabled) {
+      await LearningReminderService.restore();
+    } else {
+      await LearningReminderService.cancelAll();
+    }
 
     if (user == null || !user.onboardingComplete) {
       context.go('/welcome');
@@ -72,14 +78,20 @@ class _SplashScreenState extends State<SplashScreen>
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 30,
                         offset: const Offset(0, 10),
                       ),
                     ],
                   ),
-                  child: const Center(
-                    child: Text('🦁', style: TextStyle(fontSize: 52)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Image.asset(
+                      'assets/images/app_icon.jpg',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
@@ -105,7 +117,7 @@ class _SplashScreenState extends State<SplashScreen>
                       style: TextStyle(
                         fontFamily: 'Vazirmatn',
                         fontSize: 14,
-                        color: Colors.white70,
+                        color: const Color(0xEBFFFFFF),
                       ),
                     ),
                   ],
@@ -120,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 32,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    valueColor: AlwaysStoppedAnimation(Colors.white54),
+                    valueColor: AlwaysStoppedAnimation(const Color(0xEBFFFFFF)),
                   ),
                 ),
               ),

@@ -1,3 +1,5 @@
+import 'expanded_course_data.dart';
+
 // ─── Enums ─────────────────────────────────────────────────────────────────
 
 enum ExerciseType {
@@ -71,6 +73,9 @@ class Lesson {
   final List<Exercise> exercises;
   final int xpReward;
   final String emoji;
+  final List<String> objectivesFarsi;
+  final List<String> skillFocus;
+  final int estimatedMinutes;
 
   const Lesson({
     required this.id,
@@ -81,6 +86,9 @@ class Lesson {
     required this.exercises,
     this.xpReward = 20,
     this.emoji = '📚',
+    this.objectivesFarsi = const [],
+    this.skillFocus = const [],
+    this.estimatedMinutes = 5,
   });
 }
 
@@ -102,6 +110,48 @@ class Unit {
   });
 }
 
+/// Central pass rule shared by lesson UI and automated tests.
+class LessonPassPolicy {
+  LessonPassPolicy._();
+
+  static const double minimumAccuracy = 0.70;
+
+  static bool isPassed({required int correct, required int total}) {
+    if (total <= 0 || correct < 0 || correct > total) return false;
+    return correct / total >= minimumAccuracy;
+  }
+}
+
+/// Authoritative ordering and unlock rules for the CEFR learning path.
+/// Shared by the map UI and persistence provider so deep links cannot bypass locks.
+class LearningPathPolicy {
+  LearningPathPolicy._();
+  static String? nextLessonId({required List<Unit> units, required Set<String> completedIds}) {
+    for (final unit in units) { for (final lesson in unit.lessons) { if (!completedIds.contains(lesson.id)) return lesson.id; } }
+    return null;
+  }
+  static bool isUnitUnlocked({required List<Unit> units, required int unitIndex, required Set<String> completedIds}) {
+    if (unitIndex < 0 || unitIndex >= units.length) return false;
+    if (unitIndex == 0) return true;
+    for (final previous in units.take(unitIndex)) {
+      if (!previous.lessons.every((lesson) => completedIds.contains(lesson.id))) return false;
+      if (!completedIds.contains('checkpoint_${previous.id}')) return false;
+    }
+    return true;
+  }
+  static bool isLessonUnlocked({required List<Unit> units, required String lessonId, required Set<String> completedIds}) {
+    for (var unitIndex = 0; unitIndex < units.length; unitIndex++) {
+      final unit = units[unitIndex];
+      final lessonIndex = unit.lessons.indexWhere((lesson) => lesson.id == lessonId);
+      if (lessonIndex < 0) continue;
+      if (!isUnitUnlocked(units: units, unitIndex: unitIndex, completedIds: completedIds)) return false;
+      for (final previousLesson in unit.lessons.take(lessonIndex)) { if (!completedIds.contains(previousLesson.id)) return false; }
+      return true;
+    }
+    return false;
+  }
+}
+
 // ─── Course Data ────────────────────────────────────────────────────────────
 
 class CourseData {
@@ -121,6 +171,9 @@ class CourseData {
           id: 'a1_u1_l1',
           title: 'Hello & Goodbye',
           titleFarsi: 'سلام و خداحافظی',
+          objectivesFarsi: const ['بتوانی به انگلیسی سلام و خداحافظی کنی و خودت را با یک جمله معرفی کنی.'],
+          skillFocus: const ['vocabulary', 'speaking'],
+          estimatedMinutes: 6,
           cefrLevel: 'A1',
           emoji: '🙋',
           xpReward: 20,
@@ -211,6 +264,9 @@ class CourseData {
           id: 'a1_u1_l2',
           title: 'How are you?',
           titleFarsi: 'حال شما چطور است؟',
+          objectivesFarsi: const ['بتوانی دربارهٔ حال خودت سؤال کنی و با عبارت‌های ساده پاسخ بدهی.'],
+          skillFocus: const ['vocabulary', 'speaking'],
+          estimatedMinutes: 6,
           cefrLevel: 'A1',
           emoji: '😊',
           xpReward: 20,
@@ -291,6 +347,9 @@ class CourseData {
           id: 'a1_u2_l1',
           title: 'Numbers 1-10',
           titleFarsi: 'اعداد ۱ تا ۱۰',
+          objectivesFarsi: const ['بتوانی اعداد پایه را تشخیص بدهی و در جمله‌های ساده به کار ببری.'],
+          skillFocus: const ['vocabulary', 'reading'],
+          estimatedMinutes: 6,
           cefrLevel: 'A1',
           emoji: '🔢',
           xpReward: 20,
@@ -328,6 +387,9 @@ class CourseData {
           id: 'a1_u2_l2',
           title: 'Basic Colors',
           titleFarsi: 'رنگ‌های اصلی',
+          objectivesFarsi: const ['بتوانی نام رنگ‌های اصلی را بفهمی و برای توصیف اشیا استفاده کنی.'],
+          skillFocus: const ['vocabulary', 'speaking'],
+          estimatedMinutes: 6,
           cefrLevel: 'A1',
           emoji: '🎨',
           xpReward: 20,
@@ -366,6 +428,9 @@ class CourseData {
           id: 'a1_u3_l1',
           title: 'Family Members',
           titleFarsi: 'اعضای خانواده',
+          objectivesFarsi: const ['بتوانی اعضای خانواده را نام ببری و دربارهٔ رابطه‌های خانوادگی جملهٔ ساده بسازی.'],
+          skillFocus: const ['vocabulary', 'speaking'],
+          estimatedMinutes: 6,
           cefrLevel: 'A1',
           emoji: '👨‍👩‍👧',
           xpReward: 20,
@@ -417,6 +482,9 @@ class CourseData {
           id: 'a2_u1_l1',
           title: 'Daily Routines',
           titleFarsi: 'برنامه روزانه',
+          objectivesFarsi: const ['بتوانی کارهای روزمره را با فعل‌های رایج و زمان حال ساده توصیف کنی.'],
+          skillFocus: const ['vocabulary', 'grammar', 'writing'],
+          estimatedMinutes: 8,
           cefrLevel: 'A2',
           emoji: '⏰',
           xpReward: 25,
@@ -454,6 +522,9 @@ class CourseData {
           id: 'a2_u2_l1',
           title: 'At the Restaurant',
           titleFarsi: 'در رستوران',
+          objectivesFarsi: const ['بتوانی در رستوران منو بخواهی، غذا سفارش بدهی و صورت‌حساب درخواست کنی.'],
+          skillFocus: const ['vocabulary', 'functional_language', 'speaking'],
+          estimatedMinutes: 8,
           cefrLevel: 'A2',
           emoji: '🍽️',
           xpReward: 25,
@@ -484,14 +555,41 @@ class CourseData {
   // ── Helpers ──────────────────────────────────────────────────────
 
   static List<Unit> getUnitsForLevel(String cefrLevel) {
-    switch (cefrLevel.toUpperCase()) {
-      case 'A1': return a1Units;
-      case 'A2': return a2Units;
-      default:   return a1Units;
-    }
+    final level = cefrLevel.toUpperCase();
+    return getAllUnits().where((unit) => unit.cefrLevel == level).toList();
   }
 
-  static List<Unit> getAllUnits() => [...a1Units, ...a2Units];
+  static List<Unit> getAllUnits() {
+    final units = <Unit>[...a1Units, ...a2Units, ...ExpandedCourseData.units];
+    const levelOrder = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    // Grouping preserves declaration order within each level. That order is
+    // also the prerequisite order, so an unstable List.sort is not suitable.
+    final ordered = <Unit>[];
+    for (final level in levelOrder) {
+      ordered.addAll(units.where((unit) => unit.cefrLevel == level));
+    }
+    ordered.addAll(units.where((unit) => !levelOrder.contains(unit.cefrLevel)));
+    return ordered;
+  }
+
+  /// Returns one dictionary entry per English headword across the complete course.
+  /// Repeated appearances in lessons remain available for teaching and practice,
+  /// but they must not create duplicate dictionary or SRS cards.
+  static List<VocabularyItem> getAllVocabulary() {
+    final unique = <String, VocabularyItem>{};
+    for (final unit in getAllUnits()) {
+      for (final lesson in unit.lessons) {
+        for (final item in lesson.vocabulary) {
+          final key = item.english
+              .trim()
+              .toLowerCase()
+              .replaceAll(RegExp(r'\s+'), ' ');
+          if (key.isNotEmpty) unique.putIfAbsent(key, () => item);
+        }
+      }
+    }
+    return unique.values.toList(growable: false);
+  }
 
   static Lesson? getLessonById(String id) {
     for (final unit in getAllUnits()) {

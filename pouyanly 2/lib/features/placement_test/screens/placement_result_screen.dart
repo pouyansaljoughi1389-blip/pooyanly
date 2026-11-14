@@ -36,13 +36,13 @@ class PlacementResultScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [color, color.withOpacity(0.6)],
+                      colors: [color, color.withValues(alpha: 0.6)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: color.withOpacity(0.4),
+                        color: color.withValues(alpha: 0.4),
                         blurRadius: 30,
                         offset: const Offset(0, 10),
                       ),
@@ -81,7 +81,7 @@ class PlacementResultScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${cefrLevel.farsiDescription} — ${cefrLevel.label}',
+                  _skillBandLabel(cefrLevel),
                   style: TextStyle(
                     fontFamily: 'Vazirmatn',
                     fontSize: 15,
@@ -98,7 +98,7 @@ class PlacementResultScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.dividerLight),
+                      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,15 +120,63 @@ class PlacementResultScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                 ],
 
+                // ── Personal focus ──
+                if (user.skillScores.isNotEmpty) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'اولویت پیشنهادی برای شما',
+                          style: TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _getSkillRecommendation(user.skillScores),
+                          style: TextStyle(
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 12,
+                            height: 1.8,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        if (user.dailyStudyTime != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            'برنامهٔ پیشنهادی: روزانه ${user.dailyStudyTime!.minutes} دقیقه تمرین',
+                            style: const TextStyle(
+                              fontFamily: 'Vazirmatn',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
                 // ── Recommended Path ──
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [AppColors.primary.withOpacity(0.08), AppColors.secondary.withOpacity(0.08)],
+                      colors: [AppColors.primary.withValues(alpha: 0.08), AppColors.secondary.withValues(alpha: 0.08)],
                     ),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,10 +188,10 @@ class PlacementResultScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       Text(
                         _getRecommendation(cefrLevel),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Vazirmatn',
                           fontSize: 13,
-                          color: AppColors.textSecondaryLight,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           height: 1.7,
                         ),
                       ),
@@ -166,6 +214,34 @@ class PlacementResultScreen extends StatelessWidget {
     );
   }
 
+  String _skillBandLabel(CefrLevel level) {
+    switch (level) {
+      case CefrLevel.a1:
+      case CefrLevel.a2: return 'مبتدی';
+      case CefrLevel.b1: return 'متوسط';
+      case CefrLevel.b2: return 'متوسط رو به بالا';
+      case CefrLevel.c1:
+      case CefrLevel.c2: return 'پیشرفته';
+      case CefrLevel.unknown: return 'هنوز ارزیابی نشده';
+    }
+  }
+
+  String _getSkillRecommendation(Map<String, int> scores) {
+    const labels = {
+      'vocabulary': 'واژگان',
+      'grammar': 'گرامر',
+      'reading': 'درک مطلب',
+    };
+    final weakest = scores.entries.reduce(
+      (a, b) => a.value <= b.value ? a : b,
+    );
+    final label = labels[weakest.key] ?? weakest.key;
+    if (weakest.value >= 85) {
+      return 'عملکرد مهارت‌های سنجیده‌شده متعادل است. برای تشخیص دقیق‌تر، تمرین شنیداری و مکالمه هم لازم است.';
+    }
+    return 'فعلاً بهتر است روی $label تمرکز کنی. تمرین‌های کوتاه و مرور منظم این مهارت را تقویت می‌کند.';
+  }
+
   String _getRecommendation(CefrLevel level) {
     switch (level) {
       case CefrLevel.a1:
@@ -173,11 +249,15 @@ class PlacementResultScreen extends StatelessWidget {
       case CefrLevel.a2:
         return 'پایه‌های خوبی دارید. زندگی روزمره، خرید، و مکالمات ساده را تقویت کنید.';
       case CefrLevel.b1:
-        return 'سطح متوسط خوب! روی گرامر پیشرفته و واژگان تخصصی تمرکز کنید.';
+        return 'در محدودهٔ متوسط هستید. روی گرامر پیشرفته و واژگان تخصصی تمرکز کنید.';
       case CefrLevel.b2:
-        return 'بسیار عالی! برای تسلط بیشتر، اصطلاحات و متون پیشرفته تمرین کنید.';
-      default:
-        return 'مسیر یادگیری از A1 شروع خواهد شد.';
+        return 'در محدودهٔ متوسط رو به بالا هستید؛ روی استدلال‌نویسی، زبان آکادمیک و متون پیچیده تمرکز کنید.';
+      case CefrLevel.c1:
+        return 'در محدودهٔ پیشرفته هستید؛ روی بلاغت، تحلیل پژوهش، زبان حرفه‌ای و ظرافت‌های سبکی کار کنید.';
+      case CefrLevel.c2:
+        return 'در محدودهٔ پیشرفته هستید؛ روی دقت معنایی، گفتمان پیچیده و انتخاب سبک تمرکز کنید.';
+      case CefrLevel.unknown:
+        return 'برای تعیین سطح دقیق‌تر، آزمون را کامل کن.';
     }
   }
 }
@@ -213,7 +293,7 @@ class _SkillBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: val,
                 minHeight: 10,
-                backgroundColor: AppColors.dividerLight,
+                backgroundColor: Theme.of(context).colorScheme.outlineVariant,
                 valueColor: AlwaysStoppedAnimation(color),
               ),
             ),

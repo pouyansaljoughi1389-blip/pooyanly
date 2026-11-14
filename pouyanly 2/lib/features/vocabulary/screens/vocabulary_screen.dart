@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/persian_digits.dart';
 import '../../../shared/providers/user_provider.dart';
 import '../../lessons/models/lesson_data.dart';
+import '../services/vocabulary_audio_service.dart';
+import '../services/vocabulary_fsrs_service.dart';
 
 class VocabularyScreen extends StatefulWidget {
   const VocabularyScreen({super.key});
@@ -28,15 +31,7 @@ class _VocabularyScreenState extends State<VocabularyScreen>
     super.dispose();
   }
 
-  List<VocabularyItem> get _allVocab {
-    final all = <VocabularyItem>[];
-    for (final unit in CourseData.getAllUnits()) {
-      for (final lesson in unit.lessons) {
-        all.addAll(lesson.vocabulary);
-      }
-    }
-    return all;
-  }
+  List<VocabularyItem> get _allVocab => CourseData.getAllVocabulary();
 
   List<VocabularyItem> get _filteredVocab {
     if (_search.isEmpty) return _allVocab;
@@ -106,7 +101,7 @@ class _AllVocabTab extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'جستجوی کلمه...',
               hintStyle: const TextStyle(fontFamily: 'Vazirmatn'),
-              prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textSecondaryLight),
+              prefixIcon: Icon(Icons.search_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
               suffixIcon: search.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded),
@@ -122,11 +117,11 @@ class _AllVocabTab extends StatelessWidget {
           child: Row(
             children: [
               Text(
-                '${vocab.length} کلمه',
-                style: const TextStyle(
+                '${toPersianDigits(vocab.length)} کلمه',
+                style: TextStyle(
                   fontFamily: 'Vazirmatn',
                   fontSize: 13,
-                  color: AppColors.textSecondaryLight,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -164,7 +159,7 @@ class _VocabTileState extends State<_VocabTile> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.dividerLight),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: InkWell(
         onTap: () => setState(() => _expanded = !_expanded),
@@ -191,20 +186,39 @@ class _VocabTileState extends State<_VocabTile> {
                         ),
                         Text(
                           widget.item.pronunciation,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Vazirmatn',
                             fontSize: 12,
-                            color: AppColors.textSecondaryLight,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           textDirection: TextDirection.ltr,
                         ),
                       ],
                     ),
                   ),
+                  IconButton(
+                    tooltip: 'پخش تلفظ انگلیسی',
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () async {
+                      final played = await VocabularyAudioService.instance
+                          .speak(widget.item.english);
+                      if (!played && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('موتور تبدیل متن به گفتار در دسترس نیست.'),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.volume_up_rounded,
+                      color: AppColors.primary,
+                    ),
+                  ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.12),
+                      color: color.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -231,7 +245,7 @@ class _VocabTileState extends State<_VocabTile> {
                   Icon(
                     _expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
                     size: 18,
-                    color: AppColors.textSecondaryLight,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ],
               ),
@@ -239,23 +253,47 @@ class _VocabTileState extends State<_VocabTile> {
                 const SizedBox(height: 12),
                 const Divider(height: 1),
                 const SizedBox(height: 12),
-                Text(
-                  widget.item.exampleEn,
-                  style: const TextStyle(
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.item.exampleEn,
+                        style: TextStyle(
                     fontFamily: 'Vazirmatn',
                     fontSize: 13,
                     fontStyle: FontStyle.italic,
-                    color: AppColors.textSecondaryLight,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
-                  textDirection: TextDirection.ltr,
+                        textDirection: TextDirection.ltr,
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'پخش جمله نمونه',
+                      onPressed: () async {
+                        final played = await VocabularyAudioService.instance
+                            .speak(widget.item.exampleEn, rate: 0.38);
+                        if (!played && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('موتور تبدیل متن به گفتار در دسترس نیست.'),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.volume_up_rounded,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
                   widget.item.exampleFa,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Vazirmatn',
                     fontSize: 13,
-                    color: AppColors.textSecondaryLight,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -279,29 +317,85 @@ class _ReviewTab extends StatefulWidget {
 class _ReviewTabState extends State<_ReviewTab> {
   int _reviewIndex = 0;
   bool _revealed = false;
+  bool _sessionInitialized = false;
+  bool _isSubmitting = false;
+  List<VocabularyItem> _sessionItems = [];
 
-  List<VocabularyItem> get _reviewItems {
-    // In a real app, SRS algorithm picks items due for review.
-    // Here we show first 10 items as a demo.
-    final all = <VocabularyItem>[];
-    for (final unit in CourseData.a1Units) {
-      for (final lesson in unit.lessons) {
-        all.addAll(lesson.vocabulary);
-        if (all.length >= 10) break;
-      }
-      if (all.length >= 10) break;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_sessionInitialized) {
+      _refreshSession();
+      _sessionInitialized = true;
     }
-    return all;
+  }
+
+  void _refreshSession() {
+    final provider = context.read<UserProvider>();
+    _sessionItems = _allReviewItems
+        .where((item) => provider.isVocabularyDue(item.english))
+        .toList();
+  }
+
+  List<VocabularyItem> get _allReviewItems => CourseData.getAllVocabulary();
+
+  Future<void> _submitReview(
+    VocabularyItem item,
+    VocabularyReviewRating rating,
+  ) async {
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+    try {
+      await context.read<UserProvider>().reviewVocabulary(
+        item.english,
+        rating: rating,
+      );
+      if (!mounted) return;
+      setState(() {
+        _reviewIndex++;
+        _revealed = false;
+        _isSubmitting = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ذخیره مرور انجام نشد؛ دوباره تلاش کن.')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = _reviewItems;
+    final scheme = Theme.of(context).colorScheme;
+    final reviewProvider = context.watch<UserProvider>();
+    final items = _sessionItems;
 
     if (items.isEmpty) {
-      return const Center(
-        child: Text('هنوز لغتی برای مرور وجود ندارد',
-            style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 15)),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('🎉', style: TextStyle(fontSize: 56)),
+              const SizedBox(height: 16),
+              const Text(
+                'همه‌چیز مرتبه!',
+                style: TextStyle(
+                  fontFamily: 'Vazirmatn',
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'فعلاً لغت موعدداری نداری. بعداً دوباره سر بزن.',
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       );
     }
 
@@ -310,14 +404,32 @@ class _ReviewTabState extends State<_ReviewTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('🎉', style: TextStyle(fontSize: 60)),
+            const Text('🏆', style: TextStyle(fontSize: 58)),
             const SizedBox(height: 16),
-            const Text('مرور امروز تمام شد!',
-                style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w700)),
+            const Text(
+              'مرور امروز تمام شد!',
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${toPersianDigits(items.length)} لغت را مرور کردی.',
+              style: const TextStyle(fontFamily: 'Vazirmatn'),
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => setState(() => _reviewIndex = 0),
-              child: const Text('مرور دوباره', style: TextStyle(fontFamily: 'Vazirmatn')),
+              onPressed: () => setState(() {
+                _refreshSession();
+                _reviewIndex = 0;
+                _revealed = false;
+              }),
+              child: const Text(
+                'بررسی دوباره',
+                style: TextStyle(fontFamily: 'Vazirmatn'),
+              ),
             ),
           ],
         ),
@@ -325,109 +437,280 @@ class _ReviewTabState extends State<_ReviewTab> {
     }
 
     final item = items[_reviewIndex];
-
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Counter
+          Row(
+            children: [
+              Expanded(
+                child: _ReviewStat(
+                  title: 'احتمال یادآوری',
+                  value: '${toPersianDigits(reviewProvider.vocabularyPredictedRetentionPercent.toStringAsFixed(0))}٪',
+                  icon: Icons.auto_graph_rounded,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _ReviewStat(
+                  title: 'دفعات فراموشی',
+                  value: toPersianDigits(reviewProvider.vocabularyMistakeCount),
+                  icon: Icons.refresh_rounded,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
           Text(
-            '${_reviewIndex + 1} از ${items.length}',
-            style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight),
+            '${toPersianDigits(_reviewIndex + 1)} از ${toPersianDigits(items.length)} لغت موعددار',
+            style: TextStyle(
+              fontFamily: 'Vazirmatn',
+              fontSize: 13,
+              color: scheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 16),
-
-          // Card
           Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _revealed = true),
+              onTap: _revealed ? null : () => setState(() => _revealed = true),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  gradient: _revealed ? AppColors.primaryGradient : const LinearGradient(colors: [Color(0xFFf8f7ff), Color(0xFFf0eeff)]),
+                  gradient: _revealed
+                      ? LinearGradient(
+                          colors: [
+                            scheme.primary,
+                            scheme.primary.withValues(alpha: .82),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : LinearGradient(
+                          colors: [
+                            scheme.surfaceContainerHighest,
+                            scheme.primaryContainer,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 2),
+                  border: Border.all(
+                    color: scheme.outline.withValues(alpha: .7),
+                    width: 1.5,
+                  ),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       item.english,
+                      textDirection: TextDirection.ltr,
                       style: TextStyle(
                         fontFamily: 'Vazirmatn',
-                        fontSize: 40,
+                        fontSize: 38,
                         fontWeight: FontWeight.w800,
-                        color: _revealed ? Colors.white : AppColors.primary,
+                        color: _revealed ? scheme.onPrimary : scheme.primary,
                       ),
-                      textDirection: TextDirection.ltr,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       item.pronunciation,
+                      textDirection: TextDirection.ltr,
                       style: TextStyle(
                         fontFamily: 'Vazirmatn',
                         fontSize: 15,
-                        color: _revealed ? Colors.white70 : AppColors.textSecondaryLight,
+                        color: _revealed
+                            ? scheme.onPrimary.withValues(alpha: .78)
+                            : scheme.onSurfaceVariant,
                       ),
-                      textDirection: TextDirection.ltr,
                     ),
                     if (_revealed) ...[
                       const SizedBox(height: 24),
-                      const Divider(color: Colors.white30),
+                      Divider(color: scheme.onPrimary.withValues(alpha: .3)),
                       const SizedBox(height: 16),
                       Text(
                         item.farsi,
-                        style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 32, fontWeight: FontWeight.w700, color: Colors.white),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 30,
+                          fontWeight: FontWeight.w700,
+                          color: scheme.onPrimary,
+                        ),
                       ),
                       const SizedBox(height: 12),
-                      Text(item.exampleFa,
-                          style: const TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Colors.white70),
-                          textAlign: TextAlign.center),
+                      Text(
+                        item.exampleEn,
+                        textDirection: TextDirection.ltr,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 14,
+                          color: scheme.onPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        item.exampleFa,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 13,
+                          color: scheme.onPrimary.withValues(alpha: .78),
+                        ),
+                      ),
                     ] else ...[
                       const SizedBox(height: 24),
-                      const Text('برای دیدن معنی ضربه بزنید',
-                          style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
+                      Text(
+                        'معنی را در ذهنت حدس بزن؛ سپس کارت را لمس کن.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Vazirmatn',
+                          fontSize: 13,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
                     ],
                   ],
                 ),
               ),
             ),
           ),
-
           if (_revealed) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => setState(() { _reviewIndex++; _revealed = false; }),
-                    icon: const Icon(Icons.close_rounded, color: AppColors.error),
-                    label: const Text('اشتباه بودم', style: TextStyle(fontFamily: 'Vazirmatn', color: AppColors.error)),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.error),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
+                  child: _RatingButton(
+                    label: 'دوباره',
+                    icon: Icons.replay_rounded,
+                    color: scheme.error,
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => _submitReview(item, VocabularyReviewRating.again),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => setState(() { _reviewIndex++; _revealed = false; }),
-                    icon: const Icon(Icons.check_rounded),
-                    label: const Text('بلد بودم', style: TextStyle(fontFamily: 'Vazirmatn')),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.success,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
+                  child: _RatingButton(
+                    label: 'سخت',
+                    icon: Icons.trending_down_rounded,
+                    color: scheme.tertiary,
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => _submitReview(item, VocabularyReviewRating.hard),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: _RatingButton(
+                    label: 'خوب',
+                    icon: Icons.check_rounded,
+                    color: scheme.primary,
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => _submitReview(item, VocabularyReviewRating.good),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _RatingButton(
+                    label: 'آسان',
+                    icon: Icons.bolt_rounded,
+                    color: scheme.secondary,
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => _submitReview(item, VocabularyReviewRating.easy),
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            const SizedBox(height: 14),
+            Text(
+              'پس از دیدن معنی، میزان دشواری یادآوری را صادقانه انتخاب کن.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 12,
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
           ],
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+}
+
+class _RatingButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback? onPressed;
+
+  const _RatingButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18, color: color),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontFamily: 'Vazirmatn',
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: color.withValues(alpha: .65)),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+      ),
+    );
+  }
+}
+
+class _ReviewStat extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  const _ReviewStat({required this.title, required this.value, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary, size: 20),
+          const SizedBox(width: 8),
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: TextStyle(fontFamily: 'Vazirmatn',
+                fontSize: 10, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              Text(value, style: const TextStyle(fontFamily: 'Vazirmatn',
+                fontSize: 17, fontWeight: FontWeight.w800)),
+            ],
+          )),
         ],
       ),
     );

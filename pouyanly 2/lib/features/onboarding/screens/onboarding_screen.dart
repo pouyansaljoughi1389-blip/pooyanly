@@ -45,6 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           level: _level!,
           time: _time!,
           period: _period!,
+          name: context.read<UserProvider>().user?.name ?? 'زبان‌آموز',
         );
     if (mounted) context.go('/placement-test');
   }
@@ -75,7 +76,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     margin: const EdgeInsets.symmetric(horizontal: 3),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(100),
-                      color: i <= _page ? AppColors.primary : AppColors.dividerLight,
+                      color: i <= _page ? AppColors.primary : Theme.of(context).dividerColor,
                     ),
                   ),
                 )),
@@ -86,10 +87,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 'مرحله ${_page + 1} از ۴',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Vazirmatn',
                   fontSize: 12,
-                  color: AppColors.textSecondaryLight,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -141,9 +142,9 @@ class _GoalPage extends StatelessWidget {
           const Text('هدف شما از یادگیری چیست؟',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          const Text('بهترین مسیر یادگیری را برای شما تنظیم می‌کنیم',
-              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
-          const SizedBox(height: 20),
+          Text('بهترین مسیر یادگیری را برای شما تنظیم می‌کنیم',
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          const SizedBox(height: 14),
           Expanded(
             child: ListView(
               children: LearningGoal.values.map((g) => _ChoiceCard(
@@ -189,8 +190,8 @@ class _LevelPage extends StatelessWidget {
           const Text('سطح فعلی انگلیسی شما چیست؟',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          const Text('نگران نباشید — آزمون تعیین سطح دقیق‌تر می‌کند',
-              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
+          Text('نگران نباشید — آزمون تعیین سطح دقیق‌تر می‌کند',
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 20),
           Expanded(
             child: ListView(
@@ -235,8 +236,8 @@ class _TimePage extends StatelessWidget {
           const Text('چقدر در روز مطالعه می‌کنید؟',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          const Text('تداوم از مقدار مهم‌تر است',
-              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
+          Text('تداوم از مقدار مهم‌تر است',
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 20),
           Expanded(
             child: GridView.count(
@@ -274,8 +275,8 @@ class _PeriodPage extends StatelessWidget {
           const Text('چه وقتی مطالعه می‌کنید؟',
               style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          const Text('یادآوری هوشمند در بهترین زمان',
-              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: AppColors.textSecondaryLight)),
+          Text('یادآوری هوشمند در بهترین زمان',
+              style: TextStyle(fontFamily: 'Vazirmatn', fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 20),
           Expanded(
             child: ListView(
@@ -322,11 +323,11 @@ class _ChoiceCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.primary.withOpacity(0.08)
+              ? AppColors.primary.withValues(alpha: 0.08)
               : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.dividerLight,
+            color: selected ? AppColors.primary : Theme.of(context).dividerColor,
             width: selected ? 2 : 1,
           ),
         ),
@@ -370,11 +371,11 @@ class _GridChoiceCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.primary.withOpacity(0.08)
+              ? AppColors.primary.withValues(alpha: 0.08)
               : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.dividerLight,
+            color: selected ? AppColors.primary : Theme.of(context).dividerColor,
             width: selected ? 2 : 1,
           ),
         ),
